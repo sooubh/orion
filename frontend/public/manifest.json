@@ -1,0 +1,14 @@
+{
+  "name": "Sovereign AI",
+  "short_name": "Sovereign AI",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
