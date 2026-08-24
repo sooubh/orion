@@ -11,10 +11,13 @@ import {
   CaretRight,
   List,
   GearSix,
+  Sun,
+  Moon,
 } from "@phosphor-icons/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import paths from "@/utils/paths";
 import useUser from "@/hooks/useUser";
+import { useTheme } from "@/hooks/useTheme";
 import NewWorkspaceModal, {
   useNewWorkspaceModal,
 } from "../Modals/NewWorkspace";
@@ -26,6 +29,7 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUser();
+  const { theme, setTheme, isLight } = useTheme();
   const sidebarRef = useRef(null);
   const { showSidebar, setShowSidebar, canToggleSidebar } = useSidebarToggle();
   const [workspaceSectionOpen, setWorkspaceSectionOpen] = useState(true);
@@ -223,22 +227,28 @@ export default function Sidebar() {
               <Shield size={16} className="text-zinc-400 group-hover:text-sky-400 transition-colors" weight="duotone" />
             </Link>
 
-            {user && (
-              <div className="flex items-center justify-between px-2 pt-1 text-xs text-zinc-500">
-                <span className="truncate max-w-[150px] font-mono text-[11px] text-zinc-400">
-                  {user.username || "Admin"}
-                </span>
-                {user.role !== "default" && (
-                  <Link
-                    to="/settings/llm-preference"
-                    className="text-zinc-500 hover:text-zinc-300 p-1 hover:bg-zinc-800 rounded transition-colors"
-                    title="Settings"
-                  >
-                    <GearSix size={15} />
-                  </Link>
-                )}
+            <div className="flex items-center justify-between px-2 pt-1 text-xs text-zinc-500">
+              <span className="truncate max-w-[120px] font-mono text-[11px] text-zinc-400">
+                {user?.username || "Admin"}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setTheme(isLight ? "dark" : "light")}
+                  className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
+                  title={isLight ? "Switch to Dark Mode" : "Switch to Light Mode"}
+                >
+                  {isLight ? <Moon size={15} weight="bold" /> : <Sun size={15} weight="bold" className="text-amber-400" />}
+                </button>
+                <Link
+                  to="/settings/llm-preference"
+                  className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
+                  title="Settings & LLM Preference"
+                >
+                  <GearSix size={15} />
+                </Link>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </aside>

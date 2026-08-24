@@ -1204,7 +1204,7 @@ textarea {
   background: #3f3f46;
 }
 
-/* Sovereign Visual Utilities */
+/* Sovereign Visual Utilities & Themes */
 .sovereign-glass {
   background: rgba(17, 18, 21, 0.75);
   backdrop-filter: blur(12px);
@@ -1263,4 +1263,208 @@ textarea {
   background: linear-gradient(135deg, #ffffff 0%, #e4e4e7 50%, #a1a1aa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Comprehensive Light Theme Overrides
+   ========================================================================== */
+body.light,
+[data-theme="light"] {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Global Light Scrollbar */
+body.light ::-webkit-scrollbar-track,
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+body.light ::-webkit-scrollbar-thumb,
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+body.light ::-webkit-scrollbar-thumb:hover,
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Sovereign Elements in Light Mode */
+body.light .sovereign-card,
+[data-theme="light"] .sovereign-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+body.light .sovereign-card:hover,
+[data-theme="light"] .sovereign-card:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 8px 24px -4px rgba(56, 189, 248, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+body.light .sovereign-glass,
+[data-theme="light"] .sovereign-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light .sovereign-text-gradient,
+[data-theme="light"] .sovereign-text-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.light .sovereign-badge-sky,
+[data-theme="light"] .sovereign-badge-sky {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+body.light .sovereign-badge-emerald,
+[data-theme="light"] .sovereign-badge-emerald {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+body.light .sovereign-badge-amber,
+[data-theme="light"] .sovereign-badge-amber {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+body.light .sovereign-badge-rose,
+[data-theme="light"] .sovereign-badge-rose {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fecdd3;
+}
+
+/* Light Theme Backgrounds & Surfaces */
+body.light .bg-\[\#090a0b\],
+[data-theme="light"] .bg-\[\#090a0b\] {
+  background-color: #f8fafc !important;
+}
+
+body.light .bg-\[\#111215\],
+[data-theme="light"] .bg-\[\#111215\] {
+  background-color: #ffffff !important;
+}
+
+body.light .bg-\[\#18191d\],
+[data-theme="light"] .bg-\[\#18191d\] {
+  background-color: #f1f5f9 !important;
+}
+
+body.light .bg-zinc-950,
+[data-theme="light"] .bg-zinc-950 {
+  background-color: #f8fafc !important;
+}
+
+body.light .bg-zinc-900,
+[data-theme="light"] .bg-zinc-900 {
+  background-color: #f1f5f9 !important;
+}
+
+body.light .bg-zinc-900\/80,
+[data-theme="light"] .bg-zinc-900\/80 {
+  background-color: #ffffff !important;
+}
+
+/* Light Theme Borders */
+body.light .border-\[\#1f2328\],
+[data-theme="light"] .border-\[\#1f2328\] {
+  border-color: #e2e8f0 !important;
+}
+
+body.light .border-zinc-800,
+[data-theme="light"] .border-zinc-800,
+body.light .border-zinc-800\/80,
+[data-theme="light"] .border-zinc-800\/80,
+body.light .border-zinc-900,
+[data-theme="light"] .border-zinc-900 {
+  border-color: #e2e8f0 !important;
+}
+
+body.light .divide-\[\#1f2328\] > :not([hidden]) ~ :not([hidden]),
+[data-theme="light"] .divide-\[\#1f2328\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+
+/* Light Theme Typography */
+body.light .text-\[\#f4f4f5\],
+[data-theme="light"] .text-\[\#f4f4f5\] {
+  color: #0f172a !important;
+}
+
+body.light .text-white,
+[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+body.light .text-zinc-100,
+[data-theme="light"] .text-zinc-100 {
+  color: #0f172a !important;
+}
+
+body.light .text-zinc-200,
+[data-theme="light"] .text-zinc-200 {
+  color: #1e293b !important;
+}
+
+body.light .text-zinc-300,
+[data-theme="light"] .text-zinc-300 {
+  color: #334155 !important;
+}
+
+body.light .text-zinc-400,
+[data-theme="light"] .text-zinc-400 {
+  color: #475569 !important;
+}
+
+body.light .text-zinc-500,
+[data-theme="light"] .text-zinc-500 {
+  color: #64748b !important;
+}
+
+/* Light Theme Inputs & Controls */
+body.light input,
+[data-theme="light"] input,
+body.light select,
+[data-theme="light"] select,
+body.light textarea,
+[data-theme="light"] textarea {
+  color: #0f172a !important;
+}
+
+body.light input::placeholder,
+[data-theme="light"] input::placeholder,
+body.light textarea::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Table Hover States in Light */
+body.light tbody tr:hover,
+[data-theme="light"] tbody tr:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Sidebar Specific Light Tweaks */
+body.light aside,
+[data-theme="light"] aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light aside .hover\:bg-\[\#111215\]:hover,
+[data-theme="light"] aside .hover\:bg-\[\#111215\]:hover {
+  background-color: #f1f5f9 !important;
 }
