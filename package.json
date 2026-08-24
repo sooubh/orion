@@ -1,0 +1,26 @@
+{
+  "name": "sovereign-ai",
+  "version": "1.0.0",
+  "description": "Private AI for confidential work.",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:collector": "cd collector && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "npx concurrently \"npm run dev:server\" \"npm run dev:frontend\" \"npm run dev:collector\"",
+    "build:frontend": "cd frontend && npm run build",
+    "prisma:generate": "cd server && npx prisma generate",
+    "prisma:migrate": "cd server && npx prisma migrate deploy",
+    "prisma:seed": "cd server && npx prisma db seed",
+    "setup": "npm run prisma:generate && npm run prisma:migrate"
+  },
+  "private": false,
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
