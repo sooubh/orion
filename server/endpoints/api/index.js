@@ -1,0 +1,24 @@
+const { apiAdminEndpoints } = require("./admin");
+const { apiAuthEndpoints } = require("./auth");
+const { apiDocumentEndpoints } = require("./document");
+const { apiSystemEndpoints } = require("./system");
+const { apiWorkspaceEndpoints } = require("./workspace");
+const { apiWorkspaceThreadEndpoints } = require("./workspaceThread");
+const { apiUserManagementEndpoints } = require("./userManagement");
+const { apiOpenAICompatibleEndpoints } = require("./openai");
+const { apiEmbedEndpoints } = require("./embed");
+
+function developerEndpoints(app, router) {
+  if (!router) return;
+  apiAuthEndpoints(router);
+  apiAdminEndpoints(router);
+  apiSystemEndpoints(router);
+  apiWorkspaceEndpoints(router);
+  apiDocumentEndpoints(router);
+  apiWorkspaceThreadEndpoints(router);
+  apiUserManagementEndpoints(router);
+  apiOpenAICompatibleEndpoints(router);
+  apiEmbedEndpoints(router);
+}
+
+module.exports = { developerEndpoints };
