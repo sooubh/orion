@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" width="240" height="40" fill="none">
+  <!-- Crest Icon -->
+  <g transform="translate(4, 4)">
+    <rect width="32" height="32" rx="8" fill="#18181b" stroke="#27272a" stroke-width="1.5"/>
+    <path d="M16 6 L24 10.5 L24 21.5 L16 26 L8 21.5 L8 10.5 Z" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="16" cy="16" r="3" fill="#38bdf8"/>
+    <line x1="16" y1="6" x2="16" y2="13" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="16" y1="19" x2="16" y2="26" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <!-- Typography -->
+  <text x="46" y="22" fill="#f4f4f5" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">SOVEREIGN</text>
+  <text x="146" y="22" fill="#38bdf8" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">AI</text>
+  <text x="47" y="32" fill="#71717a" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="500" letter-spacing="0.8">PRIVATE &amp; CONFIDENTIAL</text>
+</svg>
