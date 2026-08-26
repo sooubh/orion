@@ -1,209 +1,72 @@
 import AnythingLLMIcon from "@/media/logo/sovereign-ai.svg";
-import OpenAiLogo from "@/media/llmprovider/openai.png";
 import GenericOpenAiLogo from "@/media/llmprovider/generic-openai.png";
-import AzureOpenAiLogo from "@/media/llmprovider/azure.png";
-import AnthropicLogo from "@/media/llmprovider/anthropic.png";
-import GeminiLogo from "@/media/llmprovider/gemini.png";
 import OllamaLogo from "@/media/llmprovider/ollama.png";
-import TogetherAILogo from "@/media/llmprovider/togetherai.png";
-import FireworksAILogo from "@/media/llmprovider/fireworksai.jpeg";
 import NvidiaNimLogo from "@/media/llmprovider/nvidia-nim.png";
 import LMStudioLogo from "@/media/llmprovider/lmstudio.png";
 import LocalAiLogo from "@/media/llmprovider/localai.png";
-import MistralLogo from "@/media/llmprovider/mistral.jpeg";
-import PerplexityLogo from "@/media/llmprovider/perplexity.png";
-import OpenRouterLogo from "@/media/llmprovider/openrouter.jpeg";
-import NovitaLogo from "@/media/llmprovider/novita.png";
-import GroqLogo from "@/media/llmprovider/groq.png";
 import KoboldCPPLogo from "@/media/llmprovider/koboldcpp.png";
 import TextGenWebUILogo from "@/media/llmprovider/text-generation-webui.png";
-import LiteLLMLogo from "@/media/llmprovider/litellm.png";
-import AWSBedrockLogo from "@/media/llmprovider/bedrock.png";
-import DeepSeekLogo from "@/media/llmprovider/deepseek.png";
-import APIPieLogo from "@/media/llmprovider/apipie.png";
-import XAILogo from "@/media/llmprovider/xai.png";
-import ZAiLogo from "@/media/llmprovider/zai.png";
-import CohereLogo from "@/media/llmprovider/cohere.png";
-import ZillizLogo from "@/media/vectordbs/zilliz.png";
-import AstraDBLogo from "@/media/vectordbs/astraDB.png";
 import ChromaLogo from "@/media/vectordbs/chroma.png";
-import PineconeLogo from "@/media/vectordbs/pinecone.png";
 import LanceDbLogo from "@/media/vectordbs/lancedb.png";
 import WeaviateLogo from "@/media/vectordbs/weaviate.png";
 import QDrantLogo from "@/media/vectordbs/qdrant.png";
 import MilvusLogo from "@/media/vectordbs/milvus.png";
-import VoyageAiLogo from "@/media/embeddingprovider/voyageai.png";
-import PPIOLogo from "@/media/llmprovider/ppio.png";
 import PGVectorLogo from "@/media/vectordbs/pgvector.png";
-import MoonshotAiLogo from "@/media/llmprovider/moonshotai.png";
-import CometApiLogo from "@/media/llmprovider/cometapi.png";
 import FoundryLogo from "@/media/llmprovider/foundry-local.png";
-import GiteeAILogo from "@/media/llmprovider/giteeai.png";
 import DockerModelRunnerLogo from "@/media/llmprovider/docker-model-runner.png";
 import PrivateModeLogo from "@/media/llmprovider/privatemode.png";
-import SambaNovaLogo from "@/media/llmprovider/sambanova.png";
 import LemonadeLogo from "@/media/llmprovider/lemonade.png";
 import OMLXLogo from "@/media/llmprovider/omlx.png";
-import MinimaxLogo from "@/media/llmprovider/minimax.png";
-import CerebrasLogo from "@/media/llmprovider/cerebras.png";
 
 const LLM_PROVIDER_PRIVACY_MAP = {
-  openai: {
-    name: "OpenAI",
-    policyUrl: "https://openai.com/policies/privacy-policy/",
-    logo: OpenAiLogo,
-  },
-  azure: {
-    name: "Azure OpenAI",
-    policyUrl: "https://privacy.microsoft.com/privacystatement",
-    logo: AzureOpenAiLogo,
-  },
-  anthropic: {
-    name: "Anthropic",
-    policyUrl: "https://www.anthropic.com/privacy",
-    logo: AnthropicLogo,
-  },
-  gemini: {
-    name: "Google Gemini",
-    policyUrl: "https://policies.google.com/privacy",
-    logo: GeminiLogo,
-  },
-  "nvidia-nim": {
-    name: "NVIDIA NIM",
+  ollama: {
+    name: "Ollama",
     description: [
-      "Your model and chats are only accessible on the machine running the NVIDIA NIM.",
+      "Your model and chats are only accessible on the machine running Ollama models 100% offline.",
     ],
-    logo: NvidiaNimLogo,
+    logo: OllamaLogo,
   },
   lmstudio: {
     name: "LMStudio",
     description: [
-      "Your model and chats are only accessible on the server running LMStudio.",
+      "Your model and chats are only accessible on the server running LMStudio locally.",
     ],
     logo: LMStudioLogo,
   },
   localai: {
     name: "LocalAI",
     description: [
-      "Your model and chats are only accessible on the server running LocalAI.",
+      "Your model and chats are only accessible on the server running LocalAI locally.",
     ],
     logo: LocalAiLogo,
   },
-  ollama: {
-    name: "Ollama",
+  "generic-openai": {
+    name: "Generic OpenAI compatible service",
     description: [
-      "Your model and chats are only accessible on the machine running Ollama models.",
+      "Data is stored and processed locally on your self-hosted endpoint.",
     ],
-    logo: OllamaLogo,
-  },
-  togetherai: {
-    name: "TogetherAI",
-    policyUrl: "https://www.together.ai/privacy",
-    logo: TogetherAILogo,
-  },
-  fireworksai: {
-    name: "FireworksAI",
-    policyUrl: "https://fireworks.ai/privacy-policy",
-    logo: FireworksAILogo,
-  },
-  mistral: {
-    name: "Mistral",
-    policyUrl: "https://legal.mistral.ai/terms/privacy-policy",
-    logo: MistralLogo,
-  },
-  perplexity: {
-    name: "Perplexity AI",
-    policyUrl: "https://www.perplexity.ai/privacy",
-    logo: PerplexityLogo,
-  },
-  openrouter: {
-    name: "OpenRouter",
-    policyUrl: "https://openrouter.ai/privacy",
-    logo: OpenRouterLogo,
-  },
-  novita: {
-    name: "Novita AI",
-    policyUrl: "https://novita.ai/legal/privacy-policy",
-    logo: NovitaLogo,
-  },
-  groq: {
-    name: "Groq",
-    policyUrl: "https://groq.com/privacy-policy/",
-    logo: GroqLogo,
+    logo: GenericOpenAiLogo,
   },
   koboldcpp: {
     name: "KoboldCPP",
     description: [
-      "Your model and chats are only accessible on the server running KoboldCPP",
+      "Your model and chats are only accessible on the server running KoboldCPP locally.",
     ],
     logo: KoboldCPPLogo,
   },
   textgenwebui: {
     name: "Oobabooga Web UI",
     description: [
-      "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI",
+      "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI locally.",
     ],
     logo: TextGenWebUILogo,
   },
-  "generic-openai": {
-    name: "Generic OpenAI compatible service",
+  "nvidia-nim": {
+    name: "NVIDIA NIM",
     description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      "Your model and chats are only accessible on the local machine running the NVIDIA NIM.",
     ],
-    logo: GenericOpenAiLogo,
-  },
-  cohere: {
-    name: "Cohere",
-    policyUrl: "https://cohere.com/privacy",
-    logo: CohereLogo,
-  },
-  litellm: {
-    name: "LiteLLM",
-    description: [
-      "Your model and chats are only accessible on the server running LiteLLM",
-    ],
-    logo: LiteLLMLogo,
-  },
-  bedrock: {
-    name: "AWS Bedrock",
-    policyUrl: "https://aws.amazon.com/bedrock/security-compliance/",
-    logo: AWSBedrockLogo,
-  },
-  deepseek: {
-    name: "DeepSeek",
-    policyUrl:
-      "https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html",
-    logo: DeepSeekLogo,
-  },
-  apipie: {
-    name: "APIpie.AI",
-    policyUrl: "https://apipie.ai/docs/Terms/privacy",
-    logo: APIPieLogo,
-  },
-  xai: {
-    name: "xAI",
-    policyUrl: "https://x.ai/legal/privacy-policy",
-    logo: XAILogo,
-  },
-  zai: {
-    name: "Z.AI",
-    policyUrl: "https://docs.z.ai/legal-agreement/privacy-policy",
-    logo: ZAiLogo,
-  },
-  ppio: {
-    name: "PPIO",
-    policyUrl: "https://www.pipio.ai/privacy-policy",
-    logo: PPIOLogo,
-  },
-  moonshotai: {
-    name: "Moonshot AI",
-    policyUrl: "https://platform.moonshot.ai/docs/agreement/userprivacy",
-    logo: MoonshotAiLogo,
-  },
-  cometapi: {
-    name: "CometAPI",
-    policyUrl: "https://apidoc.cometapi.com/privacy-policy-873819m0",
-    logo: CometApiLogo,
+    logo: NvidiaNimLogo,
   },
   foundry: {
     name: "Microsoft Foundry Local",
@@ -212,51 +75,33 @@ const LLM_PROVIDER_PRIVACY_MAP = {
     ],
     logo: FoundryLogo,
   },
-  giteeai: {
-    name: "GiteeAI",
-    policyUrl: "https://ai.gitee.com/docs/appendix/privacy",
-    logo: GiteeAILogo,
-  },
   "docker-model-runner": {
     name: "Docker Model Runner",
     description: [
-      "Your model and chats are only accessible on the machine running Docker Model Runner.",
+      "Your model and chats are only accessible on the machine running Docker Model Runner locally.",
     ],
     logo: DockerModelRunnerLogo,
   },
   privatemode: {
     name: "Privatemode",
-    policyUrl: "https://docs.privatemode.ai/getting-started/faq#q2",
+    description: [
+      "Your model and chats are processed privately on your local instance.",
+    ],
     logo: PrivateModeLogo,
-  },
-  sambanova: {
-    name: "SambaNova",
-    policyUrl: "https://sambanova.ai/privacy-policy",
-    logo: SambaNovaLogo,
   },
   lemonade: {
     name: "Lemonade",
     description: [
-      "Your model and chats are only accessible on the machine running the Lemonade server.",
+      "Your model and chats are only accessible on the machine running the Lemonade server locally.",
     ],
     logo: LemonadeLogo,
   },
   omlx: {
     name: "oMLX",
     description: [
-      "Your model and chats are only accessible on the machine running the oMLX server.",
+      "Your model and chats are only accessible on the machine running the oMLX server locally.",
     ],
     logo: OMLXLogo,
-  },
-  minimax: {
-    name: "Minimax",
-    policyUrl: "https://platform.minimax.io/protocol/privacy-policy",
-    logo: MinimaxLogo,
-  },
-  cerebras: {
-    name: "Cerebras",
-    policyUrl: "https://www.cerebras.ai/privacy-policy",
-    logo: CerebrasLogo,
   },
 };
 
@@ -277,16 +122,6 @@ const VECTOR_DB_PROVIDER_PRIVACY_MAP = {
     ],
     logo: ChromaLogo,
   },
-  chromacloud: {
-    name: "Chroma Cloud",
-    policyUrl: "https://www.trychroma.com/privacy",
-    logo: ChromaLogo,
-  },
-  pinecone: {
-    name: "Pinecone",
-    policyUrl: "https://www.pinecone.io/privacy/",
-    logo: PineconeLogo,
-  },
   qdrant: {
     name: "Qdrant",
     policyUrl: "https://qdrant.tech/legal/privacy-policy/",
@@ -300,19 +135,9 @@ const VECTOR_DB_PROVIDER_PRIVACY_MAP = {
   milvus: {
     name: "Milvus",
     description: [
-      "Your vectors and document text are stored on your Milvus instance (cloud or self-hosted).",
+      "Your vectors and document text are stored on your local Milvus instance.",
     ],
     logo: MilvusLogo,
-  },
-  zilliz: {
-    name: "Zilliz Cloud",
-    policyUrl: "https://zilliz.com/privacy-policy",
-    logo: ZillizLogo,
-  },
-  astra: {
-    name: "AstraDB",
-    policyUrl: "https://www.ibm.com/us-en/privacy",
-    logo: AstraDBLogo,
   },
   lancedb: {
     name: "LanceDB",

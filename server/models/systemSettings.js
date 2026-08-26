@@ -456,8 +456,8 @@ const SystemSettings = {
     } = require("../utils/agents/aibitat/utils/toolReranker");
     const AIbitat = require("../utils/agents/aibitat");
 
-    const llmProvider = process.env.LLM_PROVIDER;
-    const vectorDB = process.env.VECTOR_DB;
+    const llmProvider = process.env.LLM_PROVIDER || "ollama";
+    const vectorDB = process.env.VECTOR_DB || "lancedb";
     const embeddingEngine = process.env.EMBEDDING_ENGINE ?? "native";
     return {
       // --------------------------------------------------------

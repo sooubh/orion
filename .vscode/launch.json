@@ -1,11 +1,9 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
       "name": "Collector debug",
+      "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/collector",
       "env": {
@@ -14,15 +12,13 @@
       "runtimeArgs": [
         "index.js"
       ],
-      // not using yarn/nodemon because it doesn't work with breakpoints
-      // "runtimeExecutable": "yarn",
       "skipFiles": [
         "<node_internals>/**"
-      ],
-      "type": "node"
+      ]
     },
     {
       "name": "Server debug",
+      "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/server",
       "env": {
@@ -31,42 +27,38 @@
       "runtimeArgs": [
         "index.js"
       ],
-      // not using yarn/nodemon because it doesn't work with breakpoints
-      // "runtimeExecutable": "yarn",
       "skipFiles": [
         "<node_internals>/**"
-      ],
-      "type": "node"
+      ]
     },
     {
       "name": "Frontend debug",
+      "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/frontend",
       "env": {
-        "NODE_ENV": "development",
+        "NODE_ENV": "development"
       },
       "runtimeExecutable": "${workspaceFolder}/frontend/node_modules/.bin/vite",
       "runtimeArgs": [
         "--debug",
         "--host=0.0.0.0"
       ],
-      // "runtimeExecutable": "yarn",
       "skipFiles": [
         "<node_internals>/**"
-      ],
-      "type": "node"
+      ]
     },
     {
-      "name": "Launch Edge",
+      "name": "Launch Chrome against localhost",
+      "type": "chrome",
       "request": "launch",
-      "type": "msedge",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
     {
-      "type": "chrome",
+      "name": "Launch Edge",
+      "type": "msedge",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     }

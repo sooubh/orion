@@ -4,10 +4,8 @@ import Sidebar from "@/components/SettingsSidebar";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
 import PreLoader from "@/components/Preloader";
-import OpenAiLogo from "@/media/llmprovider/openai.png";
 import GenericOpenAiLogo from "@/media/llmprovider/generic-openai.png";
 import AnythingLLMIcon from "@/media/logo/sovereign-ai.svg";
-import OpenAiWhisperOptions from "@/components/TranscriptionSelection/OpenAiOptions";
 import GenericOpenAiWhisperOptions from "@/components/TranscriptionSelection/GenericOpenAiOptions";
 import NativeTranscriptionOptions from "@/components/TranscriptionSelection/NativeTranscriptionOptions";
 import LLMItem from "@/components/LLMSelection/LLMItem";
@@ -17,11 +15,11 @@ import { useTranslation } from "react-i18next";
 
 const PROVIDERS = [
   {
-    name: "OpenAI",
-    value: "openai",
-    logo: OpenAiLogo,
-    options: (settings) => <OpenAiWhisperOptions settings={settings} />,
-    description: "Leverage the OpenAI Whisper-large model using your API key.",
+    name: "AnythingLLM Built-In",
+    value: "local",
+    logo: AnythingLLMIcon,
+    options: (settings) => <NativeTranscriptionOptions settings={settings} />,
+    description: "Run a built-in whisper model on this instance privately.",
   },
   {
     name: "OpenAI Compatible",
@@ -29,14 +27,7 @@ const PROVIDERS = [
     logo: GenericOpenAiLogo,
     options: (settings) => <GenericOpenAiWhisperOptions settings={settings} />,
     description:
-      "Transcribe audio using any OpenAI-compatible API via custom configuration.",
-  },
-  {
-    name: "AnythingLLM Built-In",
-    value: "local",
-    logo: AnythingLLMIcon,
-    options: (settings) => <NativeTranscriptionOptions settings={settings} />,
-    description: "Run a built-in whisper model on this instance privately.",
+      "Transcribe audio using any local OpenAI-compatible API via custom configuration.",
   },
 ];
 

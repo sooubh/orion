@@ -1,75 +1,28 @@
-const { fetchOpenRouterModels } = require("../AiProviders/openRouter");
-const {
-  fetchOpenRouterEmbeddingModels,
-} = require("../EmbeddingEngines/openRouter");
-const { fetchApiPieModels } = require("../AiProviders/apipie");
-const { perplexityModels } = require("../AiProviders/perplexity");
-const { fireworksAiModels } = require("../AiProviders/fireworksAi");
-const { ElevenLabsTTS } = require("../TextToSpeech/elevenLabs");
-const { fetchNovitaModels } = require("../AiProviders/novita");
 const { parseLMStudioBasePath } = require("../AiProviders/lmStudio");
 const { parseNvidiaNimBasePath } = require("../AiProviders/nvidiaNim");
-const { fetchPPIOModels } = require("../AiProviders/ppio");
-const { GeminiLLM } = require("../AiProviders/gemini");
-const { fetchCometApiModels } = require("../AiProviders/cometapi");
 const { getDockerModels } = require("../AiProviders/dockerModelRunner");
 const { getAllLemonadeModels } = require("../AiProviders/lemonade");
 
 const SUPPORT_CUSTOM_MODELS = [
-  "openai",
-  "anthropic",
   "localai",
   "ollama",
-  "togetherai",
-  "fireworksai",
   "nvidia-nim",
-  "mistral",
-  "perplexity",
-  "openrouter",
   "lmstudio",
   "koboldcpp",
-  "litellm",
-  "elevenlabs-tts",
-  "groq",
-  "deepseek",
-  "apipie",
-  "novita",
-  "cometapi",
-  "xai",
-  "gemini",
-  "ppio",
-  "moonshotai",
   "foundry",
-  "cohere",
-  "zai",
-  "giteeai",
   "docker-model-runner",
   "privatemode",
-  "sambanova",
   "lemonade",
-  "minimax",
-  "cerebras",
   "omlx",
-  "bedrock",
   "generic-openai",
   // Image Generation Engines
-  // These are suffixed with `-imggen` so that a provider that supports both
-  // chat and image generation (eg: ollama) can return only its image-capable
-  // models for this key.
-  "openai-imggen",
-  "openrouter-imggen",
   "ollama-imggen",
   "lemonade-imggen",
   // Embedding Engines
   "native-embedder",
-  "cohere-embedder",
-  "openrouter-embedder",
   "lemonade-embedder",
   // STT Engines
-  "openai-stt",
-  "deepgram-stt",
   "lemonade-stt",
-  "groq-stt",
   // TTS Engines
   "kokoro-tts",
 ];
@@ -84,64 +37,18 @@ async function getCustomModels(
     return { models: [], error: "Invalid provider for custom models" };
 
   switch (provider) {
-    case "openai":
-      return await openAiModels(apiKey);
-    case "openai-stt":
-      return await openAiSttModels(apiKey);
-    case "anthropic":
-      return await anthropicModels(apiKey);
     case "localai":
       return await localAIModels(basePath, apiKey);
     case "ollama":
       return await ollamaAIModels(basePath, apiKey);
-    case "togetherai":
-      return await getTogetherAiModels(apiKey);
-    case "fireworksai":
-      return await getFireworksAiModels(apiKey);
-    case "mistral":
-      return await getMistralModels(apiKey);
-    case "perplexity":
-      return await getPerplexityModels();
-    case "openrouter":
-      return await getOpenRouterModels();
     case "lmstudio":
       return await getLMStudioModels(basePath, apiKey);
     case "koboldcpp":
       return await getKoboldCPPModels(basePath);
-    case "litellm":
-      return await liteLLMModels(basePath, apiKey);
-    case "elevenlabs-tts":
-      return await getElevenLabsModels(apiKey);
-    case "groq":
-      return await getGroqAiModels(apiKey);
-    case "deepseek":
-      return await getDeepSeekModels(apiKey);
-    case "apipie":
-      return await getAPIPieModels(apiKey);
-    case "novita":
-      return await getNovitaModels();
-    case "cometapi":
-      return await getCometApiModels();
-    case "xai":
-      return await getXAIModels(apiKey);
     case "nvidia-nim":
       return await getNvidiaNimModels(basePath);
-    case "gemini":
-      return await getGeminiModels(apiKey);
-    case "ppio":
-      return await getPPIOModels(apiKey);
-    case "moonshotai":
-      return await getMoonshotAiModels(apiKey);
     case "foundry":
       return await getFoundryModels(basePath);
-    case "cohere":
-      return await getCohereModels(apiKey, "chat");
-    case "zai":
-      return await getZAiModels(apiKey);
-    case "openai-imggen":
-      return await getOpenAiImageModels(apiKey);
-    case "openrouter-imggen":
-      return await getOpenRouterImageModels();
     case "ollama-imggen":
       return await getOllamaImageModels(basePath, apiKey);
     case "lemonade-imggen":
@@ -152,18 +59,10 @@ async function getCustomModels(
       );
     case "native-embedder":
       return await getNativeEmbedderModels();
-    case "cohere-embedder":
-      return await getCohereModels(apiKey, "embed");
-    case "openrouter-embedder":
-      return await getOpenRouterEmbeddingModels();
-    case "giteeai":
-      return await getGiteeAIModels(apiKey);
     case "docker-model-runner":
       return await getDockerModelRunnerModels(basePath);
     case "privatemode":
       return await getPrivatemodeModels(basePath, "generate");
-    case "sambanova":
-      return await getSambaNovaModels(apiKey);
     case "lemonade":
       return await getLemonadeModels(basePath);
     case "lemonade-stt":
@@ -172,18 +71,8 @@ async function getCustomModels(
       return await getLemonadeModels(basePath, "embedding");
     case "omlx":
       return await getOMLXModels(basePath, apiKey);
-    case "minimax":
-      return await getMinimaxModels(apiKey);
-    case "cerebras":
-      return await getCerebrasModels();
-    case "bedrock":
-      return await getBedrockModels(apiKey, options);
     case "generic-openai":
       return await getGenericOpenAiModels(basePath, apiKey);
-    case "deepgram-stt":
-      return await getDeepgramSTTModels(apiKey);
-    case "groq-stt":
-      return await getGroqSTTModels(apiKey);
     case "kokoro-tts":
       return await kokoroTtsVoices(basePath, apiKey);
     default:
@@ -416,31 +305,6 @@ async function getGroqAiModels(_apiKey = null) {
   return { models, error: null };
 }
 
-async function getGroqSTTModels(_apiKey = null) {
-  const { OpenAI: OpenAIApi } = require("openai");
-  const apiKey =
-    _apiKey === true
-      ? process.env.STT_GROQ_API_KEY
-      : _apiKey || process.env.STT_GROQ_API_KEY || null;
-
-  const openai = new OpenAIApi({
-    baseURL: "https://api.groq.com/openai/v1",
-    apiKey,
-  });
-  const models = (
-    await openai.models
-      .list()
-      .then((results) => results.data)
-      .catch((e) => {
-        console.error(`GroqSTT:listModels`, e.message);
-        return [];
-      })
-  ).filter((model) => model.id.includes("whisper"));
-
-  // Api Key was successful so lets save it for future uses
-  if (models.length > 0 && !!apiKey) process.env.GROQ_STT_API_KEY = apiKey;
-  return { models, error: null };
-}
 
 async function liteLLMModels(basePath = null, apiKey = null) {
   const { OpenAI: OpenAIApi } = require("openai");
@@ -682,31 +546,6 @@ async function getMistralModels(apiKey = null) {
   return { models, error: null };
 }
 
-async function getElevenLabsModels(apiKey = null) {
-  const models = (await ElevenLabsTTS.voices(apiKey)).map((model) => {
-    return {
-      id: model.voice_id,
-      organization: model.category,
-      name: model.name,
-    };
-  });
-
-  if (models.length === 0) {
-    return {
-      models: [
-        {
-          id: "21m00Tcm4TlvDq8ikWAM",
-          organization: "premade",
-          name: "Rachel (default)",
-        },
-      ],
-      error: null,
-    };
-  }
-
-  if (models.length > 0 && !!apiKey) process.env.TTS_ELEVEN_LABS_KEY = apiKey;
-  return { models, error: null };
-}
 
 async function getMinimaxModels(_apiKey = null) {
   const { OpenAI: OpenAIApi } = require("openai");
@@ -1100,49 +939,6 @@ async function getOMLXModels(basePath = null, _apiKey = null) {
   }
 }
 
-/**
- * Get Deepgram STT models from the Management API.
- * https://api.deepgram.com/v1/models returns { stt: [...], tts: [...] }.
- * @param {string} _apiKey - Deepgram API key. Falls back to STT_DEEPGRAM_API_KEY.
- * @returns {Promise<{models: Array<{id: string, name: string, organization: string}>, error: string | null}>}
- */
-async function getDeepgramSTTModels(_apiKey = null) {
-  const apiKey =
-    _apiKey === true
-      ? process.env.STT_DEEPGRAM_API_KEY
-      : _apiKey || process.env.STT_DEEPGRAM_API_KEY || null;
-  if (!apiKey)
-    return { models: [], error: "No Deepgram API key was provided." };
-
-  try {
-    const response = await fetch("https://api.deepgram.com/v1/models", {
-      method: "GET",
-      headers: { Authorization: `Token ${apiKey}` },
-    });
-    if (!response.ok) throw new Error(`Deepgram returned ${response.status}`);
-
-    let models = new Map();
-    const data = await response.json();
-    (data?.stt ?? [])
-      .filter((m) => m.batch !== false)
-      .forEach((m) => {
-        if (models.has(m.canonical_name)) return;
-        models.set(m.canonical_name, {
-          id: m.canonical_name,
-          name: m.canonical_name,
-          organization: "Deepgram",
-        });
-      });
-
-    models = Array.from(models.values());
-    // Api Key was successful so lets save it for future uses
-    if (models.length > 0 && _apiKey) process.env.STT_DEEPGRAM_API_KEY = apiKey;
-    return { models, error: null };
-  } catch (e) {
-    console.error(`Deepgram:getDeepgramSTTModels`, e.message);
-    return { models: [], error: "Could not fetch Deepgram STT models" };
-  }
-}
 
 /**
  * Get Privatemode models

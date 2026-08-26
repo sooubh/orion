@@ -4,16 +4,12 @@ import showToast from "@/utils/toast";
 import LLMItem from "@/components/LLMSelection/LLMItem";
 import { CaretUpDown, MagnifyingGlass, X } from "@phosphor-icons/react";
 import CTAButton from "@/components/lib/CTAButton";
-import OpenAiLogo from "@/media/llmprovider/openai.png";
 import AnythingLLMIcon from "@/media/logo/sovereign-ai.svg";
-import ElevenLabsIcon from "@/media/ttsproviders/elevenlabs.png";
 import PiperTTSIcon from "@/media/ttsproviders/piper.png";
 import GenericOpenAiLogo from "@/media/ttsproviders/generic-openai.png";
 import KokoroIcon from "@/media/ttsproviders/kokoro.png";
 
 import BrowserNative from "@/components/TextToSpeech/BrowserNative";
-import OpenAiTTSOptions from "@/components/TextToSpeech/OpenAiOptions";
-import ElevenLabsTTSOptions from "@/components/TextToSpeech/ElevenLabsOptions";
 import PiperTTSOptions from "@/components/TextToSpeech/PiperTTSOptions";
 import OpenAiGenericTTSOptions from "@/components/TextToSpeech/OpenAiGenericOptions";
 import KokoroTTSOptions from "@/components/TextToSpeech/KokoroOptions";
@@ -25,20 +21,6 @@ const PROVIDERS = [
     logo: AnythingLLMIcon,
     options: (settings) => <BrowserNative settings={settings} />,
     description: "Uses your browser's built in TTS service if supported.",
-  },
-  {
-    name: "OpenAI",
-    value: "openai",
-    logo: OpenAiLogo,
-    options: (settings) => <OpenAiTTSOptions settings={settings} />,
-    description: "Use OpenAI's text to speech voices.",
-  },
-  {
-    name: "ElevenLabs",
-    value: "elevenlabs",
-    logo: ElevenLabsIcon,
-    options: (settings) => <ElevenLabsTTSOptions settings={settings} />,
-    description: "Use ElevenLabs's text to speech voices and technology.",
   },
   {
     name: "PiperTTS",
@@ -61,7 +43,7 @@ const PROVIDERS = [
     logo: GenericOpenAiLogo,
     options: (settings) => <OpenAiGenericTTSOptions settings={settings} />,
     description:
-      "Connect to an OpenAI compatible TTS service running locally or remotely.",
+      "Connect to an OpenAI compatible TTS service running locally.",
   },
 ];
 

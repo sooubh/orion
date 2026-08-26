@@ -212,7 +212,6 @@ sovereign-ai/
 │   │   ├── embedManagement.js             # Widget configuration
 │   │   ├── browserExtension.js            # Browser extension API
 │   │   ├── communityHub.js                # Community hub import/export
-│   │   ├── mobile/                        # Mobile device pairing
 │   │   ├── webPush.js                     # Web push notifications
 │   │   ├── experimental/                  # Beta features (live doc sync)
 │   │   └── api/                           # Developer API (API key auth)
@@ -344,7 +343,6 @@ sovereign-ai/
 | `/settings/event-logs` | Admin | System event log viewer |
 | `/settings/privacy` | Admin | Privacy & data handling settings |
 | `/settings/beta-features` | Admin | Experimental features toggle |
-| `/settings/community-hub/*` | Admin | Community hub (trending, auth, import) |
 | `/settings/external-connections/telegram` | Admin | Telegram bot setup |
 | `/settings/scheduled-jobs(/:id/runs)` | SingleUser | Cron-based scheduled agent jobs |
 | `/settings/security` | Manager | Security settings |
@@ -356,7 +354,6 @@ sovereign-ai/
 | `/settings/workspaces` | Manager | Workspace management |
 | `/settings/invites` | Manager | Invitation codes |
 | `/settings/browser-extension` | Manager | Browser extension API key |
-| `/settings/mobile-connections` | Manager | Mobile device pairing |
 
 ### Route Protection
 
@@ -397,8 +394,6 @@ The server mounts **30+ endpoint modules** under `/api`. Key groups:
 | `embed` | `/api/embed/*` | Embeddable chat widget public API |
 | `embedManagement` | `/api/embed-config/*` | Widget configuration management |
 | `browserExtension` | `/api/browser-extension/*` | Browser extension API |
-| `mobile` | `/api/mobile/*` | Mobile device pairing and auth |
-| `communityHub` | `/api/community-hub/*` | Import/export community items |
 | `experimental` | `/api/experimental/*` | Beta features (live document sync) |
 | `api` (developer) | `/api/v1/*` | Public developer API (API key auth) |
 | `webPush` | `/api/web-push/*` | Web push notification subscriptions |
@@ -427,12 +422,11 @@ erDiagram
     model_routers ||--o{ model_router_rules : "has"
     users ||--o{ slash_command_presets : "owns"
     users ||--o{ prompt_history : "tracks"
-    users ||--o{ desktop_mobile_devices : "pairs"
     users ||--o{ browser_extension_api_keys : "owns"
     users ||--o{ system_prompt_variables : "defines"
 ```
 
-**30+ tables** including: `users`, `workspaces`, `workspace_documents`, `workspace_chats`, `workspace_threads`, `workspace_users`, `document_vectors`, `embed_configs`, `embed_chats`, `event_logs`, `api_keys`, `invites`, `system_settings`, `cache_data`, `recovery_codes`, `password_reset_tokens`, `slash_command_presets`, `document_sync_queues`, `document_sync_executions`, `browser_extension_api_keys`, `temporary_auth_tokens`, `system_prompt_variables`, `prompt_history`, `desktop_mobile_devices`, `workspace_parsed_files`, `external_communication_connectors`, `scheduled_jobs`, `scheduled_job_runs`, `memories`, `model_routers`, `model_router_rules`, `workspace_agent_invocations`, `workspace_suggested_messages`.
+**30+ tables** including: `users`, `workspaces`, `workspace_documents`, `workspace_chats`, `workspace_threads`, `workspace_users`, `document_vectors`, `embed_configs`, `embed_chats`, `event_logs`, `api_keys`, `invites`, `system_settings`, `cache_data`, `recovery_codes`, `password_reset_tokens`, `slash_command_presets`, `document_sync_queues`, `document_sync_executions`, `browser_extension_api_keys`, `temporary_auth_tokens`, `system_prompt_variables`, `prompt_history`, `workspace_parsed_files`, `external_communication_connectors`, `scheduled_jobs`, `scheduled_job_runs`, `memories`, `model_routers`, `model_router_rules`, `workspace_agent_invocations`, `workspace_suggested_messages`.
 
 ---
 

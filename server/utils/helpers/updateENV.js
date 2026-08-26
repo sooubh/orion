@@ -1060,8 +1060,6 @@ function validOllamaLLMBasePath(input = "") {
 function supportedTTSProvider(input = "") {
   const validSelection = [
     "native",
-    "openai",
-    "elevenlabs",
     "piper_local",
     "generic-openai",
     "kokoro",
@@ -1072,10 +1070,7 @@ function supportedTTSProvider(input = "") {
 function supportedSTTProvider(input = "") {
   const validSelection = [
     "native",
-    "openai",
     "lemonade",
-    "deepgram",
-    "groq",
     "generic-openai",
   ].includes(input);
   return validSelection ? null : `${input} is not a valid STT provider.`;
@@ -1093,46 +1088,21 @@ function validLocalWhisper(input = "") {
 
 function supportedLLM(input = "") {
   const validSelection = [
-    "openai",
-    "azure",
-    "anthropic",
-    "gemini",
+    "ollama",
     "lmstudio",
     "localai",
-    "ollama",
-    "togetherai",
-    "fireworksai",
-    "mistral",
-    "perplexity",
-    "openrouter",
-    "novita",
-    "groq",
     "koboldcpp",
     "textgenwebui",
-    "cohere",
-    "litellm",
     "generic-openai",
-    "bedrock",
-    "deepseek",
-    "apipie",
-    "xai",
-    "nvidia-nim",
-    "ppio",
-    "moonshotai",
-    "cometapi",
+    "lemonade",
     "foundry",
-    "zai",
-    "giteeai",
+    "nvidia-nim",
     "docker-model-runner",
     "privatemode",
-    "sambanova",
-    "lemonade",
-    "minimax",
-    "cerebras",
     "omlx",
     "anythingllm-router",
   ].includes(input);
-  return validSelection ? null : `${input} is not a valid LLM provider.`;
+  return validSelection ? null : `${input} is not a valid local LLM provider.`;
 }
 
 function supportedTranscriptionProvider(input = "") {
@@ -1467,8 +1437,6 @@ function dumpENV() {
     "SIMPLE_SSO_ENABLED",
     "SIMPLE_SSO_NO_LOGIN",
     "SIMPLE_SSO_NO_LOGIN_REDIRECT",
-    // Community Hub
-    "COMMUNITY_HUB_BUNDLE_DOWNLOADS_ENABLED",
 
     // Nvidia NIM Keys that are automatically managed
     "NVIDIA_NIM_LLM_MODEL_TOKEN_LIMIT",

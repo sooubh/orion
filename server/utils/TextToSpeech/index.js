@@ -1,12 +1,6 @@
 function getTTSProvider() {
-  const provider = process.env.TTS_PROVIDER || "openai";
+  const provider = process.env.TTS_PROVIDER || "native";
   switch (provider) {
-    case "openai":
-      const { OpenAiTTS } = require("./openAi");
-      return new OpenAiTTS();
-    case "elevenlabs":
-      const { ElevenLabsTTS } = require("./elevenLabs");
-      return new ElevenLabsTTS();
     case "generic-openai":
       const { GenericOpenAiTTS } = require("./openAiGeneric");
       return new GenericOpenAiTTS();
@@ -14,7 +8,9 @@ function getTTSProvider() {
       const { KokoroTTS } = require("./kokoro");
       return new KokoroTTS();
     default:
-      throw new Error("ENV: No TTS_PROVIDER value found in environment!");
+      throw new Error(
+        `ENV: TTS_PROVIDER "${provider}" is not a supported local server-side provider.`
+      );
   }
 }
 

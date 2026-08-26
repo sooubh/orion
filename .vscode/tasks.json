@@ -1,23 +1,13 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Collector: run",
       "type": "shell",
+      "command": "yarn dev",
       "options": {
-        "cwd": "${workspaceFolder}/collector",
-        "statusbar": {
-          "color": "#ffea00",
-          "detail": "Runs the collector",
-          "label": "Collector: $(play) run",
-          "running": {
-            "color": "#ffea00",
-            "label": "Collector: $(gear~spin) running"
-          }
-        }
+        "cwd": "${workspaceFolder}/collector"
       },
-      "command": "cd ${workspaceFolder}/collector/ && yarn dev",
       "runOptions": {
         "instanceLimit": 1,
         "reevaluateOnRerun": true
@@ -29,24 +19,15 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      },
-      "label": "Collector: run"
+      }
     },
     {
+      "label": "Server: run",
       "type": "shell",
+      "command": "yarn dev",
       "options": {
-        "cwd": "${workspaceFolder}/server",
-        "statusbar": {
-          "color": "#ffea00",
-          "detail": "Runs the server",
-          "label": "Server: $(play) run",
-          "running": {
-            "color": "#ffea00",
-            "label": "Server: $(gear~spin) running"
-          }
-        }
+        "cwd": "${workspaceFolder}/server"
       },
-      "command": "if [ \"${CODESPACES}\" = \"true\" ]; then while ! gh codespace ports -c $CODESPACE_NAME | grep 3001; do sleep 1; done; gh codespace ports visibility 3001:public -c $CODESPACE_NAME; fi & cd ${workspaceFolder}/server/ && yarn dev",
       "runOptions": {
         "instanceLimit": 1,
         "reevaluateOnRerun": true
@@ -58,24 +39,15 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      },
-      "label": "Server: run"
+      }
     },
     {
+      "label": "Frontend: run",
       "type": "shell",
+      "command": "yarn dev",
       "options": {
-        "cwd": "${workspaceFolder}/frontend",
-        "statusbar": {
-          "color": "#ffea00",
-          "detail": "Runs the frontend",
-          "label": "Frontend: $(play) run",
-          "running": {
-            "color": "#ffea00",
-            "label": "Frontend: $(gear~spin) running"
-          }
-        }
+        "cwd": "${workspaceFolder}/frontend"
       },
-      "command": "cd ${workspaceFolder}/frontend/ && yarn dev",
       "runOptions": {
         "instanceLimit": 1,
         "reevaluateOnRerun": true
@@ -87,8 +59,7 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      },
-      "label": "Frontend: run"
+      }
     }
   ]
 }
