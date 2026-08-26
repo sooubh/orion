@@ -12,7 +12,6 @@ const { gmailAgent } = require("./gmail/index.js");
 const { outlookAgent } = require("./outlook/index.js");
 const { googleCalendarAgent } = require("./google-calendar/index.js");
 const { requestUserInput } = require("./request-user-input.js");
-const { createScheduledJob } = require("./create-scheduled-job/index.js");
 const { modelRouterCooldown } = require("./model-router-cooldown.js");
 
 module.exports = {
@@ -30,7 +29,6 @@ module.exports = {
   outlookAgent,
   googleCalendarAgent,
   requestUserInput,
-  createScheduledJob,
   modelRouterCooldown,
 
   // Plugin name aliases so they can be pulled by slug as well.
@@ -48,6 +46,5 @@ module.exports = {
   [outlookAgent.name]: outlookAgent,
   [googleCalendarAgent.name]: googleCalendarAgent,
   [requestUserInput.name]: requestUserInput,
-  [createScheduledJob.name]: createScheduledJob,
   [modelRouterCooldown.name]: modelRouterCooldown,
 };

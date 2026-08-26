@@ -8,7 +8,6 @@ import Modal, {
   ModalPrimaryButton,
 } from "@/components/lib/Modal";
 import {
-  Eye,
   PushPin,
   CheckCircle,
   XCircle,
@@ -16,9 +15,7 @@ import {
   Clock,
   X,
 } from "@phosphor-icons/react";
-import { SEEN_DOC_PIN_ALERT, SEEN_WATCH_ALERT } from "@/utils/constants";
-import paths from "@/utils/paths";
-import { Link } from "react-router-dom";
+import { SEEN_DOC_PIN_ALERT } from "@/utils/constants";
 import Workspace from "@/models/workspace";
 import { Tooltip } from "react-tooltip";
 import { safeJsonParse } from "@/utils/request";
@@ -302,7 +299,6 @@ function WorkspaceDirectory({
         )}
       </div>
       <PinAlert />
-      <DocumentWatchAlert />
       <WorkspaceDocumentTooltips />
     </>
   );
@@ -360,67 +356,6 @@ const PinAlert = memo(() => {
       <ModalFooter className="justify-end">
         <ModalPrimaryButton onClick={dismissAlert}>
           {t("connectors.pinning.accept")}
-        </ModalPrimaryButton>
-      </ModalFooter>
-    </Modal>
-  );
-});
-
-const DocumentWatchAlert = memo(() => {
-  const { t } = useTranslation();
-  const [showAlert, setShowAlert] = useState(false);
-  function dismissAlert() {
-    setShowAlert(false);
-    window.localStorage.setItem(SEEN_WATCH_ALERT, "1");
-    window.removeEventListener(handlePinEvent);
-  }
-
-  function handlePinEvent() {
-    if (!!window?.localStorage?.getItem(SEEN_WATCH_ALERT)) return;
-    setShowAlert(true);
-  }
-
-  useEffect(() => {
-    if (!window || !!window?.localStorage?.getItem(SEEN_WATCH_ALERT)) return;
-    window?.addEventListener("watch_document_for_changes", handlePinEvent);
-  }, []);
-
-  return (
-    <Modal isOpen={showAlert} noPortal={true} onClose={dismissAlert}>
-      <ModalHeader
-        title={
-          <span className="flex items-center gap-x-2">
-            <Eye className="w-6 h-6" weight="regular" />
-            {t("connectors.watching.what_watching")}
-          </span>
-        }
-        onClose={dismissAlert}
-      />
-      <ModalBody>
-        <div className="w-full text-zinc-300 light:text-slate-700 text-md flex flex-col gap-y-2">
-          <p>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: t("connectors.watching.watch_explained_block1"),
-              }}
-            />
-          </p>
-          <p>{t("connectors.watching.watch_explained_block2")}</p>
-          <p>
-            {t("connectors.watching.watch_explained_block3_start")}
-            <Link
-              to={paths.experimental.liveDocumentSync.manage()}
-              className="text-blue-600 underline"
-            >
-              {t("connectors.watching.watch_explained_block3_link")}
-            </Link>
-            {t("connectors.watching.watch_explained_block3_end")}
-          </p>
-        </div>
-      </ModalBody>
-      <ModalFooter className="justify-end">
-        <ModalPrimaryButton onClick={dismissAlert}>
-          {t("connectors.watching.accept")}
         </ModalPrimaryButton>
       </ModalFooter>
     </Modal>

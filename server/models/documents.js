@@ -7,12 +7,12 @@ const { safeJsonParse } = require("../utils/http");
 const { getModelTag } = require("../endpoints/utils");
 
 const Document = {
-  writable: ["pinned", "watched", "lastUpdatedAt"],
+  writable: ["pinned", "lastUpdatedAt"],
   /**
    * @param {import("@prisma/client").workspace_documents} document - Document PrismaRecord
    * @returns {{
    *  metadata: (null|object),
-   *  type: import("./documentSyncQueue.js").validFileType,
+   *  type: string,
    *  source: string
    * }}
    */

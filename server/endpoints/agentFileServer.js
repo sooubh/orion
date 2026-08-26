@@ -10,7 +10,6 @@ const {
 } = require("../utils/middleware/multiUserProtected");
 const { WorkspaceChats } = require("../models/workspaceChats");
 const { Workspace } = require("../models/workspace");
-const { ScheduledJobRun } = require("../models/scheduledJobRun");
 const createFilesLib = require("../utils/agents/aibitat/plugins/create-files/lib");
 const { Telemetry } = require("../models/telemetry");
 
@@ -44,7 +43,7 @@ function agentFileServerEndpoints(app) {
             .json({ error: "Invalid filename format" });
         }
 
-        // Find a chat or scheduled job run that references this file
+        // Find a chat that references this file
         const fileSource = await findFileSource(filename, {
           user,
           isMultiUser: multiUserMode(response),
@@ -139,12 +138,8 @@ function agentFileServerEndpoints(app) {
 }
 
 /**
- * Locates the source record (a workspace chat or a scheduled job run) that
+ * Locates the source record (a workspace chat) that
  * references the given storage filename, and confirms the requester has access.
- *
- * Search order:
- *   1. Workspace chats the user can access (per multi-user permissions).
- *   2. Scheduled job runs — single-user only, so no per-user access check.
  *
  * @param {string} storageFilename
  * @param {{ user: object|null, isMultiUser: boolean }} ctx
@@ -152,15 +147,10 @@ function agentFileServerEndpoints(app) {
  */
 async function findFileSource(storageFilename, { user, isMultiUser }) {
   try {
-    const fromChat = await findInWorkspaceChats(storageFilename, {
+    return await findInWorkspaceChats(storageFilename, {
       user,
       isMultiUser,
     });
-    if (fromChat) return fromChat;
-
-    if (isMultiUser) return null;
-
-    return await findInScheduledJobRuns(storageFilename);
   } catch (error) {
     console.error("[findFileSource] Error:", error.message);
     return null;
@@ -196,29 +186,6 @@ async function findInWorkspaceChats(storageFilename, { user, isMultiUser }) {
       workspaceId: chat.workspaceId,
       displayFilename:
         output.payload.filename || output.payload.displayFilename,
-    };
-  }
-
-  return null;
-}
-
-// Search completed scheduled job runs. Scheduled jobs are single-user only,
-// so this skips access control. Returns the matching run's display filename.
-async function findInScheduledJobRuns(storageFilename) {
-  const runs = await ScheduledJobRun.where({
-    status: "completed",
-    result: { contains: storageFilename },
-  });
-
-  for (const run of runs) {
-    const { outputs = [] } = safeJsonParse(run.result, { outputs: [] });
-    const output = outputs.find(
-      (o) => o?.payload?.storageFilename === storageFilename
-    );
-    if (!output) continue;
-    return {
-      workspaceId: null,
-      displayFilename: output.payload.filename || storageFilename,
     };
   }
 

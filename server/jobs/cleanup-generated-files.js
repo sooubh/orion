@@ -1,6 +1,5 @@
 const { log, conclude } = require("./helpers/index.js");
 const { WorkspaceChats } = require("../models/workspaceChats.js");
-const { ScheduledJobRun } = require("../models/scheduledJobRun.js");
 const createFilesLib = require("../utils/agents/aibitat/plugins/create-files/lib.js");
 const { safeJsonParse } = require("../utils/http/index.js");
 
@@ -72,12 +71,7 @@ const MIN_AGE_MS = 60 * 60 * 1000;
  * @returns {Promise<Set<string>>}
  */
 async function getActiveStorageFilenames(batchSize = 50) {
-  const [workspaceChats, scheduledJobRuns] = await Promise.all([
-    workspaceChatGeneratedFilenames(batchSize),
-    scheduledJobRunGeneratedFilenames(batchSize),
-  ]);
-
-  return new Set([...workspaceChats, ...scheduledJobRuns]);
+  return await workspaceChatGeneratedFilenames(batchSize);
 }
 
 async function workspaceChatGeneratedFilenames(batchSize = 50) {
@@ -117,48 +111,6 @@ async function workspaceChatGeneratedFilenames(batchSize = 50) {
     }
   } catch (error) {
     console.error("[workspaceChatGeneratedFilenames] Error:", error.message);
-  }
-
-  return storageFilenames;
-}
-
-async function scheduledJobRunGeneratedFilenames(batchSize = 50) {
-  const storageFilenames = new Set();
-  try {
-    let offset = 0;
-    let hasMore = true;
-
-    while (hasMore) {
-      const runs = await ScheduledJobRun.where(
-        { status: "completed" },
-        batchSize,
-        { id: "asc" },
-        {},
-        offset
-      );
-
-      if (runs.length === 0) {
-        hasMore = false;
-        break;
-      }
-
-      for (const run of runs) {
-        try {
-          const response = safeJsonParse(run.result, { outputs: [] });
-          for (const output of response.outputs) {
-            if (!output?.payload?.storageFilename) continue;
-            storageFilenames.add(output.payload.storageFilename);
-          }
-        } catch {
-          continue;
-        }
-      }
-
-      offset += runs.length;
-      hasMore = runs.length === batchSize;
-    }
-  } catch (error) {
-    console.error("[scheduledJobRunGeneratedFilenames] Error:", error.message);
   }
 
   return storageFilenames;

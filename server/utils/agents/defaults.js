@@ -14,7 +14,7 @@ const DEFAULT_SKILLS = [
 ];
 
 // Skills that must never be injected when the instance is running in multi-user mode.
-const SINGLE_USER_ONLY_SKILLS = new Set(["create-scheduled-job"]);
+const SINGLE_USER_ONLY_SKILLS = new Set();
 
 /**
  * Configuration for agent skills that require availability checks and disabled sub-skill lists.

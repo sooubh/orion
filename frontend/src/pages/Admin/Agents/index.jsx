@@ -24,8 +24,6 @@ import {
   getAppIntegrationSkills,
 } from "./skills.jsx";
 import { DefaultBadge } from "./Badges/default";
-import ImportedSkillList from "./Imported/SkillList";
-import ImportedSkillConfig from "./Imported/ImportedSkillConfig";
 import { Tooltip } from "react-tooltip";
 import AgentFlowsList from "./AgentFlows";
 import FlowPanel from "./AgentFlows/FlowPanel";
@@ -54,7 +52,6 @@ export default function AdminAgents() {
   const [showSkillModal, setShowSkillModal] = useState(false);
 
   const [agentSkills, setAgentSkills] = useState([]);
-  const [importedSkills, setImportedSkills] = useState([]);
   const [disabledAgentSkills, setDisabledAgentSkills] = useState([]);
 
   const [agentFlows, setAgentFlows] = useState([]);
@@ -123,7 +120,6 @@ export default function AdminAgents() {
         Admin.systemPreferencesByFields([
           "disabled_agent_skills",
           "default_agent_skills",
-          "imported_agent_skills",
           "active_agent_flows",
         ]),
         AgentFlows.listFlows(),
@@ -137,7 +133,6 @@ export default function AdminAgents() {
       setDisabledAgentSkills(
         _preferences.settings?.disabled_agent_skills ?? []
       );
-      setImportedSkills(_preferences.settings?.imported_agent_skills ?? []);
       setActiveFlowIds(flows.filter((f) => f.active).map((f) => f.uuid));
       setAgentFlows(flows);
       setFileSystemAgentAvailable(fsAgentAvailable);
@@ -217,14 +212,12 @@ export default function AdminAgents() {
       const _preferences = await Admin.systemPreferencesByFields([
         "disabled_agent_skills",
         "default_agent_skills",
-        "imported_agent_skills",
       ]);
       setSettings({ ..._settings, preferences: _preferences.settings } ?? {});
       setAgentSkills(_preferences.settings?.default_agent_skills ?? []);
       setDisabledAgentSkills(
         _preferences.settings?.disabled_agent_skills ?? []
       );
-      setImportedSkills(_preferences.settings?.imported_agent_skills ?? []);
       showToast(`Agent preferences saved successfully.`, "success", {
         clear: true,
       });
@@ -240,8 +233,6 @@ export default function AdminAgents() {
     SelectedSkillComponent = FlowPanel;
   } else if (selectedMcpServer) {
     SelectedSkillComponent = ServerPanel;
-  } else if (selectedSkill?.imported) {
-    SelectedSkillComponent = ImportedSkillConfig;
   } else if (configurableSkills[selectedSkill]) {
     SelectedSkillComponent = configurableSkills[selectedSkill]?.component;
   } else if (appIntegrationSkills[selectedSkill]) {
@@ -411,16 +402,6 @@ export default function AdminAgents() {
               </>
             )}
 
-            <div className="text-theme-text-primary flex items-center gap-x-2">
-              <Plug size={24} />
-              <p className="text-lg font-medium">Custom Skills</p>
-            </div>
-            <ImportedSkillList
-              skills={importedSkills}
-              selectedSkill={selectedSkill}
-              handleClick={handleSkillClick}
-            />
-
             <div className="text-theme-text-primary flex items-center gap-x-2 mt-6">
               <FlowArrow size={24} />
               <p className="text-lg font-medium">Agent Flows</p>
@@ -490,12 +471,6 @@ export default function AdminAgents() {
                             toggleFlow={toggleFlow}
                             enabled={activeFlowIds.includes(selectedFlow.uuid)}
                             onDelete={handleFlowDelete}
-                          />
-                        ) : selectedSkill.imported ? (
-                          <ImportedSkillConfig
-                            key={selectedSkill.hubId}
-                            selectedSkill={selectedSkill}
-                            setImportedSkills={setImportedSkills}
                           />
                         ) : (
                           <>
@@ -716,12 +691,6 @@ export default function AdminAgents() {
                     toggleFlow={toggleFlow}
                     enabled={activeFlowIds.includes(selectedFlow.uuid)}
                     onDelete={handleFlowDelete}
-                  />
-                ) : selectedSkill.imported ? (
-                  <ImportedSkillConfig
-                    key={selectedSkill.hubId}
-                    selectedSkill={selectedSkill}
-                    setImportedSkills={setImportedSkills}
                   />
                 ) : (
                   <>

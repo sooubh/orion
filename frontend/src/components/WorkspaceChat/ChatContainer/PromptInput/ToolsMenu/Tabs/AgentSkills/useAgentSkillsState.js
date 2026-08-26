@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Admin from "@/models/admin";
 import System from "@/models/system";
-import AgentPlugins from "@/models/experimental/agentPlugins";
 import AgentFlows from "@/models/agentFlows";
 import MCPServers from "@/models/mcpServers";
 import { getSubSkillPreferenceKeys } from "./skillRegistry";
@@ -123,7 +122,6 @@ export default function useAgentSkillsState(defaultSkills) {
         s.hubId === skill.hubId ? { ...s, active: newActive } : s
       )
     );
-    await AgentPlugins.toggleFeature(skill.hubId, newActive);
     toggleAgentSessionTool(skill.hubId, newActive);
   }, []);
 

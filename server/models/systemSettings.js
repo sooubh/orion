@@ -1091,27 +1091,7 @@ const SystemSettings = {
     return connections;
   },
   getFeatureFlags: async function () {
-    return {
-      experimental_live_file_sync:
-        (await SystemSettings.get({ label: "experimental_live_file_sync" }))
-          ?.value === "enabled",
-    };
-  },
-
-  /**
-   * Get user configured Community Hub Settings
-   * Connection key is used to authenticate with the Community Hub API
-   * for your account.
-   * @returns {Promise<{connectionKey: string}>}
-   */
-  hubSettings: async function () {
-    try {
-      const hubKey = await this.get({ label: "hub_api_key" });
-      return { connectionKey: hubKey?.value || null };
-    } catch (error) {
-      console.error(error.message);
-      return { connectionKey: null };
-    }
+    return {};
   },
 
   simpleSSO: {

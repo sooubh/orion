@@ -3,7 +3,6 @@ const path = require("path");
 const { spawn } = require("child_process");
 const { v5: uuidv5, v4: uuidv4 } = require("uuid");
 const { Document } = require("../../models/documents");
-const { DocumentSyncQueue } = require("../../models/documentSyncQueue");
 const documentsPath = process.env.STORAGE_DIR
   ? path.resolve(process.env.STORAGE_DIR, `documents`)
   : path.resolve(__dirname, `../../storage/documents`);
@@ -69,7 +68,6 @@ function listFolders() {
  */
 async function viewLocalFiles() {
   if (!fs.existsSync(documentsPath)) fs.mkdirSync(documentsPath);
-  const liveSyncAvailable = await DocumentSyncQueue.enabled();
   const directory = {
     name: "documents",
     type: "folder",
@@ -98,7 +96,6 @@ async function viewLocalFiles() {
         filePromises.push(
           fileToPickerData({
             pathToFile: path.join(folderPath, subfile),
-            liveSyncAvailable,
             cachefilename,
           })
         );
@@ -212,13 +209,11 @@ async function getDocumentsByFolder(folderName = "", pagination = {}) {
   const totalCount = allJsonFiles.length;
   const paginatedFiles = allJsonFiles.slice(offset, offset + limit);
 
-  const liveSyncAvailable = await DocumentSyncQueue.enabled();
   const documents = (
     await Promise.all(
       paginatedFiles.map((file) =>
         fileToPickerData({
           pathToFile: path.join(folderPath, file),
-          liveSyncAvailable,
           cachefilename: `${folderName}/${file}`,
         })
       )
@@ -450,22 +445,7 @@ async function getPinnedWorkspacesByDocument(filenames = []) {
  * @returns {Promise<Record<string, string[]>>} - a record of filenames and their corresponding workspaceIds
  */
 async function getWatchedDocumentFilenames(filenames = []) {
-  return (
-    await Document.where(
-      {
-        docpath: { in: Object.keys(filenames) },
-        watched: true,
-      },
-      null,
-      null,
-      null,
-      { workspaceId: true, docpath: true }
-    )
-  ).reduce((result, { workspaceId, docpath }) => {
-    const filename = filenames[docpath];
-    result[filename] = workspaceId;
-    return result;
-  }, {});
+  return {};
 }
 
 /**
@@ -482,7 +462,6 @@ async function getWatchedDocumentFilenames(filenames = []) {
  */
 async function getDocumentsByDocPaths(docpaths = []) {
   if (!docpaths.length) return [];
-  const liveSyncAvailable = await DocumentSyncQueue.enabled();
   const results = [];
   const filenames = {};
 
@@ -494,7 +473,6 @@ async function getDocumentsByDocPaths(docpaths = []) {
     try {
       const data = await fileToPickerData({
         pathToFile: fullPath,
-        liveSyncAvailable,
         cachefilename: docpath,
       });
       if (data && hasRequiredMetadata(data)) {
@@ -657,7 +635,6 @@ async function searchDocuments(searchTerm = "") {
         paths.map((absPath) =>
           fileToPickerData({
             pathToFile: absPath,
-            liveSyncAvailable,
             cachefilename: `${folder}/${path.basename(absPath)}`,
           })
         )
@@ -765,12 +742,10 @@ const FILE_READ_SIZE_THRESHOLD = 150 * (1024 * 1024);
 /**
  * Converts a file to picker data
  * @param {string} pathToFile - The path to the file to convert
- * @param {boolean} liveSyncAvailable - Whether live sync is available
  * @returns {Promise<{name: string, type: string, [string]: any, cached: boolean, canWatch: boolean}>} - The picker data
  */
 async function fileToPickerData({
   pathToFile,
-  liveSyncAvailable = false,
   cachefilename = null,
 }) {
   let metadata = {};
@@ -794,11 +769,7 @@ async function fileToPickerData({
       type: "file",
       ...metadata,
       cached: cachedStatus,
-      canWatch: liveSyncAvailable
-        ? DocumentSyncQueue.canWatch(metadata)
-        : false,
-      // pinnedWorkspaces: [], // This is the list of workspaceIds that have pinned this document
-      // watched: false, // boolean to indicate if this document is watched in ANY workspace
+      canWatch: false,
     };
   }
 
@@ -844,7 +815,7 @@ async function fileToPickerData({
     type: "file",
     ...metadata,
     cached: cachedStatus,
-    canWatch: liveSyncAvailable ? DocumentSyncQueue.canWatch(metadata) : false,
+    canWatch: false,
   };
 }
 

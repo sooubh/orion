@@ -14,7 +14,6 @@ import {
   ChartBar,
   FolderOpen,
   FilePlus,
-  CalendarCheck,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -25,7 +24,6 @@ import FileSystemImage from "@/media/agents/file-system.png";
 import GMailIcon from "./GMailSkillPanel/gmail.png";
 import OutlookIcon from "./OutlookSkillPanel/outlook.png";
 import GoogleCalendarIcon from "./GoogleCalendarSkillPanel/google-calendar.png";
-import ScheduledJobsImage from "@/media/agents/scheduled-jobs.png";
 
 export const getDefaultSkills = (t) => ({
   "rag-memory": {
@@ -105,15 +103,6 @@ export const getConfigurableSkills = (
     description: t("agent.skill.sql.description"),
     component: AgentSQLConnectorSelection,
     skill: "sql-agent",
-  },
-  "create-scheduled-job": {
-    title: t("agent.skill.scheduledJob.title"),
-    description: t("agent.skill.scheduledJob.description"),
-    component: GenericSkillPanel,
-    skill: "create-scheduled-job",
-    icon: CalendarCheck,
-    image: ScheduledJobsImage,
-    mode: ["singleUserOnly"],
   },
 });
 

@@ -507,7 +507,6 @@ class EphemeralAgentHandler extends AgentHandler {
   async createAIbitat(
     args = {
       handler: null,
-      telegramChatId: null,
       toolOverrides: null,
     }
   ) {
@@ -558,14 +557,12 @@ class EphemeralAgentHandler extends AgentHandler {
     }
 
     // Attach HTTP response object if defined for chunk streaming.
-    // When telegramChatId is provided, tool approval via Telegram is enabled.
     this.log(`Attached ${httpSocket.name} plugin to Agent cluster`);
     this.aibitat.use(
       httpSocket.plugin({
         handler: args.handler,
         muteUserReply: true,
         introspection: true,
-        telegramChatId: args.telegramChatId,
       })
     );
 

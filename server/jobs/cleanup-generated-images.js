@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const { log, conclude } = require("./helpers/index.js");
 const { WorkspaceChats } = require("../models/workspaceChats.js");
-const { ScheduledJobRun } = require("../models/scheduledJobRun.js");
 const {
   generatedImagesPath,
   GENERATED_IMAGE_FILENAME_PATTERN,
@@ -52,8 +51,7 @@ const MIN_AGE_MS = 60 * 60 * 1000;
 })();
 
 /**
- * Collects every generated-image filename referenced by an active chat or
- * completed scheduled job run.
+ * Collects every generated-image filename referenced by an active chat.
  * @returns {Promise<Set<string>>}
  */
 async function referencedImageFilenames() {
@@ -61,10 +59,6 @@ async function referencedImageFilenames() {
 
   for await (const chat of activeImageChats()) {
     extractImageFilenames(chat.response, filenames);
-  }
-
-  for await (const run of completedImageRuns()) {
-    extractImageFilenames(run.result, filenames);
   }
 
   return filenames;
@@ -99,27 +93,5 @@ async function* activeImageChats(batchSize = 50) {
     yield* chats;
     if (chats.length < batchSize) return;
     offset += chats.length;
-  }
-}
-
-/**
- * Yields completed scheduled job runs that reference a generated image.
- * @param {number} batchSize
- * @returns {AsyncGenerator<object>}
- */
-async function* completedImageRuns(batchSize = 50) {
-  let offset = 0;
-  while (true) {
-    const runs = await ScheduledJobRun.where(
-      { status: "completed", result: { contains: "img-" } },
-      batchSize,
-      { id: "asc" },
-      {},
-      offset
-    );
-    if (runs.length === 0) return;
-    yield* runs;
-    if (runs.length < batchSize) return;
-    offset += runs.length;
   }
 }
