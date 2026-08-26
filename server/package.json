@@ -99,7 +99,7 @@
     "weaviate-ts-client": "^1.4.0",
     "web-push": "^3.6.7",
     "winston": "^3.13.0",
-    "zod": "^3.22.4"
+    "zod": "^4.4.3"
   },
   "resolutions": {
     "**/graphql-request/form-data": "3.0.4",
