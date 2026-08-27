@@ -17,6 +17,14 @@ import DockerModelRunnerLogo from "@/media/llmprovider/docker-model-runner.png";
 import PrivateModeLogo from "@/media/llmprovider/privatemode.png";
 import LemonadeLogo from "@/media/llmprovider/lemonade.png";
 import OMLXLogo from "@/media/llmprovider/omlx.png";
+import OpenAiLogo from "@/media/llmprovider/openai.png";
+import AzureOpenAiLogo from "@/media/llmprovider/azure.png";
+import OpenRouterLogo from "@/media/llmprovider/openrouter.jpeg";
+import CohereLogo from "@/media/llmprovider/cohere.png";
+import VoyageAiLogo from "@/media/llmprovider/generic-openai.png";
+import MistralLogo from "@/media/llmprovider/mistral.jpeg";
+import LiteLLMLogo from "@/media/llmprovider/litellm.png";
+import GeminiLogo from "@/media/llmprovider/gemini.png";
 
 const LLM_PROVIDER_PRIVACY_MAP = {
   ollama: {

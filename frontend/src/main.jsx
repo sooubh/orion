@@ -15,6 +15,12 @@ import "@/index.css";
 const isDev = import.meta.env.DEV;
 const REACTWRAP = isDev ? React.Fragment : React.StrictMode;
 
+const withPrivate = (Component) => () => <PrivateRoute Component={Component} />;
+const withAdmin = (Component, hideUserMenu = false) => () => (
+  <AdminRoute Component={Component} hideUserMenu={hideUserMenu} />
+);
+const withManager = (Component) => () => <ManagerRoute Component={Component} />;
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,63 +30,63 @@ const router = createBrowserRouter([
         path: "/",
         lazy: async () => {
           const { default: Dashboard } = await import("@/pages/Dashboard");
-          return { element: <PrivateRoute Component={Dashboard} /> };
+          return { Component: withPrivate(Dashboard) };
         },
       },
       {
         path: "/dashboard",
         lazy: async () => {
           const { default: Dashboard } = await import("@/pages/Dashboard");
-          return { element: <PrivateRoute Component={Dashboard} /> };
+          return { Component: withPrivate(Dashboard) };
         },
       },
       {
         path: "/documents",
         lazy: async () => {
           const { default: DocumentsPage } = await import("@/pages/Documents");
-          return { element: <PrivateRoute Component={DocumentsPage} /> };
+          return { Component: withPrivate(DocumentsPage) };
         },
       },
       {
         path: "/knowledge",
         lazy: async () => {
           const { default: KnowledgePage } = await import("@/pages/Knowledge");
-          return { element: <PrivateRoute Component={KnowledgePage} /> };
+          return { Component: withPrivate(KnowledgePage) };
         },
       },
       {
         path: "/review",
         lazy: async () => {
           const { default: ReviewPage } = await import("@/pages/Review");
-          return { element: <PrivateRoute Component={ReviewPage} /> };
+          return { Component: withPrivate(ReviewPage) };
         },
       },
       {
         path: "/ai-review",
         lazy: async () => {
           const { default: ReviewPage } = await import("@/pages/Review");
-          return { element: <PrivateRoute Component={ReviewPage} /> };
+          return { Component: withPrivate(ReviewPage) };
         },
       },
       {
         path: "/deliverables",
         lazy: async () => {
           const { default: DeliverablesPage } = await import("@/pages/Deliverables");
-          return { element: <PrivateRoute Component={DeliverablesPage} /> };
+          return { Component: withPrivate(DeliverablesPage) };
         },
       },
       {
         path: "/security",
         lazy: async () => {
           const { default: SecurityPage } = await import("@/pages/Security");
-          return { element: <PrivateRoute Component={SecurityPage} /> };
+          return { Component: withPrivate(SecurityPage) };
         },
       },
       {
         path: "/security-center",
         lazy: async () => {
           const { default: SecurityPage } = await import("@/pages/Security");
-          return { element: <PrivateRoute Component={SecurityPage} /> };
+          return { Component: withPrivate(SecurityPage) };
         },
       },
       {
@@ -97,7 +103,7 @@ const router = createBrowserRouter([
           const { default: WorkspaceChat } = await import(
             "@/pages/WorkspaceChat"
           );
-          return { element: <PrivateRoute Component={WorkspaceChat} /> };
+          return { Component: withPrivate(WorkspaceChat) };
         },
       },
       {
@@ -106,7 +112,7 @@ const router = createBrowserRouter([
           const { default: WorkspaceSettings } = await import(
             "@/pages/WorkspaceSettings"
           );
-          return { element: <ManagerRoute Component={WorkspaceSettings} /> };
+          return { Component: withManager(WorkspaceSettings) };
         },
       },
       {
@@ -115,7 +121,7 @@ const router = createBrowserRouter([
           const { default: WorkspaceChat } = await import(
             "@/pages/WorkspaceChat"
           );
-          return { element: <PrivateRoute Component={WorkspaceChat} /> };
+          return { Component: withPrivate(WorkspaceChat) };
         },
         children: [{ path: "t/:threadSlug" }],
       },
@@ -123,7 +129,7 @@ const router = createBrowserRouter([
         path: "/accept-invite/:code",
         lazy: async () => {
           const { default: InvitePage } = await import("@/pages/Invite");
-          return { element: <InvitePage /> };
+          return { Component: InvitePage };
         },
       },
       // Admin routes
@@ -133,7 +139,7 @@ const router = createBrowserRouter([
           const { default: GeneralLLMPreference } = await import(
             "@/pages/GeneralSettings/LLMPreference"
           );
-          return { element: <AdminRoute Component={GeneralLLMPreference} /> };
+          return { Component: withAdmin(GeneralLLMPreference) };
         },
       },
       {
@@ -143,7 +149,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/TranscriptionPreference"
           );
           return {
-            element: <AdminRoute Component={GeneralTranscriptionPreference} />,
+            Component: withAdmin(GeneralTranscriptionPreference),
           };
         },
       },
@@ -154,7 +160,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/AudioPreference"
           );
           return {
-            element: <AdminRoute Component={GeneralAudioPreference} />,
+            Component: withAdmin(GeneralAudioPreference),
           };
         },
       },
@@ -165,7 +171,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/EmbeddingPreference"
           );
           return {
-            element: <AdminRoute Component={GeneralEmbeddingPreference} />,
+            Component: withAdmin(GeneralEmbeddingPreference),
           };
         },
       },
@@ -176,7 +182,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/ImageGenerationPreference"
           );
           return {
-            element: <AdminRoute Component={ImageGenerationPreference} />,
+            Component: withAdmin(ImageGenerationPreference),
           };
         },
       },
@@ -187,7 +193,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/EmbeddingTextSplitterPreference"
           );
           return {
-            element: <AdminRoute Component={EmbeddingTextSplitterPreference} />,
+            Component: withAdmin(EmbeddingTextSplitterPreference),
           };
         },
       },
@@ -198,7 +204,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/VectorDatabase"
           );
           return {
-            element: <AdminRoute Component={GeneralVectorDatabase} />,
+            Component: withAdmin(GeneralVectorDatabase),
           };
         },
       },
@@ -206,7 +212,7 @@ const router = createBrowserRouter([
         path: "/settings/agents",
         lazy: async () => {
           const { default: AdminAgents } = await import("@/pages/Admin/Agents");
-          return { element: <AdminRoute Component={AdminAgents} /> };
+          return { Component: withAdmin(AdminAgents) };
         },
       },
       {
@@ -216,9 +222,7 @@ const router = createBrowserRouter([
             "@/pages/Admin/AgentBuilder"
           );
           return {
-            element: (
-              <AdminRoute Component={AgentBuilder} hideUserMenu={true} />
-            ),
+            Component: withAdmin(AgentBuilder, true),
           };
         },
       },
@@ -229,9 +233,7 @@ const router = createBrowserRouter([
             "@/pages/Admin/AgentBuilder"
           );
           return {
-            element: (
-              <AdminRoute Component={AgentBuilder} hideUserMenu={true} />
-            ),
+            Component: withAdmin(AgentBuilder, true),
           };
         },
       },
@@ -239,7 +241,7 @@ const router = createBrowserRouter([
         path: "/settings/event-logs",
         lazy: async () => {
           const { default: AdminLogs } = await import("@/pages/Admin/Logging");
-          return { element: <AdminRoute Component={AdminLogs} /> };
+          return { Component: withAdmin(AdminLogs) };
         },
       },
       {
@@ -248,7 +250,7 @@ const router = createBrowserRouter([
           const { default: ChatEmbedWidgets } = await import(
             "@/pages/GeneralSettings/ChatEmbedWidgets"
           );
-          return { element: <AdminRoute Component={ChatEmbedWidgets} /> };
+          return { Component: withAdmin(ChatEmbedWidgets) };
         },
       },
       // Manager routes
@@ -258,7 +260,7 @@ const router = createBrowserRouter([
           const { default: GeneralSecurity } = await import(
             "@/pages/GeneralSettings/Security"
           );
-          return { element: <ManagerRoute Component={GeneralSecurity} /> };
+          return { Component: withManager(GeneralSecurity) };
         },
       },
       {
@@ -267,7 +269,7 @@ const router = createBrowserRouter([
           const { default: PrivacyAndData } = await import(
             "@/pages/GeneralSettings/PrivacyAndData"
           );
-          return { element: <AdminRoute Component={PrivacyAndData} /> };
+          return { Component: withAdmin(PrivacyAndData) };
         },
       },
       {
@@ -276,7 +278,7 @@ const router = createBrowserRouter([
           const { default: InterfaceSettings } = await import(
             "@/pages/GeneralSettings/Settings/Interface"
           );
-          return { element: <ManagerRoute Component={InterfaceSettings} /> };
+          return { Component: withManager(InterfaceSettings) };
         },
       },
       {
@@ -285,7 +287,7 @@ const router = createBrowserRouter([
           const { default: BrandingSettings } = await import(
             "@/pages/GeneralSettings/Settings/Branding"
           );
-          return { element: <ManagerRoute Component={BrandingSettings} /> };
+          return { Component: withManager(BrandingSettings) };
         },
       },
       {
@@ -294,7 +296,7 @@ const router = createBrowserRouter([
           const { default: DefaultSystemPrompt } = await import(
             "@/pages/Admin/DefaultSystemPrompt"
           );
-          return { element: <AdminRoute Component={DefaultSystemPrompt} /> };
+          return { Component: withAdmin(DefaultSystemPrompt) };
         },
       },
       {
@@ -303,7 +305,7 @@ const router = createBrowserRouter([
           const { default: ChatSettings } = await import(
             "@/pages/GeneralSettings/Settings/Chat"
           );
-          return { element: <ManagerRoute Component={ChatSettings} /> };
+          return { Component: withManager(ChatSettings) };
         },
       },
       {
@@ -312,7 +314,7 @@ const router = createBrowserRouter([
           const { default: GeneralApiKeys } = await import(
             "@/pages/GeneralSettings/ApiKeys"
           );
-          return { element: <AdminRoute Component={GeneralApiKeys} /> };
+          return { Component: withAdmin(GeneralApiKeys) };
         },
       },
       {
@@ -321,7 +323,7 @@ const router = createBrowserRouter([
           const { default: ModelRouters } = await import(
             "@/pages/GeneralSettings/ModelRouters"
           );
-          return { element: <AdminRoute Component={ModelRouters} /> };
+          return { Component: withAdmin(ModelRouters) };
         },
       },
       {
@@ -330,7 +332,7 @@ const router = createBrowserRouter([
           const { default: RouterRulesPage } = await import(
             "@/pages/GeneralSettings/ModelRouters/RouterRulesPage"
           );
-          return { element: <AdminRoute Component={RouterRulesPage} /> };
+          return { Component: withAdmin(RouterRulesPage) };
         },
       },
       {
@@ -340,7 +342,7 @@ const router = createBrowserRouter([
             "@/pages/Admin/SystemPromptVariables"
           );
           return {
-            element: <AdminRoute Component={SystemPromptVariables} />,
+            Component: withAdmin(SystemPromptVariables),
           };
         },
       },
@@ -351,7 +353,7 @@ const router = createBrowserRouter([
             "@/pages/GeneralSettings/BrowserExtensionApiKey"
           );
           return {
-            element: <ManagerRoute Component={GeneralBrowserExtension} />,
+            Component: withManager(GeneralBrowserExtension),
           };
         },
       },
@@ -361,7 +363,7 @@ const router = createBrowserRouter([
           const { default: GeneralChats } = await import(
             "@/pages/GeneralSettings/Chats"
           );
-          return { element: <ManagerRoute Component={GeneralChats} /> };
+          return { Component: withManager(GeneralChats) };
         },
       },
       {
@@ -370,14 +372,14 @@ const router = createBrowserRouter([
           const { default: AdminInvites } = await import(
             "@/pages/Admin/Invitations"
           );
-          return { element: <ManagerRoute Component={AdminInvites} /> };
+          return { Component: withManager(AdminInvites) };
         },
       },
       {
         path: "/settings/users",
         lazy: async () => {
           const { default: AdminUsers } = await import("@/pages/Admin/Users");
-          return { element: <ManagerRoute Component={AdminUsers} /> };
+          return { Component: withManager(AdminUsers) };
         },
       },
       {
@@ -386,7 +388,7 @@ const router = createBrowserRouter([
           const { default: AdminWorkspaces } = await import(
             "@/pages/Admin/Workspaces"
           );
-          return { element: <ManagerRoute Component={AdminWorkspaces} /> };
+          return { Component: withManager(AdminWorkspaces) };
         },
       },
       // Onboarding Flow
@@ -403,7 +405,7 @@ const router = createBrowserRouter([
         path: "*",
         lazy: async () => {
           const { default: NotFound } = await import("@/pages/404");
-          return { element: <NotFound /> };
+          return { Component: NotFound };
         },
       },
     ],
