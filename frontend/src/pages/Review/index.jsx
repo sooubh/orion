@@ -184,7 +184,7 @@ export default function ReviewPage() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
                 <div className="text-[11px] text-zinc-400 font-mono">
-                  Specialists: <span className="text-sky-400 font-semibold">Technical</span> · <span className="text-amber-400 font-semibold">Policy</span> · <span className="text-emerald-400 font-semibold">Risk</span> · <span className="text-purple-400 font-semibold">Final Decision</span>
+                  Specialists: <span className="text-sky-400 font-semibold">Technical</span> · <span className="text-amber-400 font-semibold">Policy</span> · <span className="text-emerald-400 font-semibold">Risk</span> · <span className="text-zinc-200 font-semibold">Final Decision</span>
                 </div>
 
                 <button

@@ -135,7 +135,7 @@ export default function DocumentsPage() {
     if (ext === "pdf") return <FilePdf size={20} className="text-rose-400" weight="duotone" />;
     if (["doc", "docx"].includes(ext)) return <FileDoc size={20} className="text-sky-400" weight="duotone" />;
     if (["xls", "xlsx", "csv"].includes(ext)) return <FileXls size={20} className="text-emerald-400" weight="duotone" />;
-    if (["js", "py", "json", "sh", "ts"].includes(ext)) return <FileCode size={20} className="text-purple-400" weight="duotone" />;
+    if (["js", "py", "json", "sh", "ts"].includes(ext)) return <FileCode size={20} className="text-sky-400" weight="duotone" />;
     return <FileText size={20} className="text-zinc-400" weight="duotone" />;
   }
 

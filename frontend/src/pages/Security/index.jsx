@@ -145,9 +145,9 @@ export default function SecurityPage() {
             <div className="sovereign-card rounded-2xl p-5 space-y-3">
               <div className="flex items-center justify-between text-zinc-400">
                 <span className="text-xs font-bold uppercase tracking-wider font-mono">Agent Tool Sandboxing</span>
-                <Wrench size={20} className="text-purple-400" weight="duotone" />
+                <Wrench size={20} className="text-sky-400" weight="duotone" />
               </div>
-              <div className="text-lg font-extrabold text-purple-400 font-mono">
+              <div className="text-lg font-extrabold text-sky-400 font-mono">
                 Active Isolation
               </div>
               <div className="text-xs text-zinc-400 font-mono">

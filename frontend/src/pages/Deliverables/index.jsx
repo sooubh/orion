@@ -94,7 +94,7 @@ export default function DeliverablesPage() {
     if (ext === "pdf")
       return <FilePdf size={24} className="text-rose-400" weight="duotone" />;
     if (["js", "py", "ts", "json", "sh"].includes(ext))
-      return <FileCode size={24} className="text-purple-400" weight="duotone" />;
+      return <FileCode size={24} className="text-sky-400" weight="duotone" />;
     return <FileText size={24} className="text-zinc-400" weight="duotone" />;
   }
 
