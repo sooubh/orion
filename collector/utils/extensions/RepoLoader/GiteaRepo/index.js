@@ -44,7 +44,11 @@ async function loadGiteaRepo(args, response) {
           __dirname,
           `../../../../../server/storage/documents/${outFolder}`
         )
-      : path.resolve(process.env.STORAGE_DIR, `documents/${outFolder}`);
+      : path.resolve(
+          process.env.STORAGE_DIR ??
+            path.resolve(__dirname, `../../../../../server/storage`),
+          `documents/${outFolder}`
+        );
 
   if (!fs.existsSync(outFolderPath))
     fs.mkdirSync(outFolderPath, { recursive: true });

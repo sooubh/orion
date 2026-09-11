@@ -711,7 +711,7 @@ function moveProcessedDocsToFolder(
       throw new Error("Invalid file location.");
 
     fs.renameSync(sourcePath, destinationPath);
-    doc.location = path.join(folder, path.basename(doc.location));
+    doc.location = `${folder}/${path.basename(doc.location)}`;
     doc.name = path.basename(doc.location);
   }
 
