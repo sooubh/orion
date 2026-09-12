@@ -107,6 +107,9 @@ export default {
     return `${API_BASE}/docs`;
   },
   settings: {
+    home: () => {
+      return "/settings";
+    },
     users: () => {
       return `/settings/users`;
     },

@@ -11,6 +11,9 @@ import Login from "@/pages/Login";
 import SimpleSSOPassthrough from "@/pages/Login/SSO/simple";
 import OnboardingFlow from "@/pages/OnboardingFlow";
 import "@/index.css";
+import { migrateLocalStorage } from "@/utils/storageMigration";
+
+migrateLocalStorage();
 
 const isDev = import.meta.env.DEV;
 const REACTWRAP = isDev ? React.Fragment : React.StrictMode;
@@ -132,7 +135,16 @@ const router = createBrowserRouter([
           return { Component: InvitePage };
         },
       },
-      // Admin routes
+      // Settings Hub & Admin routes
+      {
+        path: "/settings",
+        lazy: async () => {
+          const { default: GeneralSettingsHub } = await import(
+            "@/pages/GeneralSettings"
+          );
+          return { Component: withManager(GeneralSettingsHub) };
+        },
+      },
       {
         path: "/settings/llm-preference",
         lazy: async () => {
