@@ -1,8 +1,8 @@
-# Sovereign AI — Private AI for Confidential Work
+# Orion — Private Intelligence Platform
 
-A self-hosted, air-gap-ready AI platform for private document intelligence. Ingest documents of any format, embed them into vector databases, and chat with an LLM grounded in your data — all running on local hardware with zero external data egress.
+A self-hosted, air-gap-ready AI platform for private intelligence. Ingest documents of any format, embed them into vector databases, and chat with an LLM grounded in your data — all running on local hardware with zero external data egress.
 
-Built on the [AnythingLLM](https://github.com/Mintplex-Labs/anything-llm) foundation by Mintplex Labs, customized with a Sovereign AI command center, multi-perspective specialist review engine, deliverables registry, and security center.
+Built on the AnythingLLM foundation by Mintplex Labs, transformed into Orion — a private intelligence platform with unified model routing, specialist AI review engine, deliverables registry, and security center.
 
 > **Author:** Timothy Carambat (Mintplex Labs) · **License:** MIT
 
@@ -33,7 +33,7 @@ Built on the [AnythingLLM](https://github.com/Mintplex-Labs/anything-llm) founda
 
 ## What This Project Does
 
-Sovereign AI is a three-service monorepo that provides a complete private AI assistant:
+Orion is a three-service monorepo that provides a complete private AI assistant:
 
 1. **Collector** — A document ingestion microservice that parses PDFs, DOCX, XLSX, PPTX, ePub, emails (mbox), images (via OCR), audio/video (via Whisper), web pages, YouTube transcripts, GitHub/GitLab repos, Confluence, and more.
 2. **Server** — An Express.js API that manages workspaces, users, vector embeddings, chat (with SSE streaming), agents with tool-calling, scheduled jobs, model routing, memories, and an encrypted SQLite database via Prisma ORM.
@@ -51,7 +51,7 @@ Sovereign AI is a three-service monorepo that provides a complete private AI ass
 | Workspace management with threads | ✅ Implemented |
 | Agent system with tool-calling & skills | ✅ Implemented |
 | Multi-user auth (JWT, roles, invites, SSO) | ✅ Implemented |
-| Sovereign AI Dashboard (command center) | ✅ Implemented |
+| Orion Dashboard (command center) | ✅ Implemented |
 | Specialist AI Review Engine (4 perspectives) | ✅ Implemented |
 | Deliverables Registry (DOCX/XLSX/PPTX/PDF/Code) | ✅ Implemented |
 | Security Center (hardware vitals, audit logs) | ✅ Implemented |
@@ -154,7 +154,7 @@ graph TB
 ## Project Structure
 
 ```
-sovereign-ai/
+orion/
 ├── .github/
 │   ├── FUNDING.yml
 │   ├── ISSUE_TEMPLATE/
@@ -553,8 +553,8 @@ sequenceDiagram
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/sooubh/vision.git
-cd vision
+git clone https://github.com/sooubh/orion.git
+cd orion
 ```
 
 ### 2. Install Dependencies

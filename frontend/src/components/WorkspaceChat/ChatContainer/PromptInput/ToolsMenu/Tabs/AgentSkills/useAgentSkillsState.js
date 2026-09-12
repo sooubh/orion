@@ -141,7 +141,9 @@ export default function useAgentSkillsState(defaultSkills) {
         return prev.map((server) => {
           if (server.name !== serverName) return server;
           const currentSuppressed =
-            server.config?.anythingllm?.suppressedTools || [];
+            server.config?.orion?.suppressedTools ||
+            server.config?.anythingllm?.suppressedTools ||
+            [];
           const newSuppressed = newEnabled
             ? currentSuppressed.filter((t) => t !== toolName)
             : [...currentSuppressed, toolName];
@@ -149,6 +151,10 @@ export default function useAgentSkillsState(defaultSkills) {
             ...server,
             config: {
               ...server.config,
+              orion: {
+                ...server.config?.orion,
+                suppressedTools: newSuppressed,
+              },
               anythingllm: {
                 ...server.config?.anythingllm,
                 suppressedTools: newSuppressed,

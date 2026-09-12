@@ -23,7 +23,7 @@ import NewWorkspaceModal, {
 } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
 import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
-import SovereignLogo from "@/media/logo/sovereign-ai.svg";
+import OrionBrand from "@/components/OrionBrand";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -113,13 +113,7 @@ export default function Sidebar() {
         <div className={`flex flex-col h-full overflow-hidden ${showSidebar ? "opacity-100" : "opacity-0 pointer-events-none"} transition-opacity duration-200`}>
           {/* Header Brand */}
           <div className="h-16 flex items-center px-5 border-b border-[#1f2328] justify-between">
-            <Link to={paths.dashboard()} className="flex items-center gap-2 group">
-              <img
-                src={SovereignLogo}
-                alt="Sovereign AI"
-                className="h-8 w-auto object-contain"
-              />
-            </Link>
+            <OrionBrand to={paths.dashboard()} size="lg" />
           </div>
 
           {/* Navigation Links */}
@@ -241,9 +235,9 @@ export default function Sidebar() {
                   {isLight ? <Moon size={15} weight="bold" /> : <Sun size={15} weight="bold" className="text-amber-400" />}
                 </button>
                 <Link
-                  to="/settings/llm-preference"
+                  to="/settings"
                   className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
-                  title="Settings & LLM Preference"
+                  title="System Settings"
                 >
                   <GearSix size={15} />
                 </Link>
@@ -272,13 +266,7 @@ export function SidebarMobileHeader() {
       >
         <List size={22} />
       </button>
-      <Link to={paths.dashboard()} className="flex items-center">
-        <img
-          src={SovereignLogo}
-          alt="Sovereign AI"
-          className="h-6 w-auto object-contain"
-        />
-      </Link>
+      <OrionBrand to={paths.dashboard()} size="md" />
       <Link
         to={paths.security()}
         className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-bold text-emerald-400 font-mono"

@@ -1,5 +1,6 @@
 import { useLanguageOptions } from "@/hooks/useLanguageOptions";
 import { useTranslation } from "react-i18next";
+import { CaretDown } from "@phosphor-icons/react";
 
 export default function LanguagePreference() {
   const { t } = useTranslation();
@@ -11,28 +12,33 @@ export default function LanguagePreference() {
   } = useLanguageOptions();
 
   return (
-    <div className="flex flex-col gap-y-0.5 my-4">
-      <p className="text-sm leading-6 font-semibold text-white">
-        {t("customization.items.display-language.title")}
-      </p>
-      <p className="text-xs text-white/60">
-        {t("customization.items.display-language.description")}
-      </p>
-      <div className="flex items-center gap-x-4">
+    <div className="p-5 rounded-2xl bg-theme-bg-sidebar/70 border border-theme-sidebar-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-white block">
+          {t("customization.items.display-language.title")}
+        </label>
+        <p className="text-xs text-zinc-400">
+          {t("customization.items.display-language.description")}
+        </p>
+      </div>
+      <div className="relative min-w-[200px]">
         <select
           name="userLang"
-          className="border-none bg-theme-settings-input-bg mt-2 text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-fit py-2 px-4"
           defaultValue={currentLanguage || "en"}
           onChange={(e) => changeLanguage(e.target.value)}
+          className="w-full appearance-none bg-zinc-900/90 hover:bg-zinc-900 border border-zinc-700/60 hover:border-indigo-500/50 text-white text-sm font-medium rounded-xl py-2.5 pl-4 pr-10 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all cursor-pointer shadow-sm"
         >
-          {supportedLanguages.map((lang) => {
-            return (
-              <option key={lang} value={lang}>
-                {getLanguageName(lang)}
-              </option>
-            );
-          })}
+          {supportedLanguages.map((lang) => (
+            <option key={lang} value={lang} className="bg-zinc-900 text-white">
+              {getLanguageName(lang)}
+            </option>
+          ))}
         </select>
+        <CaretDown
+          size={16}
+          weight="bold"
+          className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
+        />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import SovereignLogo from "./media/logo/sovereign-ai.svg";
+import OrionLogo from "./media/logo/orion.svg";
 import System from "./models/system";
 
 export const REFETCH_LOGO_EVENT = "refetch-logo";
@@ -10,8 +10,8 @@ function isLightMode() {
 export const LogoContext = createContext();
 
 export function LogoProvider({ children }) {
-  const [logo, setLogo] = useState(SovereignLogo);
-  const [loginLogo, setLoginLogo] = useState(SovereignLogo);
+  const [logo, setLogo] = useState(OrionLogo);
+  const [loginLogo, setLoginLogo] = useState(OrionLogo);
   const [isCustomLogo, setIsCustomLogo] = useState(false);
 
   async function fetchInstanceLogo() {
@@ -22,13 +22,13 @@ export function LogoProvider({ children }) {
         setLoginLogo(logoURL);
         setIsCustomLogo(true);
       } else {
-        setLogo(SovereignLogo);
-        setLoginLogo(SovereignLogo);
+        setLogo(OrionLogo);
+        setLoginLogo(OrionLogo);
         setIsCustomLogo(false);
       }
     } catch {
-      setLogo(SovereignLogo);
-      setLoginLogo(SovereignLogo);
+      setLogo(OrionLogo);
+      setLoginLogo(OrionLogo);
       setIsCustomLogo(false);
     }
   }

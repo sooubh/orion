@@ -7,7 +7,7 @@
 }
 
 :root {
-  /* Sovereign AI Enterprise Industrial Graphite Theme */
+  /* Orion Enterprise Industrial Graphite Theme */
   --theme-loader: #4a7299;
   --theme-bg-primary: #0e1013;
   --theme-bg-secondary: #16191d;
@@ -1185,7 +1185,7 @@ textarea {
     sans-serif !important;
 }
 
-/* Sovereign AI Modern Scrollbar */
+/* Orion Modern Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

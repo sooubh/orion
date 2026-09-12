@@ -18,7 +18,9 @@ export default function TextSizeMenu() {
   const mode = useLoginMode();
   const [showMenu, setShowMenu] = useState(false);
   const [selectedSize, setSelectedSize] = useState(
-    window.localStorage.getItem("anythingllm_text_size") || "normal"
+    window.localStorage.getItem("orion_text_size") ||
+      window.localStorage.getItem("anythingllm_text_size") ||
+      "normal"
   );
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -41,7 +43,7 @@ export default function TextSizeMenu() {
 
   function handleTextSizeChange(size) {
     setSelectedSize(size);
-    window.localStorage.setItem("anythingllm_text_size", size);
+    window.localStorage.setItem("orion_text_size", size);
     window.dispatchEvent(new CustomEvent("textSizeChange", { detail: size }));
   }
 

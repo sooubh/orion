@@ -1,7 +1,7 @@
 {
-  "name": "sovereign-ai-collector",
+  "name": "orion-collector",
   "version": "1.0.0",
-  "description": "Sovereign AI Document Ingestion and Processing Engine",
+  "description": "Orion Document Ingestion and Processing Engine",
   "main": "index.js",
   "author": "Timothy Carambat (Mintplex Labs)",
   "license": "MIT",

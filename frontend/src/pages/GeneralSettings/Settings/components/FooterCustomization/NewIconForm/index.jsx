@@ -53,29 +53,29 @@ export default function NewIconForm({ icon, url, onSave, onRemove }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-x-1.5">
+    <form onSubmit={handleSubmit} className="flex items-center gap-x-2">
       <div className="relative" ref={dropdownRef}>
         <div
-          className="h-[34px] w-[34px] bg-theme-settings-input-bg rounded-full flex items-center justify-center cursor-pointer hover:outline-primary-button hover:outline"
+          className="h-9 w-9 bg-zinc-900 border border-zinc-700/60 hover:border-indigo-500/50 rounded-xl flex items-center justify-center cursor-pointer transition-all shadow-sm"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           {React.createElement(ICON_COMPONENTS[selectedIcon] || Plus, {
-            className: "h-5 w-5",
+            className: "h-4 w-4",
             weight: selectedIcon === "Plus" ? "bold" : "fill",
             color: "var(--theme-sidebar-footer-icon-fill)",
           })}
         </div>
         {isDropdownOpen && (
-          <div className="absolute z-10 grid grid-cols-4 bg-theme-settings-input-bg mt-2 rounded-md w-[150px] h-[78px] overflow-y-auto border border-white/20 shadow-lg">
+          <div className="absolute z-20 grid grid-cols-4 bg-zinc-900 mt-2 p-1.5 rounded-xl w-[160px] h-[86px] overflow-y-auto border border-zinc-700 shadow-2xl">
             {Object.keys(ICON_COMPONENTS).map((iconName) => (
               <button
                 key={iconName}
                 type="button"
-                className="flex justify-center items-center border border-transparent hover:bg-theme-sidebar-footer-icon-hover hover:border-slate-100 light:hover:border-black/80 rounded-full p-2"
+                className="flex justify-center items-center border border-transparent hover:bg-zinc-800 rounded-lg p-2 transition-colors cursor-pointer"
                 onClick={() => handleIconChange(iconName)}
               >
                 {React.createElement(ICON_COMPONENTS[iconName], {
-                  className: "h-5 w-5",
+                  className: "h-4 w-4",
                   weight: "fill",
                   color: "var(--theme-sidebar-footer-icon-fill)",
                 })}
@@ -89,7 +89,7 @@ export default function NewIconForm({ icon, url, onSave, onRemove }) {
         value={selectedUrl}
         onChange={handleUrlChange}
         placeholder="https://example.com"
-        className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-md p-2.5 w-[300px] h-[32px] focus:outline-primary-button active:outline-primary-button outline-none"
+        className="bg-zinc-900 border border-zinc-700/60 focus:border-indigo-500 rounded-xl text-white placeholder:text-zinc-500 text-sm px-3.5 py-2 w-[320px] outline-none transition-all"
         required
       />
       {selectedIcon !== "Plus" && (
@@ -97,7 +97,7 @@ export default function NewIconForm({ icon, url, onSave, onRemove }) {
           {isEdited ? (
             <button
               type="submit"
-              className="text-sky-400 px-2 py-2 rounded-md text-sm font-bold hover:text-sky-500"
+              className="text-indigo-400 hover:text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/60 border border-indigo-700/40 transition-colors cursor-pointer"
             >
               Save
             </button>
@@ -105,9 +105,9 @@ export default function NewIconForm({ icon, url, onSave, onRemove }) {
             <button
               type="button"
               onClick={handleRemove}
-              className="hover:text-red-500 text-white/80 px-2 py-2 rounded-md text-sm font-bold"
+              className="text-zinc-400 hover:text-red-400 p-2 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           )}
         </>

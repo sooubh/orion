@@ -5,7 +5,7 @@ import System from "@/models/system";
 import showToast from "@/utils/toast";
 import PreLoader from "@/components/Preloader";
 import GenericOpenAiLogo from "@/media/llmprovider/generic-openai.png";
-import AnythingLLMIcon from "@/media/logo/sovereign-ai.svg";
+import OrionIcon from "@/media/logo/sovereign-ai.svg";
 import GenericOpenAiWhisperOptions from "@/components/TranscriptionSelection/GenericOpenAiOptions";
 import NativeTranscriptionOptions from "@/components/TranscriptionSelection/NativeTranscriptionOptions";
 import LLMItem from "@/components/LLMSelection/LLMItem";
@@ -15,9 +15,9 @@ import { useTranslation } from "react-i18next";
 
 const PROVIDERS = [
   {
-    name: "AnythingLLM Built-In",
+    name: "Orion Built-In Whisper",
     value: "local",
-    logo: AnythingLLMIcon,
+    logo: OrionIcon,
     options: (settings) => <NativeTranscriptionOptions settings={settings} />,
     description: "Run a built-in whisper model on this instance privately.",
   },
@@ -114,123 +114,143 @@ export default function TranscriptionModelPreference() {
       ) : (
         <div
           style={{ height: isMobile ? "100%" : "calc(100% - 32px)" }}
-          className="relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary w-full h-full overflow-y-scroll p-4 md:p-0"
+          className="relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary w-full h-full overflow-y-auto modern-scrollbar p-4 md:p-8"
         >
-          <form onSubmit={handleSubmit} className="flex w-full">
-            <div className="flex flex-col w-full px-1 md:pl-6 md:pr-[50px] py-16 md:py-6">
-              <div className="w-full flex flex-col gap-y-1 pb-6 border-white light:border-theme-sidebar-border border-b-2 border-opacity-10">
-                <div className="flex gap-x-4 items-center">
-                  <p className="text-lg leading-6 font-bold text-white">
+          <div className="max-w-4xl mx-auto">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-y-6">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+                    <span>Settings</span>
+                    <span>/</span>
+                    <span className="text-indigo-400">AI & Intelligence</span>
+                  </div>
+                  <h1 className="text-2xl font-bold tracking-tight text-white">
                     {t("transcription.title")}
+                  </h1>
+                  <p className="text-xs text-zinc-400">
+                    {t("transcription.description")}
                   </p>
                 </div>
-                <p className="text-xs leading-[18px] font-base text-white text-opacity-60">
-                  {t("transcription.description")}
-                </p>
-              </div>
-              <div className="w-full justify-end flex">
                 {hasChanges && (
                   <CTAButton
                     onClick={() => handleSubmit()}
-                    className="mt-3 mr-0 -mb-14 z-10"
+                    className="shadow-lg animate-pulse shrink-0"
                   >
                     {saving ? "Saving..." : "Save changes"}
                   </CTAButton>
                 )}
               </div>
-              <div className="text-base font-bold text-white mt-6 mb-4">
-                {t("transcription.provider")}
-              </div>
-              <div className="relative">
-                {searchMenuOpen && (
-                  <div
-                    className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 backdrop-blur-sm z-10"
-                    onClick={() => setSearchMenuOpen(false)}
-                  />
-                )}
-                {searchMenuOpen ? (
-                  <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[310px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
-                    <div className="w-full flex flex-col gap-y-1">
-                      <div className="flex items-center sticky top-0 z-10 border-b border-[#9CA3AF] mx-4 bg-theme-settings-input-bg">
-                        <MagnifyingGlass
-                          size={20}
-                          weight="bold"
-                          className="absolute left-4 z-30 text-theme-text-primary -ml-4 my-2"
-                        />
-                        <input
-                          type="text"
-                          name="provider-search"
-                          autoComplete="off"
-                          placeholder="Search audio transcription providers"
-                          className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none focus:outline-primary-button active:outline-primary-button outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          ref={searchInputRef}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") e.preventDefault();
-                          }}
-                        />
-                        <X
-                          size={20}
-                          weight="bold"
-                          className="cursor-pointer text-white hover:text-x-button"
-                          onClick={handleXButton}
-                        />
-                      </div>
-                      <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
-                        {filteredProviders.map((provider) => (
-                          <LLMItem
-                            key={provider.name}
-                            name={provider.name}
-                            value={provider.value}
-                            image={provider.logo}
-                            description={provider.description}
-                            checked={selectedProvider === provider.value}
-                            onClick={() => updateProviderChoice(provider.value)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
+
+              {/* Provider Selector Card */}
+              <div className="p-5 rounded-2xl bg-theme-bg-sidebar/70 border border-theme-sidebar-border/30 space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block mb-1">
+                    {t("transcription.provider")}
+                  </label>
+                  <p className="text-xs text-zinc-400">
+                    Select the audio transcription provider for speech recognition.
+                  </p>
+                </div>
+
+                <div className="relative max-w-xl">
                   <button
-                    className="w-full max-w-[640px] h-[64px] bg-theme-settings-input-bg rounded-lg flex items-center p-[14px] justify-between cursor-pointer border-2 border-transparent hover:border-primary-button transition-all duration-300"
+                    className="w-full h-16 bg-zinc-900/90 hover:bg-zinc-900 border border-zinc-700/60 hover:border-indigo-500/50 rounded-xl flex items-center px-4 justify-between cursor-pointer transition-all shadow-sm group"
                     type="button"
                     onClick={() => setSearchMenuOpen(true)}
                   >
-                    <div className="flex gap-x-4 items-center">
-                      <img
-                        src={selectedProviderObject.logo}
-                        alt={`${selectedProviderObject.name} logo`}
-                        className="w-10 h-10 rounded-md"
-                      />
-                      <div className="flex flex-col text-left">
-                        <div className="text-sm font-semibold text-white">
+                    <div className="flex gap-x-3.5 items-center min-w-0">
+                      <div className="w-10 h-10 rounded-lg p-1 bg-zinc-950 border border-white/10 flex items-center justify-center shrink-0">
+                        <img
+                          src={selectedProviderObject.logo}
+                          alt={`${selectedProviderObject.name} logo`}
+                          className="w-7 h-7 rounded object-contain"
+                        />
+                      </div>
+                      <div className="flex flex-col text-left truncate">
+                        <div className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">
                           {selectedProviderObject.name}
                         </div>
-                        <div className="mt-1 text-xs text-description">
+                        <div className="text-xs text-zinc-400 truncate">
                           {selectedProviderObject.description}
                         </div>
                       </div>
                     </div>
                     <CaretUpDown
-                      size={24}
+                      size={18}
                       weight="bold"
-                      className="text-white"
+                      className="text-zinc-400 group-hover:text-white shrink-0 ml-3 transition-colors"
                     />
                   </button>
-                )}
+
+                  {searchMenuOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
+                        onClick={() => setSearchMenuOpen(false)}
+                      />
+                      <div className="absolute top-0 left-0 w-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-40 overflow-hidden flex flex-col">
+                        <div className="flex items-center px-3 py-2.5 bg-zinc-950 border-b border-zinc-800 gap-2">
+                          <MagnifyingGlass
+                            size={16}
+                            className="text-zinc-400 shrink-0"
+                          />
+                          <input
+                            type="text"
+                            name="provider-search"
+                            autoComplete="off"
+                            placeholder="Search audio transcription providers..."
+                            className="bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none w-full py-1"
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            ref={searchInputRef}
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.preventDefault();
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleXButton}
+                            className="p-1 text-zinc-400 hover:text-white transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                        <div className="p-2 space-y-1 overflow-y-auto max-h-64 modern-scrollbar">
+                          {filteredProviders.map((provider) => (
+                            <LLMItem
+                              key={provider.name}
+                              name={provider.name}
+                              value={provider.value}
+                              image={provider.logo}
+                              description={provider.description}
+                              checked={selectedProvider === provider.value}
+                              onClick={() => updateProviderChoice(provider.value)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+
+              {/* Provider Options Card */}
               <div
                 onChange={() => setHasChanges(true)}
-                className="mt-4 flex flex-col gap-y-1"
+                className="p-5 rounded-2xl bg-theme-bg-sidebar/70 border border-theme-sidebar-border/30 space-y-4"
               >
+                <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                  {selectedProviderObject.name} Configuration
+                </h3>
                 {selectedProvider &&
                   PROVIDERS.find(
                     (provider) => provider.value === selectedProvider
                   )?.options(settings)}
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       )}
     </div>

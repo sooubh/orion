@@ -40,6 +40,8 @@
     "openai",
     "opendocument",
     "openrouter",
+    "orion",
+    "orionai",
     "pagerender",
     "ppio",
     "Qdrant",

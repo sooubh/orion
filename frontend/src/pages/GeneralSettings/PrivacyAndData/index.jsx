@@ -27,27 +27,28 @@ export default function PrivacyAndDataHandling() {
       <Sidebar />
       <div
         style={{ height: isMobile ? "100%" : "calc(100% - 32px)" }}
-        className="relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] light:border light:border-theme-sidebar-border bg-theme-bg-secondary w-full h-full overflow-y-scroll p-4 md:p-0"
+        className="relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary w-full h-full overflow-y-auto modern-scrollbar p-4 md:p-8"
       >
-        <div className="flex flex-col w-full px-1 md:pl-6 md:pr-[50px] md:py-6 py-16">
-          <div className="w-full flex flex-col gap-y-1 pb-6 border-white/10 border-b-2">
-            <div className="items-center flex gap-x-4">
-              <p className="text-lg leading-6 font-bold text-theme-text-primary">
-                {t("privacy.title")}
-              </p>
+        <div className="max-w-4xl mx-auto flex flex-col gap-y-6">
+          <div className="flex flex-col gap-1 pb-6 border-b border-white/10">
+            <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+              <span>Settings</span>
+              <span>/</span>
+              <span className="text-emerald-400">Security & Isolation</span>
             </div>
-            <p className="text-xs leading-[18px] font-base text-theme-text-secondary">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              {t("privacy.title")}
+            </h1>
+            <p className="text-xs text-zinc-400">
               {t("privacy.description")}
             </p>
           </div>
           {loading ? (
-            <div className="h-1/2 transition-all duration-500 relative md:ml-[2px] md:mr-[8px] md:my-[16px] md:rounded-[26px] p-[18px] h-full overflow-y-scroll">
-              <div className="w-full h-full flex justify-center items-center">
-                <PreLoader />
-              </div>
+            <div className="w-full h-64 flex justify-center items-center">
+              <PreLoader />
             </div>
           ) : (
-            <div className="overflow-x-auto flex flex-col gap-y-6 pt-6">
+            <div className="flex flex-col gap-y-6">
               <ProviderPrivacy />
               <TelemetryLogs settings={settings} />
             </div>
@@ -93,7 +94,7 @@ function TelemetryLogs({ settings }) {
         </div>
         <div className="flex flex-col items-left space-y-2">
           <p className="text-theme-text-secondary text-xs rounded-lg w-96">
-            Sovereign AI is built for <b>100% confidential and air-gapped operations</b>.
+            Orion is built for <b>100% confidential and air-gapped operations</b>.
             External telemetry is completely disabled and all model queries and embeddings
             remain strictly on-premise.
           </p>

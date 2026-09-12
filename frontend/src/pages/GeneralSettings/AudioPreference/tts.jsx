@@ -4,7 +4,7 @@ import showToast from "@/utils/toast";
 import LLMItem from "@/components/LLMSelection/LLMItem";
 import { CaretUpDown, MagnifyingGlass, X } from "@phosphor-icons/react";
 import CTAButton from "@/components/lib/CTAButton";
-import AnythingLLMIcon from "@/media/logo/sovereign-ai.svg";
+import OrionIcon from "@/media/logo/sovereign-ai.svg";
 import PiperTTSIcon from "@/media/ttsproviders/piper.png";
 import GenericOpenAiLogo from "@/media/ttsproviders/generic-openai.png";
 import KokoroIcon from "@/media/ttsproviders/kokoro.png";
@@ -18,7 +18,7 @@ const PROVIDERS = [
   {
     name: "System native",
     value: "native",
-    logo: AnythingLLMIcon,
+    logo: OrionIcon,
     options: (settings) => <BrowserNative settings={settings} />,
     description: "Uses your browser's built in TTS service if supported.",
   },
@@ -115,7 +115,7 @@ export default function TextToSpeechProvider({ settings }) {
           </div>
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60">
             Here you can specify what kind of text-to-speech providers you would
-            want to use in your AnythingLLM experience. By default, we use the
+            want to use in your Orion experience. By default, we use the
             browser's built in support for these services, but you may want to
             use others.
           </p>

@@ -55,18 +55,20 @@ export default function FooterCustomization() {
   };
 
   return (
-    <div className="flex flex-col gap-y-0.5 my-4">
-      <p className="text-sm leading-6 font-semibold text-white">
-        {t("customization.items.sidebar-footer.title")}
-      </p>
-      <p className="text-xs text-white/60">
-        {t("customization.items.sidebar-footer.description")}
-      </p>
-      <div className="mt-2 flex gap-x-3 font-medium text-white text-sm">
-        <div>{t("customization.items.sidebar-footer.icon")}</div>
-        <div>{t("customization.items.sidebar-footer.link")}</div>
+    <div className="p-5 rounded-2xl bg-theme-bg-sidebar/70 border border-theme-sidebar-border/30 space-y-4">
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-white block">
+          {t("customization.items.sidebar-footer.title")}
+        </label>
+        <p className="text-xs text-zinc-400">
+          {t("customization.items.sidebar-footer.description")}
+        </p>
       </div>
-      <div className="mt-2 flex flex-col gap-y-[10px]">
+      <div className="flex gap-x-3 font-semibold text-zinc-300 text-xs uppercase tracking-wider">
+        <div>{t("customization.items.sidebar-footer.icon")}</div>
+        <div className="ml-8">{t("customization.items.sidebar-footer.link")}</div>
+      </div>
+      <div className="space-y-2.5">
         {footerIcons.map((icon, index) => (
           <NewIconForm
             key={index}

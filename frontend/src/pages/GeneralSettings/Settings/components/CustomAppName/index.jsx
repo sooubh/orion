@@ -60,21 +60,23 @@ export default function CustomAppName() {
 
   return (
     <form
-      className="flex flex-col gap-y-0.5 mt-4"
+      className="p-5 rounded-2xl bg-theme-bg-sidebar/70 border border-theme-sidebar-border/30 space-y-4"
       onSubmit={updateCustomAppName}
     >
-      <p className="text-sm leading-6 font-semibold text-white">
-        {t("customization.items.app-name.title")}
-      </p>
-      <p className="text-xs text-white/60">
-        {t("customization.items.app-name.description")}
-      </p>
-      <div className="flex items-center gap-x-4">
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-white block">
+          {t("customization.items.app-name.title")}
+        </label>
+        <p className="text-xs text-zinc-400">
+          {t("customization.items.app-name.description")}
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
         <input
           name="customAppName"
           type="text"
-          className="border-none bg-theme-settings-input-bg mt-2 text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-fit py-2 px-4"
-          placeholder="AnythingLLM"
+          className="bg-zinc-900 border border-zinc-700/60 focus:border-indigo-500 rounded-xl text-white placeholder:text-zinc-500 text-sm py-2.5 px-4 outline-none transition-all w-full max-w-sm"
+          placeholder="Orion"
           required={true}
           autoComplete="off"
           onChange={handleChange}
@@ -84,7 +86,7 @@ export default function CustomAppName() {
           <button
             type="button"
             onClick={(e) => updateCustomAppName(e, "")}
-            className="text-white text-base font-medium hover:text-opacity-60"
+            className="text-xs text-zinc-400 hover:text-white px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Clear
           </button>
@@ -93,7 +95,7 @@ export default function CustomAppName() {
       {hasChanges && (
         <button
           type="submit"
-          className="transition-all mt-2 w-fit duration-300 border border-slate-200 px-5 py-2.5 rounded-lg text-white text-sm items-center flex gap-x-2 hover:bg-slate-200 hover:text-slate-800 focus:ring-gray-800"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition-all shadow-sm cursor-pointer"
         >
           Save
         </button>
