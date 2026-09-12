@@ -9,6 +9,10 @@ import {
   PencilSimpleLine,
   Nut,
   Toolbox,
+  ArrowLeft,
+  MagnifyingGlass,
+  X,
+  SquaresFour,
 } from "@phosphor-icons/react";
 import AgentIcon from "@/media/animations/agent-static.png";
 import useUser from "@/hooks/useUser";
@@ -21,6 +25,7 @@ import System from "@/models/system";
 import Option from "./MenuOption";
 import { CanViewChatHistoryProvider } from "../CanViewChatHistory";
 import useAppVersion from "@/hooks/useAppVersion";
+import OrionBrand from "@/components/OrionBrand";
 
 export default function SettingsSidebar() {
   const { t } = useTranslation();
@@ -29,6 +34,7 @@ export default function SettingsSidebar() {
   const sidebarRef = useRef(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showBgOverlay, setShowBgOverlay] = useState(false);
+  const [searchFilter, setSearchFilter] = useState("");
 
   useEffect(() => {
     function handleBg() {
@@ -54,14 +60,15 @@ export default function SettingsSidebar() {
             <List className="h-6 w-6" />
           </button>
           <div className="flex items-center justify-center flex-grow">
-            <img
-              src={logo}
-              alt="Logo"
-              className="block mx-auto h-6 w-auto"
-              style={{ maxHeight: "40px", objectFit: "contain" }}
-            />
+            <OrionBrand to={paths.dashboard()} size="md" />
           </div>
-          <div className="w-12"></div>
+          <Link
+            to={paths.dashboard()}
+            className="p-2 text-theme-text-secondary hover:text-white"
+            title="Dashboard"
+          >
+            <House className="h-5 w-5" />
+          </Link>
         </div>
         <div
           style={{
@@ -74,55 +81,52 @@ export default function SettingsSidebar() {
               showBgOverlay
                 ? "transition-all opacity-1"
                 : "transition-none opacity-0"
-            }  duration-500 fixed top-0 left-0 bg-theme-bg-secondary bg-opacity-75 w-screen h-screen`}
+            } duration-500 fixed top-0 left-0 bg-theme-bg-secondary bg-opacity-75 w-screen h-screen`}
             onClick={() => setShowSidebar(false)}
           />
           <div
             ref={sidebarRef}
-            className="h-[100vh] fixed top-0 left-0 rounded-r-[26px] bg-theme-bg-sidebar w-[80%] p-[18px]"
+            className="h-[100vh] fixed top-0 left-0 rounded-r-[26px] bg-theme-bg-sidebar w-[85%] max-w-[320px] p-4 flex flex-col"
           >
-            <div className="w-full h-full flex flex-col overflow-x-hidden items-between">
+            <div className="w-full h-full flex flex-col overflow-x-hidden justify-between">
               {/* Header Information */}
-              <div className="flex w-full items-center justify-between gap-x-4">
-                <div className="flex shrink-1 w-fit items-center justify-start">
-                  <img
-                    src={logo}
-                    alt="Logo"
-                    className="rounded w-full max-h-[40px]"
-                    style={{ objectFit: "contain" }}
+              <div className="flex w-full items-center justify-between pb-3 border-b border-theme-sidebar-border/20">
+                <OrionBrand to={paths.dashboard()} size="lg" />
+                <Link
+                  to={paths.dashboard()}
+                  className="p-2 rounded-lg text-theme-text-secondary hover:text-white bg-theme-action-menu-bg"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </div>
+
+              {/* Mobile Filter */}
+              <div className="py-3">
+                <div className="relative flex items-center">
+                  <MagnifyingGlass
+                    size={14}
+                    className="absolute left-3 text-theme-text-secondary"
                   />
-                </div>
-                <div className="flex gap-x-2 items-center text-slate-500 shrink-0">
-                  <a
-                    href={paths.home()}
-                    className="transition-all duration-300 p-2 rounded-full text-white bg-theme-action-menu-bg hover:bg-theme-action-menu-item-hover hover:border-slate-100 hover:border-opacity-50 border-transparent border"
-                  >
-                    <House className="h-4 w-4" />
-                  </a>
+                  <input
+                    type="text"
+                    placeholder="Filter settings..."
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    className="w-full pl-8 pr-6 py-1.5 bg-theme-settings-input-bg rounded-md text-xs text-theme-text-primary"
+                  />
                 </div>
               </div>
 
               {/* Primary Body */}
-              <div className="h-full flex flex-col w-full justify-between pt-4 overflow-y-scroll no-scroll">
-                <div className="h-auto md:sidebar-items">
-                  <div className="flex flex-col gap-y-4 pb-[60px] overflow-y-scroll no-scroll">
-                    <SidebarOptions user={user} t={t} />
-                    <div className="h-[1.5px] bg-[#3D4147] mx-3 mt-[14px]" />
-                    <SupportEmail />
-                    <Link
-                      hidden={
-                        user?.hasOwnProperty("role") && user.role !== "admin"
-                      }
-                      to={paths.settings.privacy()}
-                      className="text-theme-text-secondary hover:text-white text-xs leading-[18px] mx-3"
-                    >
-                      {t("settings.privacy")}
-                    </Link>
-                    <AppVersion />
-                  </div>
-                </div>
+              <div className="flex-1 overflow-y-auto space-y-1">
+                <SidebarOptions user={user} t={t} searchFilter={searchFilter} />
               </div>
-              <div className="absolute bottom-2 left-0 right-0 pt-2 bg-theme-bg-sidebar bg-opacity-80 backdrop-filter backdrop-blur-md">
+
+              <div className="pt-3 border-t border-theme-sidebar-border/20">
+                <div className="flex items-center justify-between text-xs text-theme-text-secondary pb-2">
+                  <SupportEmail />
+                  <AppVersion />
+                </div>
                 <Footer />
               </div>
             </div>
@@ -133,53 +137,81 @@ export default function SettingsSidebar() {
   }
 
   return (
-    <>
-      <div>
+    <div
+      ref={sidebarRef}
+      className="w-72 shrink-0 h-screen flex flex-col bg-theme-bg-sidebar border-r border-theme-sidebar-border/30 select-none z-20"
+    >
+      {/* Brand & Top Bar */}
+      <div className="p-4 border-b border-theme-sidebar-border/20 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <OrionBrand to={paths.dashboard()} size="md" />
+          <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold">
+            {user?.role ? user.role.toUpperCase() : "CONSOLE"}
+          </span>
+        </div>
         <Link
-          to={paths.home()}
-          className="flex shrink-0 items-center justify-start mx-[20.5px] my-[18px]"
+          to={paths.dashboard()}
+          className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg text-xs font-medium text-theme-text-secondary hover:text-white bg-theme-action-menu-bg/40 hover:bg-theme-action-menu-bg border border-white/5 transition-all shadow-sm group"
         >
-          <img
-            src={logo}
-            alt="Logo"
-            className="rounded max-h-[24px]"
-            style={{ objectFit: "contain" }}
-          />
+          <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back to Dashboard</span>
         </Link>
-        <div
-          ref={sidebarRef}
-          className="transition-all duration-500 relative m-[16px] rounded-[16px] bg-theme-bg-sidebar border-[2px] border-theme-sidebar-border light:border-none min-w-[250px] p-[10px] h-[calc(100%-76px)]"
-        >
-          <div className="w-full h-full flex flex-col overflow-x-hidden items-between min-w-[235px]">
-            <div className="text-theme-text-secondary text-sm font-medium uppercase mt-[4px] mb-0 ml-2">
-              {t("settings.title")}
-            </div>
-            <div className="relative h-[calc(100%-60px)] flex flex-col w-full justify-between pt-[10px] overflow-y-scroll no-scroll">
-              <div className="h-auto sidebar-items">
-                <div className="flex flex-col gap-y-2 pb-[60px] overflow-y-scroll no-scroll">
-                  <SidebarOptions user={user} t={t} />
-                  <div className="h-[1.5px] bg-[#3D4147] mx-3 mt-[14px]" />
-                  <SupportEmail />
-                  <Link
-                    hidden={
-                      user?.hasOwnProperty("role") && user.role !== "admin"
-                    }
-                    to={paths.settings.privacy()}
-                    className="text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary text-xs leading-[18px] mx-3"
-                  >
-                    {t("settings.privacy")}
-                  </Link>
-                  <AppVersion />
-                </div>
-              </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 pt-4 pb-3 rounded-b-[16px] bg-theme-bg-sidebar bg-opacity-80 backdrop-filter backdrop-blur-md z-10">
-              <Footer />
-            </div>
-          </div>
+      </div>
+
+      {/* Quick Search / Filter Bar */}
+      <div className="px-3 pt-3 pb-2 border-b border-theme-sidebar-border/10">
+        <div className="relative flex items-center">
+          <MagnifyingGlass
+            size={13}
+            className="absolute left-2.5 text-theme-text-secondary pointer-events-none"
+          />
+          <input
+            type="text"
+            placeholder="Filter settings..."
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            className="w-full pl-7 pr-6 py-1.5 bg-theme-settings-input-bg/70 border border-white/10 rounded-md text-xs text-theme-text-primary placeholder:text-theme-text-secondary/60 focus:outline-none focus:border-indigo-500/50 transition-colors"
+          />
+          {searchFilter && (
+            <button
+              onClick={() => setSearchFilter("")}
+              className="absolute right-2 text-theme-text-secondary hover:text-white"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
       </div>
-    </>
+
+      {/* Scrollable Navigation Items */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        <SidebarOptions user={user} t={t} searchFilter={searchFilter} />
+      </div>
+
+      {/* Bottom Status & Links */}
+      <div className="p-3 border-t border-theme-sidebar-border/20 bg-theme-bg-sidebar/90 flex flex-col gap-2">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] text-emerald-400 font-medium">Zero-Egress Active</span>
+          </div>
+          <AppVersion />
+        </div>
+        <div className="flex items-center justify-between text-xs text-theme-text-secondary px-1 pt-1 border-t border-white/5">
+          <SupportEmail />
+          <Link
+            hidden={user?.hasOwnProperty("role") && user.role !== "admin"}
+            to={paths.settings.privacy()}
+            className="text-theme-text-secondary hover:text-white text-[11px] transition-colors"
+          >
+            {t("settings.privacy")}
+          </Link>
+        </div>
+        <div className="pt-1">
+          <Footer />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -202,21 +234,31 @@ function SupportEmail() {
   return (
     <a
       href={supportEmail}
-      className="text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary text-xs leading-[18px] mx-3 mt-1"
+      className="text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary text-xs leading-[18px] transition-colors"
     >
       {t("settings.contact")}
     </a>
   );
 }
 
-const SidebarOptions = ({ user = null, t }) => (
+const SidebarOptions = ({ user = null, t, searchFilter = "" }) => (
   <CanViewChatHistoryProvider>
     {({ viewable: canViewChatHistory }) => (
       <>
         <Option
+          btnText={t("settings.overview") || "Overview"}
+          icon={<SquaresFour className="h-5 w-5 flex-shrink-0" />}
+          href={paths.settings.home()}
+          user={user}
+          flex={true}
+          roles={["admin", "manager"]}
+          searchFilter={searchFilter}
+        />
+        <Option
           btnText={t("settings.ai-providers")}
           icon={<Gear className="h-5 w-5 flex-shrink-0" />}
           user={user}
+          searchFilter={searchFilter}
           childOptions={[
             {
               btnText: t("settings.llm"),
@@ -272,6 +314,7 @@ const SidebarOptions = ({ user = null, t }) => (
           btnText={t("settings.admin")}
           icon={<UserCircleGear className="h-5 w-5 flex-shrink-0" />}
           user={user}
+          searchFilter={searchFilter}
           childOptions={[
             {
               btnText: t("settings.users"),
@@ -316,11 +359,13 @@ const SidebarOptions = ({ user = null, t }) => (
           user={user}
           flex={true}
           roles={["admin"]}
+          searchFilter={searchFilter}
         />
         <Option
           btnText={t("settings.customization")}
           icon={<PencilSimpleLine className="h-5 w-5 flex-shrink-0" />}
           user={user}
+          searchFilter={searchFilter}
           childOptions={[
             {
               btnText: t("settings.interface"),
@@ -346,6 +391,7 @@ const SidebarOptions = ({ user = null, t }) => (
           btnText={t("settings.tools")}
           icon={<Toolbox className="h-5 w-5 flex-shrink-0" />}
           user={user}
+          searchFilter={searchFilter}
           childOptions={[
             {
               hidden: !canViewChatHistory,
@@ -388,6 +434,7 @@ const SidebarOptions = ({ user = null, t }) => (
           flex={true}
           roles={["admin", "manager"]}
           hidden={user?.role}
+          searchFilter={searchFilter}
         />
       </>
     )}
@@ -399,7 +446,7 @@ function AppVersion() {
   if (isLoading) return null;
   return (
     <span className="text-theme-text-secondary light:opacity-80 opacity-50 text-xs mx-3">
-      Sovereign AI v{version}
+      Orion v{version}
     </span>
   );
 }

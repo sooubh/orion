@@ -15,6 +15,7 @@ export default function MenuOption({
   roles = [],
   hidden = false,
   isChild = false,
+  searchFilter = "",
 }) {
   const storageKey = generateStorageKey({ key: btnText });
   const location = useLocation();
@@ -27,8 +28,20 @@ export default function MenuOption({
     location: location.pathname,
   });
 
+  const query = searchFilter?.trim().toLowerCase() || "";
+  const selfMatches = query ? btnText.toLowerCase().includes(query) : true;
+  const anyChildMatches = query
+    ? childOptions.some((c) => c.btnText?.toLowerCase().includes(query))
+    : false;
+
+  if (query && !selfMatches && !anyChildMatches) {
+    return null;
+  }
+
+  const expanded = query && anyChildMatches ? true : isExpanded;
+
   const isActive = hasChildren
-    ? (!isExpanded &&
+    ? (!expanded &&
         childOptions.some((child) =>
           isPathMatch(child.href, location.pathname)
         )) ||
@@ -69,61 +82,75 @@ export default function MenuOption({
   };
 
   return (
-    <div>
+    <div className="w-full">
       <div
         className={`
           flex items-center justify-between w-full
-          transition-all duration-300
-          rounded-[6px]
+          transition-all duration-200
+          rounded-lg my-0.5 group
           ${
             isActive
-              ? "bg-theme-sidebar-subitem-selected font-medium border-outline"
-              : "hover:bg-theme-sidebar-subitem-hover"
+              ? "bg-indigo-600/15 text-indigo-300 font-medium border-l-2 border-indigo-500 shadow-sm"
+              : "text-theme-text-secondary hover:text-white hover:bg-white/5"
           }
         `}
       >
         <Link
           ref={ref}
           to={href}
-          className={`flex flex-grow items-center px-[12px] h-[32px] font-medium ${
-            isChild ? "hover:text-white" : "text-white light:text-black"
+          className={`flex flex-grow items-center px-3 font-medium transition-colors ${
+            isChild ? "h-8 text-xs pl-4" : "h-9 text-sm"
           }`}
           onClick={hasChildren ? handleClick : undefined}
         >
-          {icon}
+          {icon && (
+            <span
+              className={`shrink-0 mr-2.5 transition-colors ${
+                isActive
+                  ? "text-indigo-400"
+                  : "text-theme-text-secondary group-hover:text-white"
+              }`}
+            >
+              {icon}
+            </span>
+          )}
           <p
-            className={`${
-              isChild ? "text-xs" : "text-sm"
-            } leading-loose whitespace-nowrap overflow-hidden ml-2 ${
+            className={`whitespace-nowrap overflow-hidden text-ellipsis ${
               isActive
                 ? "text-white font-semibold"
-                : "text-white light:text-black"
-            } ${!icon && "pl-5"}`}
+                : isChild
+                ? "text-theme-text-secondary/80 group-hover:text-white"
+                : "text-theme-text-secondary group-hover:text-white"
+            } ${!icon && !isChild ? "pl-2" : ""}`}
           >
             {btnText}
           </p>
         </Link>
         {hasChildren && (
-          <button onClick={handleClick} className="p-2 text-white">
+          <button
+            onClick={handleClick}
+            className="p-2 text-theme-text-secondary hover:text-white transition-colors"
+            title={expanded ? "Collapse" : "Expand"}
+          >
             <CaretRight
-              size={16}
+              size={13}
               weight="bold"
-              // color={isExpanded ? "#000000" : "var(--theme-sidebar-subitem-icon)"}
-              className={`transition-transform text-white light:text-black ${
-                isExpanded ? "rotate-90" : ""
+              className={`transition-transform duration-200 ${
+                expanded ? "rotate-90 text-indigo-400" : "text-white/40"
               }`}
             />
           </button>
         )}
       </div>
-      {isExpanded && hasChildren && (
-        <div className="mt-1 rounded-r-lg w-full">
+      {expanded && hasChildren && (
+        <div className="ml-3.5 pl-2.5 border-l border-white/10 space-y-0.5 my-1">
           {childOptions.map((childOption, index) => (
             <MenuOption
               key={index}
               {...childOption} // flex and roles go here.
               user={user}
               isChild={true}
+              searchFilter={searchFilter}
             />
           ))}
         </div>
