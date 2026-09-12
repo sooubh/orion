@@ -2,16 +2,15 @@
 
 A self-hosted, air-gap-ready AI platform for private intelligence. Ingest documents of any format, embed them into vector databases, and chat with an LLM grounded in your data — all running on local hardware with zero external data egress.
 
-Built on the AnythingLLM foundation by Mintplex Labs, transformed into Orion — a private intelligence platform with unified model routing, specialist AI review engine, deliverables registry, and security center.
+Orion is an enterprise-hardened private intelligence platform featuring unified model routing, a multi-perspective specialist AI review engine, deliverables registry, and an air-gapped security center.
 
-> **Author:** Timothy Carambat (Mintplex Labs) · **License:** MIT
+> **License:** MIT
 
 ---
 
 ## Table of Contents
 
 - [What This Project Does](#what-this-project-does)
-- [Current Status](#current-status)
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -25,7 +24,6 @@ Built on the AnythingLLM foundation by Mintplex Labs, transformed into Orion —
 - [Setup & Installation](#setup--installation)
 - [Environment Variables](#environment-variables)
 - [Running the Project](#running-the-project)
-- [CI/CD](#cicd)
 - [Limitations](#limitations)
 - [Future Scope](#future-scope)
 
@@ -38,34 +36,6 @@ Orion is a three-service monorepo that provides a complete private AI assistant:
 1. **Collector** — A document ingestion microservice that parses PDFs, DOCX, XLSX, PPTX, ePub, emails (mbox), images (via OCR), audio/video (via Whisper), web pages, YouTube transcripts, GitHub/GitLab repos, Confluence, and more.
 2. **Server** — An Express.js API that manages workspaces, users, vector embeddings, chat (with SSE streaming), agents with tool-calling, scheduled jobs, model routing, memories, and an encrypted SQLite database via Prisma ORM.
 3. **Frontend** — A React SPA with a command-center dashboard, workspace chat interface, document manager, vector knowledge explorer, multi-perspective AI review engine, deliverables registry, and security center.
-
----
-
-## Current Status
-
-| Area | Status |
-|------|--------|
-| Document ingestion (20+ formats, OCR, Whisper) | ✅ Implemented |
-| Multi-provider LLM chat with SSE streaming | ✅ Implemented |
-| Vector embedding & RAG retrieval | ✅ Implemented |
-| Workspace management with threads | ✅ Implemented |
-| Agent system with tool-calling & skills | ✅ Implemented |
-| Multi-user auth (JWT, roles, invites, SSO) | ✅ Implemented |
-| Orion Dashboard (command center) | ✅ Implemented |
-| Specialist AI Review Engine (4 perspectives) | ✅ Implemented |
-| Deliverables Registry (DOCX/XLSX/PPTX/PDF/Code) | ✅ Implemented |
-| Security Center (hardware vitals, audit logs) | ✅ Implemented |
-| Scheduled jobs (cron-based agent tasks) | ✅ Implemented |
-| Model routers (conditional routing rules) | ✅ Implemented |
-| MCP server integration | ✅ Implemented |
-| Telegram bot connector | ✅ Implemented |
-| Embeddable chat widgets | ✅ Implemented |
-| Internationalization (i18n) | ✅ Implemented |
-| CI/CD (Docker build, lint, tests) | ✅ Implemented |
-| Community Hub (import/export flows) | ✅ Implemented |
-| Memory extraction (per-workspace) | ✅ Implemented |
-| Browser extension API | ✅ Implemented |
-| Mobile device connections | ✅ Implemented |
 
 ---
 
@@ -99,7 +69,6 @@ Orion is a three-service monorepo that provides a complete private AI assistant:
 | **Collector** | Node.js, Express, Puppeteer, Tesseract.js (OCR), pdf-parse, mammoth, Sharp, Turndown |
 | **Agents** | AIbitat framework, MCP SDK, tool-calling with approval flow, agent flow builder |
 | **Background Jobs** | Bree (worker threads), cron scheduling, memory extraction, document sync |
-| **CI/CD** | GitHub Actions (9 workflows), Docker multi-arch builds |
 | **Dev Tools** | Nodemon, ESLint 9 (flat config), Prettier, Concurrently, VS Code launch configs |
 
 ---
@@ -155,19 +124,6 @@ graph TB
 
 ```
 orion/
-├── .github/
-│   ├── FUNDING.yml
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-│       ├── build-and-push-image.yaml      # Docker build on push to master
-│       ├── build-and-push-image-semver.yaml # Docker build on release
-│       ├── build-qa-tag.yaml              # QA test image for PRs
-│       ├── cleanup-qa-tag.yaml            # Clean up QA images
-│       ├── lint.yaml                      # ESLint across all 3 services
-│       ├── run-tests.yaml                 # Backend test runner
-│       ├── check-package-versions.yaml    # Shared dependency version check
-│       ├── check-translations.yaml        # i18n locale validation
-│       └── sponsors.yaml                  # Auto-update sponsors section
 ├── collector/                             # Document Ingestion Microservice
 │   ├── index.js                           # Express entry (:8888)
 │   ├── processSingleFile/                 # File-type converters
@@ -661,35 +617,13 @@ npm run build:frontend    # Build frontend → frontend/dist/
 cd server && npm start    # Start server (serves frontend from public/)
 ```
 
-### Docker
-
-The project includes multi-arch Docker workflows. In production, the server serves the built frontend from `server/public/` and all three services run in a single container.
-
----
-
-## CI/CD
-
-9 GitHub Actions workflows in `.github/workflows/`:
-
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `build-and-push-image.yaml` | Push to `master` | Build & push Docker images (amd64 + arm64) to Docker Hub + GHCR |
-| `build-and-push-image-semver.yaml` | Release published | Build Docker images with semver tags |
-| `build-qa-tag.yaml` | PR labeled "Ready for QA" | Build ephemeral test image |
-| `cleanup-qa-tag.yaml` | PR closed / label removed | Delete ephemeral test image |
-| `lint.yaml` | PR with code changes | ESLint across server, frontend, collector |
-| `run-tests.yaml` | PR with server/collector changes | Run backend tests |
-| `check-package-versions.yaml` | PR | Verify shared dependency versions match |
-| `check-translations.yaml` | PR | Validate i18n locale file completeness |
-| `sponsors.yaml` | Weekly cron | Auto-update sponsors section |
-
 ---
 
 ## Limitations
 
 - **SQLite default** — Production deployments with high concurrency should switch to PostgreSQL (supported via Prisma schema swap)
 - **Review engine uses heuristics** — The specialist review (`review.js`) uses keyword-based scoring, not actual LLM-powered analysis
-- **No end-to-end tests** — CI runs unit tests but there are no integration or E2E test suites
+- **No end-to-end tests** — The automated test suite covers unit tests, but there are no integration or E2E test suites
 - **Bulk insert not protected** — The collector communicates via signed IPC, but the `/process` endpoint relies on signature verification that is skipped in development
 - **Scraper fragility** — Web scraping with Puppeteer depends on site structures that can change
 - **Single-process server** — No clustering or horizontal scaling built in
