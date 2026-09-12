@@ -219,7 +219,10 @@ async function prepareAttachmentsWithValidation(
  * @returns {{success: boolean, attachment?: object, error?: string, fileInfo?: object}}
  */
 function prepareAttachment(filePath) {
-  if (process.env.ANYTHING_LLM_RUNTIME === "docker") {
+  if (
+    process.env.ORION_RUNTIME === "docker" ||
+    process.env.ANYTHING_LLM_RUNTIME === "docker"
+  ) {
     return {
       success: false,
       error: "File attachments are not supported in Docker environments.",

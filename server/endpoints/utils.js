@@ -94,7 +94,11 @@ function utilEndpoints(app) {
 }
 
 function getGitVersion() {
-  if (process.env.ANYTHING_LLM_RUNTIME === "docker") return "--";
+  if (
+    process.env.ORION_RUNTIME === "docker" ||
+    process.env.ANYTHING_LLM_RUNTIME === "docker"
+  )
+    return "--";
   try {
     return require("child_process")
       .execSync("git rev-parse HEAD")
@@ -268,18 +272,21 @@ function getDeploymentVersion() {
 }
 
 /**
- * Returns the user agent for the AnythingLLM deployment.
+ * Returns the user agent for the Orion deployment.
  * @returns {string} The user agent.
  */
-function getAnythingLLMUserAgent() {
+function getOrionUserAgent() {
   const version = getDeploymentVersion() || "unknown";
-  return `AnythingLLM/${version}`;
+  return `Orion/${version}`;
 }
+
+const getAnythingLLMUserAgent = getOrionUserAgent;
 
 module.exports = {
   utilEndpoints,
   getGitVersion,
   getModelTag,
+  getOrionUserAgent,
   getAnythingLLMUserAgent,
   getDeploymentVersion,
 };

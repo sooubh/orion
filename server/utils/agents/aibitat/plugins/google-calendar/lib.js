@@ -143,7 +143,7 @@ class GoogleCalendarBridge {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-AnythingLLM-UA": "AnythingLLM-GoogleCalendar-Agent/1.0",
+          "X-Orion-UA": "Orion-GoogleCalendar-Agent/1.0",
         },
         body: JSON.stringify({
           key: this.#apiKey,

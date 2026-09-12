@@ -448,7 +448,7 @@ const webBrowsing = {
               headers: {
                 Authorization: `Bearer ${process.env.AGENT_SEARCHAPI_API_KEY}`,
                 "Content-Type": "application/json",
-                "X-SearchApi-Source": "AnythingLLM",
+                "X-SearchApi-Source": "Orion",
               },
             })
               .then((res) => {

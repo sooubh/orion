@@ -66,7 +66,7 @@ function bootHTTP(app, port = 3001) {
       new EncryptionManager();
       new BackgroundService().boot();
       await eagerLoadContextWindows();
-      console.log(`\x1b[36m[SOVEREIGN AI]\x1b[0m Primary server in HTTP mode listening on port ${port}`);
+      console.log(`\x1b[36m[ORION]\x1b[0m Primary server in HTTP mode listening on port ${port}`);
     })
     .on("error", catchSigTerms);
 
