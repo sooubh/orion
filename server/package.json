@@ -1,7 +1,7 @@
 {
-  "name": "sovereign-ai-server",
+  "name": "orion-server",
   "version": "1.0.0",
-  "description": "Sovereign AI Server - Private AI for confidential work",
+  "description": "Orion Server - Private Intelligence Platform",
   "main": "index.js",
   "author": "Timothy Carambat (Mintplex Labs)",
   "license": "MIT",

@@ -46,7 +46,7 @@ class PGVector extends VectorDatabase {
    * @returns {string}
    */
   static tableName() {
-    return process.env.PGVECTOR_TABLE_NAME || "anythingllm_vectors";
+    return process.env.PGVECTOR_TABLE_NAME || "orion_vectors";
   }
 
   /**

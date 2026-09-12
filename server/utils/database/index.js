@@ -78,37 +78,43 @@ async function validateTablePragmas(force = false) {
   return;
 }
 
-// Telemetry is anonymized and your data is never read. This can be disabled by setting
-// DISABLE_TELEMETRY=true in the `.env` of however you setup. Telemetry helps us determine use
-// of how AnythingLLM is used and how to improve this product!
-// You can see all Telemetry events by ctrl+f `Telemetry.sendTelemetry` calls to verify this claim.
+function checkAndMigrateSqliteDatabase() {
+  const fs = require("fs");
+  const path = require("path");
+  const storageDir =
+    process.env.STORAGE_DIR || path.resolve(__dirname, "../../storage");
+  const legacyDb = path.join(storageDir, "anythingllm.db");
+  const orionDb = path.join(storageDir, "orion.db");
+
+  if (fs.existsSync(legacyDb) && !fs.existsSync(orionDb)) {
+    console.log(
+      "\x1b[36m[ORION MIGRATION]\x1b[0m Migrating legacy SQLite database anythingllm.db -> orion.db..."
+    );
+    try {
+      fs.copyFileSync(legacyDb, orionDb);
+      console.log(
+        "\x1b[32m[ORION MIGRATION]\x1b[0m Legacy database successfully migrated to orion.db."
+      );
+    } catch (err) {
+      console.error(
+        "\x1b[31m[ORION MIGRATION ERROR]\x1b[0m Failed to copy database:",
+        err
+      );
+    }
+  }
+}
+
 async function setupTelemetry() {
-  if (process.env.DISABLE_TELEMETRY === "true") {
-    console.log(
-      `\x1b[31m[TELEMETRY DISABLED]\x1b[0m Telemetry is marked as disabled - no events will send. Telemetry helps Mintplex Labs Inc improve AnythingLLM.`
-    );
-    return true;
-  }
-
-  if (Telemetry.isDev()) {
-    console.log(
-      `\x1b[33m[TELEMETRY STUBBED]\x1b[0m Anonymous Telemetry stubbed in development.`
-    );
-    return;
-  }
-
   console.log(
-    `\x1b[32m[TELEMETRY ENABLED]\x1b[0m Anonymous Telemetry enabled. Telemetry helps Mintplex Labs Inc improve AnythingLLM.`
+    `\x1b[32m[ORION]\x1b[0m Running in 100% Local & Private Mode. External telemetry disabled.`
   );
-  await Telemetry.findOrCreateId();
-  await Telemetry.sendTelemetry("server_boot", {
-    commit: getGitVersion(),
-  });
-  return;
+  return true;
 }
 
 module.exports = {
+  checkAndMigrateSqliteDatabase,
   checkForMigrations,
   validateTablePragmas,
   setupTelemetry,
 };
+

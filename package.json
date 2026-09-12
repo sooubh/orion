@@ -1,7 +1,7 @@
 {
-  "name": "sovereign-ai",
+  "name": "orion",
   "version": "1.0.0",
-  "description": "Private AI for confidential work.",
+  "description": "Orion — Private Intelligence Platform.",
   "main": "index.js",
   "type": "module",
   "license": "MIT",

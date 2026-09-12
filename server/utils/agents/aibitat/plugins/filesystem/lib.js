@@ -39,7 +39,10 @@ class FilesystemManager {
    */
   isToolAvailable() {
     if (process.env.NODE_ENV === "development") return true;
-    return process.env.ANYTHING_LLM_RUNTIME === "docker";
+    return (
+      process.env.ORION_RUNTIME === "docker" ||
+      process.env.ANYTHING_LLM_RUNTIME === "docker"
+    );
   }
 
   #allowedDirectories = [];
@@ -53,7 +56,16 @@ class FilesystemManager {
     const storageRoot =
       process.env.STORAGE_DIR ||
       path.resolve(__dirname, "../../../../../storage");
-    return path.join(storageRoot, "anythingllm-fs");
+    const legacyPath = path.join(storageRoot, "anythingllm-fs");
+    const orionPath = path.join(storageRoot, "orion-fs");
+    if (fs.existsSync(legacyPath) && !fs.existsSync(orionPath)) {
+      try {
+        fs.renameSync(legacyPath, orionPath);
+      } catch {
+        // ignore error
+      }
+    }
+    return orionPath;
   }
 
   /**
