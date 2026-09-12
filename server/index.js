@@ -6,6 +6,8 @@ if (!process.env.STORAGE_DIR) {
   process.env.STORAGE_DIR = require("path").resolve(__dirname, "storage");
 }
 
+require("./utils/database").checkAndMigrateSqliteDatabase();
+
 require("./utils/logger")();
 require("./utils/boot/patchSdkTimeouts")();
 require("./utils/helpers/modelPricing"); // boots the model pricing cache refresh

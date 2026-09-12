@@ -11,7 +11,7 @@ function securityEndpoints(app) {
 
   /**
    * GET /api/security/status
-   * Real runtime information for the Sovereign AI Security Center
+   * Real runtime information for the Orion Security Center
    */
   app.get(
     "/security/status",

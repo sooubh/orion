@@ -259,12 +259,16 @@ const Workspace = {
       validatedUpdates.chatModel = null;
     }
 
-    // When switching to anythingllm-router, chatModel is not used.
-    // When switching away from anythingllm-router, clear router_id.
+    // When switching to orion-router, chatModel is not used.
+    // When switching away from orion-router, clear router_id.
     if (validatedUpdates?.chatProvider === "anythingllm-router") {
+      validatedUpdates.chatProvider = "orion-router";
+    }
+    if (validatedUpdates?.chatProvider === "orion-router") {
       validatedUpdates.chatModel = null;
     } else if (
       validatedUpdates?.chatProvider &&
+      validatedUpdates.chatProvider !== "orion-router" &&
       validatedUpdates.chatProvider !== "anythingllm-router"
     ) {
       validatedUpdates.router_id = null;
@@ -678,7 +682,7 @@ const Workspace = {
     // Model router delegates to a resolved provider at chat time.
     // Check the router's fallback provider for tool calling support
     // as a reasonable proxy for the router's capabilities.
-    if (provider === "anythingllm-router") {
+    if (provider === "orion-router" || provider === "anythingllm-router") {
       const { ModelRouter } = require("./modelRouter");
       const routerId =
         workspace?.router_id ||
