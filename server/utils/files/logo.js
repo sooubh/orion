@@ -4,8 +4,8 @@ const { getType } = require("mime");
 const { v4 } = require("uuid");
 const { SystemSettings } = require("../../models/systemSettings");
 const { normalizePath, isWithin } = require(".");
-const LOGO_FILENAME = "sovereign-ai.svg";
-const LOGO_FILENAME_DARK = "sovereign-ai.svg";
+const LOGO_FILENAME = "orion.svg";
+const LOGO_FILENAME_DARK = "orion.svg";
 
 /**
  * Checks if the filename is the default logo filename for dark or light mode.
@@ -13,7 +13,12 @@ const LOGO_FILENAME_DARK = "sovereign-ai.svg";
  * @returns {boolean} Whether the filename is the default logo filename.
  */
 function isDefaultFilename(filename) {
-  return [LOGO_FILENAME, LOGO_FILENAME_DARK].includes(filename);
+  return [
+    LOGO_FILENAME,
+    LOGO_FILENAME_DARK,
+    "sovereign-ai.svg",
+    "anything-llm.png",
+  ].includes(filename);
 }
 
 function validFilename(newFilename = "") {
