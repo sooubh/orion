@@ -1,14 +1,12 @@
 import paths from "@/utils/paths";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import useRedirectToHomeOnOnboardingComplete from "@/hooks/useOnboardingComplete";
 import { OnboardingLogoSVG } from "./components/OnboardingLogoSVG";
 import Wordmark from "./wordmark.svg";
 import WordmarkLight from "./wordmark-light.svg";
 
 export default function OnboardingHome() {
   const navigate = useNavigate();
-  useRedirectToHomeOnOnboardingComplete();
   const { t } = useTranslation();
 
   return (
