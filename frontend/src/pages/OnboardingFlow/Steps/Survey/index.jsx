@@ -5,6 +5,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Workspace from "@/models/workspace";
+import System from "@/models/system";
+import showToast from "@/utils/toast";
 
 async function sendQuestionnaire({ email, useCase, comment }) {
   // Air-gapped private mode: complete locally without external telemetry
@@ -17,14 +19,31 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
   const [selectedOption, setSelectedOption] = useState("");
   const formRef = useRef(null);
   const navigate = useNavigate();
-  const submitRef = useRef(null);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const TITLE = t("onboarding.survey.title");
   const DESCRIPTION = t("onboarding.survey.description");
 
+  async function completeOnboarding() {
+    if (isCompleting) return;
+
+    setIsCompleting(true);
+    const completed = await System.markOnboardingComplete();
+
+    if (!completed) {
+      setIsCompleting(false);
+      showToast("Failed to complete onboarding. Please try again.", "error");
+      return;
+    }
+
+    navigate(paths.home(), { replace: true });
+  }
+
   function handleForward() {
+    if (isCompleting) return;
+
     if (!!window?.localStorage?.getItem(COMPLETE_QUESTIONNAIRE)) {
-      navigate(paths.home());
+      completeOnboarding();
       return;
     }
 
@@ -34,7 +53,7 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
     }
 
     // Check if any inputs are not empty. If that is the case, trigger form validation.
-    // via the requestSubmit() handler
+    // via requestSubmit() so required fields are validated by the browser.
     const formData = new FormData(formRef.current);
     if (
       !!formData.get("email") ||
@@ -48,8 +67,8 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
     skipSurvey();
   }
 
-  function skipSurvey() {
-    navigate(paths.home());
+  async function skipSurvey() {
+    await completeOnboarding();
   }
 
   function handleBack() {
@@ -58,9 +77,13 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
 
   useEffect(() => {
     setHeader({ title: TITLE, description: DESCRIPTION });
-    setForwardBtn({ showing: true, disabled: false, onClick: handleForward });
-    setBackBtn({ showing: true, disabled: false, onClick: handleBack });
-  }, []);
+    setForwardBtn({
+      showing: true,
+      disabled: isCompleting,
+      onClick: handleForward,
+    });
+    setBackBtn({ showing: true, disabled: isCompleting, onClick: handleBack });
+  }, [isCompleting]);
 
   useEffect(() => {
     async function createDefaultWorkspace() {
@@ -77,6 +100,8 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isCompleting) return;
+
     const form = e.target;
     const formData = new FormData(form);
 
@@ -86,7 +111,7 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
       comment: formData.get("comment") || null,
     });
 
-    navigate(paths.home());
+    await completeOnboarding();
   };
 
   if (!!window?.localStorage?.getItem(COMPLETE_QUESTIONNAIRE)) {
@@ -115,7 +140,7 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
             htmlFor="email"
             className="text-theme-text-primary text-base font-medium"
           >
-            {t("onboarding.survey.email")}{" "}
+            {t("onboarding.survey.email")} {" "}
           </label>
           <input
             name="email"
@@ -131,7 +156,7 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
             className="text-theme-text-primary text-base font-medium"
             htmlFor="use_case"
           >
-            {t("onboarding.survey.useCase")}{" "}
+            {t("onboarding.survey.useCase")} {" "}
           </label>
           <div className="mt-2 gap-y-3 flex flex-col">
             <label
@@ -217,7 +242,7 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
 
         <div className="mt-8">
           <label htmlFor="comment" className="text-white text-base font-medium">
-            {t("onboarding.survey.comment")}{" "}
+            {t("onboarding.survey.comment")} {" "}
             <span className="text-neutral-400 text-base font-light">
               ({t("common.optional")})
             </span>
@@ -231,18 +256,13 @@ export default function Survey({ setHeader, setForwardBtn, setBackBtn }) {
             autoComplete="off"
           />
         </div>
-        <button
-          type="submit"
-          ref={submitRef}
-          hidden
-          aria-hidden="true"
-        ></button>
 
         <div className="w-full flex items-center justify-center">
           <button
             type="button"
             onClick={skipSurvey}
-            className="text-white text-base font-medium text-opacity-30 hover:text-opacity-100 hover:text-teal mt-8"
+            disabled={isCompleting}
+            className="text-white text-base font-medium text-opacity-30 hover:text-opacity-100 hover:text-teal mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t("onboarding.survey.skip")}
           </button>
