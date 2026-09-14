@@ -109,8 +109,8 @@ const LLMS = [
   {
     name: "Privatemode",
     value: "privatemode",
-    logo: PrivateModeLogo,
     options: (settings) => <PrivateModeOptions settings={settings} />,
+    logo: PrivateModeLogo,
     description: "Run LLMs with private local execution.",
   },
 ];
@@ -141,17 +141,8 @@ export default function LLMPreference({
     fetchKeys();
   }, []);
 
-  async function handleForward() {
-    try {
-      await System.markOnboardingComplete();
-      console.log("Onboarding complete");
-    } catch (error) {
-      console.error("Onboarding complete failed", error);
-    } finally {
-      if (hiddenSubmitButtonRef.current) {
-        hiddenSubmitButtonRef.current.click();
-      }
-    }
+  function handleForward() {
+    hiddenSubmitButtonRef.current?.click();
   }
 
   function handleBack() {
@@ -167,7 +158,7 @@ export default function LLMPreference({
     // Default to Orion native embedder and LanceDB
     data.EmbeddingEngine = "native";
     data.VectorDB = "lancedb";
-    for (var [key, value] of formData.entries()) data[key] = value;
+    for (const [key, value] of formData.entries()) data[key] = value;
 
     const { error } = await System.updateSystem(data);
     if (error) {
@@ -204,7 +195,7 @@ export default function LLMPreference({
               <input
                 type="text"
                 placeholder="Search LLM providers"
-                className="bg-theme-bg-secondary placeholder:text-theme-text-secondary z-20 pl-10 h-[38px] rounded-full w-full px-4 py-1 text-sm border border-theme-chat-input-border outline-none focus:outline-primary-button active:outline-primary-button outline-none text-theme-text-primary"
+                className="bg-theme-bg-secondary placeholder:text-theme-text-secondary z-20 pl-10 h-[38px] rounded-full w-full px-4 py-1 text-sm border border-theme-chat-input-border outline-none focus:outline-primary-button active:outline-primary-button text-theme-text-primary"
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoComplete="off"
                 onKeyDown={(e) => {
