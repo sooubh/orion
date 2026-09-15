@@ -13,11 +13,24 @@ import AzureAI from "@lobehub/icons/es/AzureAI/components/Mono";
 import DeepSeek from "@lobehub/icons/es/DeepSeek/components/Mono";
 import HuggingFace from "@lobehub/icons/es/HuggingFace/components/Mono";
 import Qwen from "@lobehub/icons/es/Qwen/components/Mono";
-import IBM from "@lobehub/icons/es/IBM/components/Mono";
 import Bytedance from "@lobehub/icons/es/ByteDance/components/Mono";
 import Kimi from "@lobehub/icons/es/Kimi/components/Mono";
 import Snowflake from "@lobehub/icons/es/Snowflake/components/Mono";
 import Liquid from "@lobehub/icons/es/Liquid/components/Mono";
+
+function IBM({ size = 24, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M2 5h6v2H2zm8 0h6v2h-6zm8 0h4v2h-4zM2 8h6v1H2zm8 0h6v1h-6zm8 0h4v1h-4zM2 10h6v1H2zm8 0h6v1h-6zm8 0h4v1h-4zM2 12h6v1H2zm8 0h6v1h-6zm8 0h4v1h-4zM2 14h6v1H2zm8 0h6v1h-6zm8 0h4v1h-4zM2 16h6v1H2zm8 0h6v1h-6zm8 0h4v1h-4zM2 18h6v2H2zm8 0h6v2h-6zm8 0h4v2h-4z" />
+    </svg>
+  );
+}
 
 // Direct provider key -> icon mapping for exact matches
 const providerIcons = {
