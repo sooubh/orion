@@ -102,8 +102,12 @@ function systemEndpoints(app) {
     }
   });
 
-  app.post("/onboarding", [validatedRequest], async (_, response) => {
+  app.post("/onboarding", async (_, response) => {
     try {
+      const isComplete = await SystemSettings.isOnboardingComplete();
+      if (isComplete) {
+        return response.sendStatus(200).end();
+      }
       await SystemSettings.markOnboardingComplete();
       response.sendStatus(200).end();
     } catch (e) {

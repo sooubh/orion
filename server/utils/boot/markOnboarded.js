@@ -46,6 +46,21 @@ async function isLegacyOnboarded() {
 
   // Check multi-user mode is enabled, if it is, then they are already using the app.
   if ((await SystemSettings.isMultiUserMode()) === true) return true;
+
+  // Check if any users exist in the database, instance has already been set up
+  try {
+    const { User } = require("../../models/user");
+    const userCount = await User.count();
+    if (userCount > 0) return true;
+  } catch {}
+
+  // Check if any workspaces exist in the database, instance has already been set up
+  try {
+    const prisma = require("../prisma");
+    const workspaceCount = await prisma.workspaces.count();
+    if (workspaceCount > 0) return true;
+  } catch {}
+
   return false;
 }
 
