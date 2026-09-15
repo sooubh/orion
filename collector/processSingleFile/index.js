@@ -53,19 +53,17 @@ async function processSingleFile(targetFilename, options = {}, metadata = {}) {
     };
 
   const fileExtension = path.extname(fullFilePath).toLowerCase();
-  if (fullFilePath.includes(".") && !fileExtension) {
-    return {
-      success: false,
-      reason: `No file extension found. This file cannot be processed.`,
-      documents: [],
-    };
-  }
-
   let processFileAs = fileExtension;
-  if (!SUPPORTED_FILETYPE_CONVERTERS.hasOwnProperty(fileExtension)) {
+
+  if (
+    !fileExtension ||
+    !SUPPORTED_FILETYPE_CONVERTERS.hasOwnProperty(fileExtension)
+  ) {
     if (isTextType(fullFilePath)) {
       console.log(
-        `\x1b[33m[Collector]\x1b[0m The provided filetype of ${fileExtension} does not have a preset and will be processed as .txt.`
+        `\x1b[33m[Collector]\x1b[0m The provided file ${targetFilename} (${
+          fileExtension || "no-extension"
+        }) will be processed as .txt.`
       );
       processFileAs = ".txt";
     } else {
@@ -73,7 +71,9 @@ async function processSingleFile(targetFilename, options = {}, metadata = {}) {
       if (!options.absolutePath) trashFile(fullFilePath);
       return {
         success: false,
-        reason: `File extension ${fileExtension} not supported for parsing and cannot be assumed as text file type.`,
+        reason: fileExtension
+          ? `File extension ${fileExtension} not supported for parsing and cannot be assumed as text file type.`
+          : `No supported file extension found and file is not a recognized text format.`,
         documents: [],
       };
     }
