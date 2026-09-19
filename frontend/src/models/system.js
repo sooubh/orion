@@ -927,6 +927,27 @@ const System = {
       .catch((e) => ({ text: null, error: e.message }));
   },
 
+  uploadDocument: async function (formData, slug = null) {
+    try {
+      let targetSlug = slug;
+      const Workspace = (await import("./workspace")).default;
+      if (!targetSlug) {
+        const workspaces = await Workspace.all();
+        if (workspaces && workspaces.length > 0) {
+          targetSlug = workspaces[0].slug;
+        }
+      }
+      if (!targetSlug) {
+        return { success: false, error: "No workspace available to upload document." };
+      }
+      const { response, data } = await Workspace.uploadFile(targetSlug, formData);
+      return { success: response?.ok && data?.success, ...data };
+    } catch (e) {
+      console.error("System.uploadDocument error:", e);
+      return { success: false, error: e.message };
+    }
+  },
+
   promptVariables: SystemPromptVariable,
 };
 

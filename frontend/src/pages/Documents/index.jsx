@@ -51,16 +51,19 @@ export default function DocumentsPage() {
 
       const flatDocs = [];
       if (filesData?.items) {
-        filesData.items.forEach((folder) => {
-          if (folder.items) {
-            folder.items.forEach((doc) => {
-              flatDocs.push({
-                ...doc,
-                folderName: folder.name,
+        await Promise.all(
+          filesData.items.map(async (folder) => {
+            const folderData = await System.localFiles(folder.name, 0, "all");
+            if (folderData?.documents) {
+              folderData.documents.forEach((doc) => {
+                flatDocs.push({
+                  ...doc,
+                  folderName: folder.name,
+                });
               });
-            });
-          }
-        });
+            }
+          })
+        );
       }
 
       setDocuments(flatDocs);
@@ -80,19 +83,46 @@ export default function DocumentsPage() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
+    if (!selectedWorkspace) {
+      showToast("Please select a workspace before uploading documents", "warning");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
+    let successCount = 0;
+    const errors = [];
+
     try {
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append(`file${i}`, files[i]);
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+
+        const { response, data } = await Workspace.uploadFile(
+          selectedWorkspace.slug,
+          formData
+        );
+
+        if (response?.ok && data?.success) {
+          successCount++;
+        } else {
+          errors.push(data?.error || `Failed to upload ${file.name}`);
+        }
       }
 
-      const response = await System.uploadDocument(formData);
-      if (response?.success) {
-        showToast("Files uploaded and parsed successfully", "success");
+      if (successCount > 0) {
+        showToast(
+          `Successfully uploaded and parsed ${successCount} file${successCount > 1 ? "s" : ""}`,
+          "success"
+        );
         await loadData();
-      } else {
-        showToast(response?.error || "Failed to upload files", "error");
+      }
+
+      if (errors.length > 0) {
+        showToast(
+          `Failed to upload ${errors.length} file${errors.length > 1 ? "s" : ""}: ${errors[0]}`,
+          "error"
+        );
       }
     } catch (err) {
       console.error("Upload error:", err);
