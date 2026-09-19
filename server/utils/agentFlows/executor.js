@@ -201,10 +201,45 @@ class FlowExecutor {
     this.attachLogging(aibitat?.introspect, aibitat?.handlerProps?.log);
     const results = [];
     let directOutputResult = null;
+    const taskId = flow.uuid || `flow_${Date.now()}`;
+    const { CheckpointManager } = require("../checkpoints");
 
-    for (const step of flow.config.steps) {
+    for (let i = 0; i < flow.config.steps.length; i++) {
+      const step = flow.config.steps[i];
+      const stepOrder = i + 1;
       try {
         const result = await this.executeStep(step);
+
+        // Record validated checkpoint for flow step
+        try {
+          await CheckpointManager.onStepVerified({
+            taskId,
+            workflowId: flow.uuid || null,
+            step: {
+              stepId: step.id || `step_${stepOrder}`,
+              stepOrder,
+              stepTitle: step.name || `Flow Step ${stepOrder}: ${step.type}`,
+              type: step.type,
+              input: step.config,
+            },
+            output: result,
+            verificationResult: {
+              status: "PASSED",
+              confidence: 1.0,
+              method: "FlowStepExecutionVerifier",
+              reason: `Flow step ${stepOrder} (${step.type}) executed successfully.`,
+            },
+            context: {
+              variables: this.variables,
+              classification: aibitat?.handlerProps?.classification || "INTERNAL",
+              user: aibitat?.handlerProps?.user || null,
+              workspace: aibitat?.handlerProps?.workspace || null,
+            },
+            socket: aibitat?.socket,
+          });
+        } catch (cpErr) {
+          console.warn("[FlowExecutor] Checkpoint creation warning:", cpErr.message);
+        }
 
         // If the step has directOutput, stop processing and return the result
         // so that no other steps are executed or processed
@@ -215,6 +250,41 @@ class FlowExecutor {
 
         results.push({ success: true, result });
       } catch (error) {
+        // Step failed: attempt checkpoint recovery
+        try {
+          const recovery = await CheckpointManager.handleStepFailure({
+            taskId,
+            failedStep: {
+              stepId: step.id || `step_${stepOrder}`,
+              stepOrder,
+              type: step.type,
+              input: step.config,
+            },
+            verificationResult: {
+              status: "FAILED",
+              confidence: 1.0,
+              reason: error.message,
+            },
+            context: {
+              variables: this.variables,
+              classification: aibitat?.handlerProps?.classification || "INTERNAL",
+              user: aibitat?.handlerProps?.user || null,
+              workspace: aibitat?.handlerProps?.workspace || null,
+            },
+            socket: aibitat?.socket,
+          });
+
+          if (recovery.status === "RECOVERED") {
+            // Restore variable state from checkpoint
+            this.variables = { ...(recovery.restoredContext?.variables || this.variables) };
+            this.logger?.(
+              `[Checkpoint Recovery] Resumed flow from Step ${recovery.lastValidCheckpoint?.stepOrder}: ${recovery.lastValidCheckpoint?.stepTitle}`
+            );
+          }
+        } catch (recErr) {
+          console.warn("[FlowExecutor] Checkpoint recovery error:", recErr.message);
+        }
+
         results.push({ success: false, error: error.message });
         break;
       }

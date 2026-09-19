@@ -212,6 +212,44 @@ async function streamChatWithWorkspace(
     return;
   }
 
+  // Policy Engine: Filter retrieved knowledge sources based on sensitivity clearance
+  const { PolicyEngine } = require("../policy");
+  const { EventLogs } = require("../../models/eventLogs");
+  const authorizedSources = [];
+
+  for (const src of (vectorSearchResults.sources || [])) {
+    const chunkClassification = src.metadata?.classification || "INTERNAL";
+    const policyResult = PolicyEngine.evaluatePolicy({
+      requestedCapability: "knowledge",
+      classification: chunkClassification,
+      source: src.metadata,
+      user,
+      workspace,
+      model: LLMConnector,
+    });
+
+    if (policyResult.decision === "ALLOW") {
+      authorizedSources.push(src);
+    } else {
+      console.warn(
+        `[Policy Engine] RAG chunk (${src.metadata?.title || src.metadata?.docpath}) blocked: ${policyResult.reason}`
+      );
+      await EventLogs.logEvent(
+        "knowledge_source_blocked",
+        {
+          docTitle: src.metadata?.title || "unknown",
+          docpath: src.metadata?.docpath || "unknown",
+          classification: chunkClassification,
+          reason: policyResult.reason,
+          policyRule: policyResult.policyRule,
+        },
+        user?.id ? Number(user.id) : null
+      );
+    }
+  }
+
+  vectorSearchResults.sources = authorizedSources;
+
   const { fillSourceWindow } = require("../helpers/chat");
   const filledSources = fillSourceWindow({
     nDocs: workspace?.topN || 4,
@@ -325,6 +363,31 @@ async function streamChatWithWorkspace(
   }
 
   if (completeText?.length > 0) {
+    const { ClassificationService } = require("../classification");
+    const promptClass = ClassificationService.classifyDocument({
+      content: message,
+      filename: "user-prompt.txt",
+    }).classification;
+    const sourceClasses = (sources || []).map(
+      (s) => s.metadata?.classification || "INTERNAL"
+    );
+    const outputClassification = ClassificationService.resolveSupremum([
+      promptClass,
+      ...sourceClasses,
+      workspace?.classification,
+    ]);
+
+    const { VerificationManager, StepType } = require("../verification");
+    const groundingVerification = await VerificationManager.verifyStep({
+      step: {
+        stepId: `${uuid}_rag_grounding`,
+        type: StepType.RAG_GROUNDING,
+        sources: sources || [],
+      },
+      output: completeText,
+      context: { user, workspace, classification: outputClassification },
+    });
+
     const { chat } = await WorkspaceChats.new({
       workspaceId: workspace.id,
       prompt: message,
@@ -334,6 +397,8 @@ async function streamChatWithWorkspace(
         type: chatMode,
         attachments,
         metrics,
+        outputClassification,
+        groundingVerification,
       },
       threadId: thread?.id || null,
       user,
@@ -346,6 +411,8 @@ async function streamChatWithWorkspace(
       error: false,
       chatId: chat.id,
       metrics,
+      classification: outputClassification,
+      groundingVerification,
     });
     return;
   }

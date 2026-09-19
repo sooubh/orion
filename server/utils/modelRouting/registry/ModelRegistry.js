@@ -127,6 +127,7 @@ class ModelRegistry {
 
   clear() {
     this.models.clear();
+    this.hasDiscovered = true;
   }
 
   reset() {

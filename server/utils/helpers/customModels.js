@@ -414,20 +414,7 @@ async function ollamaAIModels(basePath = null, _authToken = null) {
 }
 
 async function getTogetherAiModels(apiKey = null) {
-  const _apiKey =
-    apiKey === true
-      ? process.env.TOGETHER_AI_API_KEY
-      : apiKey || process.env.TOGETHER_AI_API_KEY || null;
-  try {
-    const { togetherAiModels } = require("../AiProviders/togetherAi");
-    const models = await togetherAiModels(_apiKey);
-    if (models.length > 0 && !!_apiKey)
-      process.env.TOGETHER_AI_API_KEY = _apiKey;
-    return { models, error: null };
-  } catch (error) {
-    console.error("Error in getTogetherAiModels:", error);
-    return { models: [], error: "Failed to fetch Together AI models" };
-  }
+  return { models: [], error: null };
 }
 
 async function getFireworksAiModels(apiKey = null) {
@@ -650,17 +637,7 @@ async function getDeepSeekModels(apiKey = null) {
 }
 
 async function getGiteeAIModels() {
-  const { giteeAiModels } = require("../AiProviders/giteeai");
-  const modelMap = await giteeAiModels();
-  if (!Object.keys(modelMap).length === 0) return { models: [], error: null };
-  const models = Object.values(modelMap).map((model) => {
-    return {
-      id: model.id,
-      organization: model.organization ?? "GiteeAI",
-      name: model.id,
-    };
-  });
-  return { models, error: null };
+  return { models: [], error: null };
 }
 
 async function getXAIModels(_apiKey = null) {

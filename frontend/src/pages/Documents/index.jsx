@@ -18,9 +18,12 @@ import {
   HardDrives,
   CheckCircle,
   Eye,
+  Shield,
+  ShieldCheck,
 } from "@phosphor-icons/react";
 import System from "@/models/system";
 import Workspace from "@/models/workspace";
+import Security from "@/models/security";
 import showToast from "@/utils/toast";
 import { humanFileSize } from "@/utils/numbers";
 import Modal, { ModalHeader, ModalBody, ModalFooter } from "@/components/lib/Modal";
@@ -33,7 +36,12 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFileType, setSelectedFileType] = useState("all");
+  const [selectedSensitivity, setSelectedSensitivity] = useState("all");
   const [selectedDocForPreview, setSelectedDocForPreview] = useState(null);
+  const [selectedDocForReview, setSelectedDocForReview] = useState(null);
+  const [reviewClassification, setReviewClassification] = useState("CONFIDENTIAL");
+  const [reviewReason, setReviewReason] = useState("");
+  const [updatingClassification, setUpdatingClassification] = useState(false);
   const [embeddingDocId, setEmbeddingDocId] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -160,6 +168,66 @@ export default function DocumentsPage() {
     }
   }
 
+  async function handleSaveClassificationOverride() {
+    if (!selectedDocForReview) return;
+    setUpdatingClassification(true);
+    try {
+      const res = await Security.updateClassification(
+        selectedDocForReview.folderName,
+        selectedDocForReview.name,
+        reviewClassification,
+        reviewReason || "Manual administrative override via document repository"
+      );
+      if (res?.success) {
+        showToast(`Updated classification to ${reviewClassification}`, "success");
+        setSelectedDocForReview(null);
+        setReviewReason("");
+        await loadData();
+      } else {
+        showToast(res?.error || "Failed to update classification", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Error updating classification", "error");
+    } finally {
+      setUpdatingClassification(false);
+    }
+  }
+
+  function renderClassificationBadge(classification = "INTERNAL", confidence = 1, method = "auto_detected") {
+    const tier = (classification || "INTERNAL").toUpperCase();
+    const confPct = Math.round((confidence || 1) * 100);
+
+    let badgeClasses = "bg-zinc-800 text-zinc-300 border-zinc-700";
+    let dotColor = "bg-zinc-400";
+    if (tier === "RESTRICTED") {
+      badgeClasses = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+      dotColor = "bg-rose-500";
+    } else if (tier === "CONFIDENTIAL") {
+      badgeClasses = "bg-amber-500/10 text-amber-400 border-amber-500/30";
+      dotColor = "bg-amber-400";
+    } else if (tier === "INTERNAL") {
+      badgeClasses = "bg-blue-500/10 text-blue-400 border-blue-500/30";
+      dotColor = "bg-blue-400";
+    } else if (tier === "PUBLIC") {
+      badgeClasses = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+      dotColor = "bg-emerald-400";
+    }
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md border text-[11px] font-mono font-semibold ${badgeClasses}`}
+        title={`Sensitivity: ${tier} (${confPct}% confidence, ${method || "rule"})`}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+        <span>{tier}</span>
+        {confPct < 100 && (
+          <span className="text-[9px] opacity-75">({confPct}%)</span>
+        )}
+      </span>
+    );
+  }
+
   function getFileExt(filename = "") {
     return filename.split(".").pop().toLowerCase();
   }
@@ -185,11 +253,15 @@ export default function DocumentsPage() {
     const matchesSearch = name.includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;
-    if (selectedFileType === "all") return true;
-    if (selectedFileType === "pdf") return ext === "pdf";
-    if (selectedFileType === "docs") return ["doc", "docx", "txt", "md"].includes(ext);
-    if (selectedFileType === "sheets") return ["xls", "xlsx", "csv"].includes(ext);
-    if (selectedFileType === "code") return ["js", "py", "ts", "json", "sh"].includes(ext);
+    if (selectedFileType === "pdf" && ext !== "pdf") return false;
+    if (selectedFileType === "docs" && !["doc", "docx", "txt", "md"].includes(ext)) return false;
+    if (selectedFileType === "sheets" && !["xls", "xlsx", "csv"].includes(ext)) return false;
+    if (selectedFileType === "code" && !["js", "py", "ts", "json", "sh"].includes(ext)) return false;
+
+    if (selectedSensitivity !== "all" && (doc.classification || "INTERNAL").toUpperCase() !== selectedSensitivity) {
+      return false;
+    }
+
     return true;
   });
 
@@ -295,7 +367,7 @@ export default function DocumentsPage() {
               {/* Type Filter Pills */}
               <div className="flex items-center gap-1 overflow-x-auto py-1">
                 {[
-                  { id: "all", label: "All" },
+                  { id: "all", label: "All Types" },
                   { id: "pdf", label: "PDF" },
                   { id: "docs", label: "Word & Text" },
                   { id: "sheets", label: "Sheets" },
@@ -312,6 +384,30 @@ export default function DocumentsPage() {
                     }`}
                   >
                     {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sensitivity Filter Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto py-1 border-l border-zinc-700/50 pl-2">
+                {[
+                  { id: "all", label: "All Tiers" },
+                  { id: "RESTRICTED", label: "Restricted", color: "text-rose-400" },
+                  { id: "CONFIDENTIAL", label: "Confidential", color: "text-amber-400" },
+                  { id: "INTERNAL", label: "Internal", color: "text-blue-400" },
+                  { id: "PUBLIC", label: "Public", color: "text-emerald-400" },
+                ].map((tier) => (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    onClick={() => setSelectedSensitivity(tier.id)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-medium transition-colors cursor-pointer ${
+                      selectedSensitivity === tier.id
+                        ? "bg-zinc-200 text-zinc-900 font-bold shadow-sm"
+                        : `${tier.color || "text-zinc-400"} hover:bg-zinc-800/60`
+                    }`}
+                  >
+                    {tier.label}
                   </button>
                 ))}
               </div>
@@ -369,6 +465,7 @@ export default function DocumentsPage() {
                     <tr className="border-b border-white/5 text-zinc-400 font-mono text-[11px]">
                       <th className="py-3 px-5 font-semibold uppercase">Document</th>
                       <th className="py-3 px-4 font-semibold uppercase">Namespace</th>
+                      <th className="py-3 px-4 font-semibold uppercase">Sensitivity</th>
                       <th className="py-3 px-4 font-semibold uppercase">Est. Chunks</th>
                       <th className="py-3 px-4 font-semibold uppercase">Size</th>
                       <th className="py-3 px-5 font-semibold uppercase text-right">Actions</th>
@@ -393,6 +490,9 @@ export default function DocumentsPage() {
                             {doc.folderName}
                           </span>
                         </td>
+                        <td className="py-3 px-4">
+                          {renderClassificationBadge(doc.classification, doc.classification_confidence, doc.classification_method)}
+                        </td>
                         <td className="py-3 px-4 text-zinc-400 font-mono">
                           {doc.token_count_estimate ? `${Math.ceil(doc.token_count_estimate / 250)} chunks` : "Parsed"}
                         </td>
@@ -400,6 +500,19 @@ export default function DocumentsPage() {
                           {humanFileSize(doc.cachedSize || 10240)}
                         </td>
                         <td className="py-3 px-5 text-right space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDocForReview(doc);
+                              setReviewClassification(doc.classification || "CONFIDENTIAL");
+                              setReviewReason("");
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-500/30 text-xs font-medium transition-all cursor-pointer"
+                            title="Review or override sensitivity classification"
+                          >
+                            <Shield size={13} weight="duotone" />
+                            <span>Review</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => setSelectedDocForPreview(doc)}
@@ -459,6 +572,16 @@ export default function DocumentsPage() {
                   <span className="font-mono text-zinc-300">{selectedDocForPreview.folderName}</span>
                 </div>
                 <div>
+                  <span className="text-zinc-500 block text-[10px] uppercase font-mono">Sensitivity Tier</span>
+                  <div className="mt-0.5">
+                    {renderClassificationBadge(
+                      selectedDocForPreview.classification,
+                      selectedDocForPreview.classification_confidence,
+                      selectedDocForPreview.classification_method
+                    )}
+                  </div>
+                </div>
+                <div className="mt-2">
                   <span className="text-zinc-500 block text-[10px] uppercase font-mono">File Size</span>
                   <span className="font-mono text-zinc-300">{humanFileSize(selectedDocForPreview.cachedSize || 10240)}</span>
                 </div>
@@ -466,16 +589,42 @@ export default function DocumentsPage() {
                   <span className="text-zinc-500 block text-[10px] uppercase font-mono">Token Estimate</span>
                   <span className="font-mono text-zinc-300">{selectedDocForPreview.token_count_estimate || "N/A"}</span>
                 </div>
-                <div className="mt-2">
+                <div className="col-span-2 mt-2">
                   <span className="text-zinc-500 block text-[10px] uppercase font-mono">Storage ID</span>
                   <span className="font-mono text-zinc-400 truncate block text-[11px]">{selectedDocForPreview.id}</span>
                 </div>
               </div>
+
+              {selectedDocForPreview.classification_reasons?.length > 0 && (
+                <div className="p-3 bg-zinc-950/60 rounded-xl border border-zinc-800/80">
+                  <span className="text-zinc-400 font-mono text-[10px] uppercase block mb-1">Classification Reasons</span>
+                  <ul className="list-disc list-inside space-y-0.5 text-zinc-300 font-mono text-[11px]">
+                    {selectedDocForPreview.classification_reasons.map((r, i) => (
+                      <li key={i} className="text-amber-300/80">{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <p className="text-zinc-400 text-xs leading-relaxed">
                 This document is parsed and indexed in local memory. You can embed it into any target workspace vector index for retrieval-augmented generation.
               </p>
             </div>
             <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+              <button
+                type="button"
+                onClick={() => {
+                  const doc = selectedDocForPreview;
+                  setSelectedDocForPreview(null);
+                  setSelectedDocForReview(doc);
+                  setReviewClassification(doc.classification || "CONFIDENTIAL");
+                  setReviewReason("");
+                }}
+                className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-amber-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Shield size={14} weight="duotone" />
+                <span>Review Classification</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -487,6 +636,129 @@ export default function DocumentsPage() {
               >
                 <Lightning size={14} weight="fill" />
                 <span>Embed into {selectedWorkspace?.name || "Workspace"}</span>
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Classification Review & Policy Override Modal */}
+      {selectedDocForReview && (
+        <Modal isOpen={!!selectedDocForReview} onClose={() => setSelectedDocForReview(null)} size="md">
+          <div className="p-6 space-y-4 bg-zinc-900 rounded-2xl border border-zinc-800 text-white">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck size={22} className="text-amber-400" weight="duotone" />
+                <h3 className="text-sm font-bold truncate max-w-sm">
+                  Sensitivity Review & Policy Governance
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedDocForReview(null)}
+                className="text-zinc-400 hover:text-white p-1"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="bg-zinc-950/70 p-3.5 rounded-xl border border-zinc-800/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400 font-mono text-[11px]">Document</span>
+                  <span className="font-medium text-white truncate max-w-[220px]">
+                    {selectedDocForReview.title || selectedDocForReview.name}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400 font-mono text-[11px]">Current Sensitivity</span>
+                  <div>
+                    {renderClassificationBadge(
+                      selectedDocForReview.classification,
+                      selectedDocForReview.classification_confidence,
+                      selectedDocForReview.classification_method
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400 font-mono text-[11px]">Detection Mode</span>
+                  <span className="font-mono text-zinc-300 capitalize">
+                    {selectedDocForReview.classification_method || "Deterministic Rule Engine"}
+                  </span>
+                </div>
+                {selectedDocForReview.classification_reasons?.length > 0 && (
+                  <div className="pt-2 border-t border-zinc-800/60">
+                    <span className="text-zinc-400 font-mono text-[10px] uppercase block mb-1">Matched Indicators</span>
+                    <ul className="list-disc list-inside space-y-1 text-zinc-300 font-mono text-[11px]">
+                      {selectedDocForReview.classification_reasons.map((r, i) => (
+                        <li key={i} className="text-amber-300/90">{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Policy Implication Banner */}
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300/90 text-[11px] leading-relaxed">
+                <strong>Policy Enforcement Notice:</strong> Assigning <em>RESTRICTED</em> or <em>CONFIDENTIAL</em> strictly denies egress to external cloud LLMs, blocks unapproved network tools, and mandates sovereign on-premise execution.
+              </div>
+
+              {/* Override Form */}
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-zinc-300 font-semibold mb-1.5">
+                    Assign Sensitivity Tier:
+                  </label>
+                  <select
+                    value={reviewClassification}
+                    onChange={(e) => setReviewClassification(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-700 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="PUBLIC">PUBLIC — Unrestricted, suitable for general distribution</option>
+                    <option value="INTERNAL">INTERNAL — Standard operational docs, local team access</option>
+                    <option value="CONFIDENTIAL">CONFIDENTIAL — Proprietary IP, sovereign models only</option>
+                    <option value="RESTRICTED">RESTRICTED — Highly sensitive / ITAR / keys, maximum isolation</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-zinc-300 font-semibold mb-1.5">
+                    Override Justification (Required for Audit):
+                  </label>
+                  <input
+                    type="text"
+                    value={reviewReason}
+                    onChange={(e) => setReviewReason(e.target.value)}
+                    placeholder="e.g., Verified document contents, reclassified after security audit"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+                  />
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    All classification overrides are logged to the immutable security audit ledger.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
+              <button
+                type="button"
+                onClick={() => setSelectedDocForReview(null)}
+                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-xs font-medium transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveClassificationOverride}
+                disabled={updatingClassification}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                {updatingClassification ? (
+                  <CircleNotch size={14} className="animate-spin" />
+                ) : (
+                  <ShieldCheck size={14} weight="bold" />
+                )}
+                <span>Save & Apply Policy</span>
               </button>
             </div>
           </div>

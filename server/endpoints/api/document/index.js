@@ -8,6 +8,7 @@ const {
   isWithin,
   moveProcessedDocsToFolder,
   viewLocalFiles,
+  documentsPath,
 } = require("../../../utils/files");
 const { reqBody, safeJsonParse, queryParams } = require("../../../utils/http");
 const { EventLogs } = require("../../../models/eventLogs");
@@ -17,10 +18,6 @@ const path = require("path");
 const { Document } = require("../../../models/documents");
 const { purgeFolder } = require("../../../utils/files/purgeDocument");
 const createFilesLib = require("../../../utils/agents/aibitat/plugins/create-files/lib");
-const documentsPath =
-  process.env.NODE_ENV === "development"
-    ? path.resolve(__dirname, "../../../storage/documents")
-    : path.resolve(process.env.STORAGE_DIR, `documents`);
 
 /**
  * Runs a simple validation check on the addToWorkspaces query parameter to ensure it is a string of comma-separated workspace slugs.
@@ -150,6 +147,14 @@ function apiDocumentEndpoints(app) {
             .json({ success: false, error: reason, documents })
             .end();
         }
+
+        const { ClassificationService } = require("../../../utils/classification");
+        await ClassificationService.applyClassificationToProcessedDocs(
+          documents,
+          originalname,
+          metadata,
+          response.locals?.user?.id || null
+        );
 
         Collector.log(
           `Document ${originalname} uploaded processed and successfully. It is now available in documents.`
@@ -297,6 +302,14 @@ function apiDocumentEndpoints(app) {
         // For each processed document, check if it is already in the desired folder.
         // If not, move it using similar logic as in the move-files endpoint.
         const folder = moveProcessedDocsToFolder(documents, folderName);
+
+        const { ClassificationService } = require("../../../utils/classification");
+        await ClassificationService.applyClassificationToProcessedDocs(
+          documents,
+          originalname,
+          metadata,
+          response.locals?.user?.id || null
+        );
 
         Collector.log(
           `Document ${originalname} uploaded, processed, and moved to folder ${folder} successfully.`

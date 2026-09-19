@@ -767,6 +767,10 @@ async function fileToPickerData({
     return {
       name: filename,
       type: "file",
+      classification: metadata.classification || "INTERNAL",
+      confidence: metadata.confidence ?? 0.8,
+      classification_method: metadata.classification_method || "system_default",
+      classification_reasons: metadata.classification_reasons || ["Default organizational sensitivity"],
       ...metadata,
       cached: cachedStatus,
       canWatch: false,
@@ -813,6 +817,10 @@ async function fileToPickerData({
   return {
     name: filename,
     type: "file",
+    classification: metadata.classification || "INTERNAL",
+    confidence: metadata.confidence ?? 0.8,
+    classification_method: metadata.classification_method || "system_default",
+    classification_reasons: metadata.classification_reasons || ["Default organizational sensitivity"],
     ...metadata,
     cached: cachedStatus,
     canWatch: false,

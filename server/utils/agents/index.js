@@ -141,7 +141,7 @@ class AgentHandler {
         break;
       case "ollama":
         if (!process.env.OLLAMA_BASE_PATH)
-          throw new Error("Ollama base path must be provided to use agents.");
+          process.env.OLLAMA_BASE_PATH = "http://127.0.0.1:11434";
         break;
       case "groq":
         if (!process.env.GROQ_API_KEY)
@@ -857,6 +857,9 @@ class AgentHandler {
         invocation: this.invocation,
         log: this.log,
         routingMetadata: this.routingMetadata || null,
+        workspace: this.invocation?.workspace,
+        user: this.invocation?.user,
+        classification: this.effectiveSensitivity || "INTERNAL",
       },
     });
 

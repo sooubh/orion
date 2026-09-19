@@ -250,119 +250,45 @@ function getImageGeneratorProvider() {
  */
 function getLLMProviderClass({ provider = null } = {}) {
   switch (provider) {
-    case "openai":
-      const { OpenAiLLM } = require("../AiProviders/openAi");
-      return OpenAiLLM;
-    case "azure":
-      const { AzureOpenAiLLM } = require("../AiProviders/azureOpenAi");
-      return AzureOpenAiLLM;
-    case "anthropic":
-      const { AnthropicLLM } = require("../AiProviders/anthropic");
-      return AnthropicLLM;
-    case "gemini":
-      const { GeminiLLM } = require("../AiProviders/gemini");
-      return GeminiLLM;
+    case "ollama":
+      const { OllamaAILLM } = require("../AiProviders/ollama");
+      return OllamaAILLM;
     case "lmstudio":
       const { LMStudioLLM } = require("../AiProviders/lmStudio");
       return LMStudioLLM;
     case "localai":
       const { LocalAiLLM } = require("../AiProviders/localAi");
       return LocalAiLLM;
-    case "ollama":
-      const { OllamaAILLM } = require("../AiProviders/ollama");
-      return OllamaAILLM;
-    case "togetherai":
-      const { TogetherAiLLM } = require("../AiProviders/togetherAi");
-      return TogetherAiLLM;
-    case "fireworksai":
-      const { FireworksAiLLM } = require("../AiProviders/fireworksAi");
-      return FireworksAiLLM;
-    case "perplexity":
-      const { PerplexityLLM } = require("../AiProviders/perplexity");
-      return PerplexityLLM;
-    case "openrouter":
-      const { OpenRouterLLM } = require("../AiProviders/openRouter");
-      return OpenRouterLLM;
-    case "mistral":
-      const { MistralLLM } = require("../AiProviders/mistral");
-      return MistralLLM;
-    case "groq":
-      const { GroqLLM } = require("../AiProviders/groq");
-      return GroqLLM;
+    case "generic-openai":
+      const { GenericOpenAiLLM } = require("../AiProviders/genericOpenAi");
+      return GenericOpenAiLLM;
+    case "lemonade":
+      const { LemonadeLLM } = require("../AiProviders/lemonade");
+      return LemonadeLLM;
     case "koboldcpp":
       const { KoboldCPPLLM } = require("../AiProviders/koboldCPP");
       return KoboldCPPLLM;
     case "textgenwebui":
       const { TextGenWebUILLM } = require("../AiProviders/textGenWebUI");
       return TextGenWebUILLM;
-    case "cohere":
-      const { CohereLLM } = require("../AiProviders/cohere");
-      return CohereLLM;
-    case "litellm":
-      const { LiteLLM } = require("../AiProviders/liteLLM");
-      return LiteLLM;
-    case "generic-openai":
-      const { GenericOpenAiLLM } = require("../AiProviders/genericOpenAi");
-      return GenericOpenAiLLM;
-    case "bedrock":
-      const { AWSBedrockLLM } = require("../AiProviders/bedrock");
-      return AWSBedrockLLM;
-    case "deepseek":
-      const { DeepSeekLLM } = require("../AiProviders/deepseek");
-      return DeepSeekLLM;
-    case "apipie":
-      const { ApiPieLLM } = require("../AiProviders/apipie");
-      return ApiPieLLM;
-    case "novita":
-      const { NovitaLLM } = require("../AiProviders/novita");
-      return NovitaLLM;
-    case "xai":
-      const { XAiLLM } = require("../AiProviders/xai");
-      return XAiLLM;
     case "nvidia-nim":
       const { NvidiaNimLLM } = require("../AiProviders/nvidiaNim");
       return NvidiaNimLLM;
-    case "ppio":
-      const { PPIOLLM } = require("../AiProviders/ppio");
-      return PPIOLLM;
-    case "moonshotai":
-      const { MoonshotAiLLM } = require("../AiProviders/moonshotAi");
-      return MoonshotAiLLM;
-    case "cometapi":
-      const { CometApiLLM } = require("../AiProviders/cometapi");
-      return CometApiLLM;
     case "foundry":
       const { FoundryLLM } = require("../AiProviders/foundry");
       return FoundryLLM;
-    case "zai":
-      const { ZAiLLM } = require("../AiProviders/zai");
-      return ZAiLLM;
-    case "giteeai":
-      const { GiteeAILLM } = require("../AiProviders/giteeai");
-      return GiteeAILLM;
     case "docker-model-runner":
       const {
         DockerModelRunnerLLM,
       } = require("../AiProviders/dockerModelRunner");
       return DockerModelRunnerLLM;
     case "privatemode":
-      const { PrivateModeLLM } = require("../AiProviders/privatemode");
-      return PrivateModeLLM;
-    case "sambanova":
-      const { SambaNovaLLM } = require("../AiProviders/sambanova");
-      return SambaNovaLLM;
-    case "lemonade":
-      const { LemonadeLLM } = require("../AiProviders/lemonade");
-      return LemonadeLLM;
+      const { PrivatemodeLLM } = require("../AiProviders/privatemode");
+      return PrivatemodeLLM;
     case "omlx":
       const { OMLXLLM } = require("../AiProviders/omlx");
       return OMLXLLM;
-    case "minimax":
-      const { MinimaxLLM } = require("../AiProviders/minimax");
-      return MinimaxLLM;
-    case "cerebras":
-      const { CerebrasLLM } = require("../AiProviders/cerebras");
-      return CerebrasLLM;
+    case "adaptive-router":
     case "orion-router":
     case "anythingllm-router":
       const { OrionModelRouter } = require("../AiProviders/modelRouter");

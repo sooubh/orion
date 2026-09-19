@@ -116,6 +116,82 @@ function securityEndpoints(app) {
       }
     }
   );
+
+  /**
+   * GET /api/security/policies
+   * Returns the active 4-tier data classification & policy governance matrix
+   */
+  app.get(
+    "/security/policies",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async (request, response) => {
+      try {
+        const { PolicyEngine } = require("../utils/policy");
+        const matrix = PolicyEngine.getPolicyGovernanceMatrix();
+        return response.status(200).json({ success: true, policies: matrix });
+      } catch (error) {
+        console.error("[securityEndpoints] Policies error:", error);
+        return response.status(500).json({ success: false, error: error.message });
+      }
+    }
+  );
+
+  /**
+   * POST /api/security/evaluate-policy
+   * Real-time policy simulator for administrators to test hypothetical decisions
+   */
+  app.post(
+    "/security/evaluate-policy",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async (request, response) => {
+      try {
+        const { PolicyEngine } = require("../utils/policy");
+        const { reqBody } = require("../utils/http");
+        const params = reqBody(request);
+        const result = PolicyEngine.evaluatePolicy({
+          ...params,
+          user: response.locals?.user || params.user,
+        });
+        return response.status(200).json({ success: true, ...result });
+      } catch (error) {
+        console.error("[securityEndpoints] Evaluate policy error:", error);
+        return response.status(500).json({ success: false, error: error.message });
+      }
+    }
+  );
+
+  /**
+   * GET /api/security/policy-audit
+   * Filtered audit events specifically for classification and policy decisions
+   */
+  app.get(
+    "/security/policy-audit",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async (request, response) => {
+      try {
+        const logs = await EventLogs.where(
+          {
+            event: {
+              in: [
+                "document_classified",
+                "classification_override",
+                "model_blocked",
+                "model_allowed",
+                "tool_blocked",
+                "knowledge_source_blocked",
+              ],
+            },
+          },
+          100,
+          { occurredAt: "desc" }
+        );
+        return response.status(200).json({ success: true, logs: logs || [] });
+      } catch (error) {
+        console.error("[securityEndpoints] Policy audit logs error:", error);
+        return response.status(500).json({ success: false, error: error.message });
+      }
+    }
+  );
 }
 
 function isProviderLocal(provider) {

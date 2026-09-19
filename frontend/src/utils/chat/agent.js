@@ -70,6 +70,8 @@ const handledEvents = [
   "rechartVisualize",
   "toolApprovalRequest",
   "clarificationRequest",
+  "verificationEvent",
+  "checkpointEvent",
   // Streaming events
   "reportStreamEvent",
 ];
@@ -91,6 +93,32 @@ export default function handleSocketResponse(socket, event, setChatHistory) {
       window.dispatchEvent(
         new CustomEvent(THREAD_RENAME_EVENT, {
           detail: { threadSlug: slug, newName: name },
+        })
+      );
+    }
+    return;
+  }
+
+  // Handle closed-loop verification events
+  if (data.type === "verificationEvent") {
+    const { event: verEvent, data: eventData } = data;
+    if (verEvent === "step_requires_human_review") {
+      window.dispatchEvent(
+        new CustomEvent("verification_human_review_required", {
+          detail: eventData,
+        })
+      );
+    }
+    return;
+  }
+
+  // Handle checkpoint events
+  if (data.type === "checkpointEvent") {
+    const { event: cpEvent, data: eventData } = data;
+    if (cpEvent === "checkpoint_recovery_exhausted") {
+      window.dispatchEvent(
+        new CustomEvent("checkpoint_recovery_exhausted", {
+          detail: eventData,
         })
       );
     }
@@ -139,6 +167,37 @@ export default function handleSocketResponse(socket, event, setChatHistory) {
     return setChatHistory((prev) => {
       if (data.content.type === "removeStatusResponse")
         return [...prev.filter((msg) => msg.uuid !== data.content.uuid)];
+
+      if (data.content.type === "humanReviewNotification") {
+        return [
+          ...prev,
+          {
+            uuid: data.content.uuid,
+            type: "humanReviewNotification",
+            content: `Execution halted for Human Review on step "${data.content.stepName}". ${data.content.reason}`,
+            stepId: data.content.stepId,
+            stepName: data.content.stepName,
+            reason: data.content.reason,
+            role: "assistant",
+          },
+        ];
+      }
+
+      if (data.content.type === "checkpointRecoveryNotification") {
+        return [
+          ...prev,
+          {
+            uuid: data.content.uuid || v4(),
+            type: "checkpointRecoveryNotification",
+            action: data.content.action,
+            stepName: data.content.stepName,
+            stepOrder: data.content.stepOrder,
+            stepTitle: data.content.stepTitle,
+            reason: data.content.reason,
+            role: "assistant",
+          },
+        ];
+      }
 
       if (data.content.type === "modelRouteNotification") {
         if (!data.content.routedTo) return prev;

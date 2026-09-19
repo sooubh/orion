@@ -156,6 +156,14 @@ function workspaceEndpoints(app) {
         // documents from their default location into the target folder.
         if (!!folderName) moveProcessedDocsToFolder(documents, folderName);
 
+        const { ClassificationService } = require("../utils/classification");
+        await ClassificationService.applyClassificationToProcessedDocs(
+          documents,
+          originalname,
+          metadata,
+          response.locals?.user?.id
+        );
+
         Collector.log(
           `Document ${originalname} uploaded processed and successfully. It is now available in documents.`
         );
@@ -821,6 +829,14 @@ function workspaceEndpoints(app) {
           response.status(500).json({ success: false, error: reason }).end();
           return;
         }
+
+        const { ClassificationService } = require("../utils/classification");
+        await ClassificationService.applyClassificationToProcessedDocs(
+          documents,
+          originalname,
+          {},
+          response.locals?.user?.id
+        );
 
         Collector.log(
           `Document ${originalname} uploaded processed and successfully. It is now available in documents.`

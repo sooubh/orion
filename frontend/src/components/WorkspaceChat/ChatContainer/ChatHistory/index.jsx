@@ -11,6 +11,8 @@ import ManageWorkspace from "../../../Modals/ManageWorkspace";
 import { ArrowDown } from "@phosphor-icons/react";
 import Chartable from "./Chartable";
 import ModelRouteNotification from "./ModelRouteNotification";
+import HumanReviewCard from "./HumanReviewCard";
+import CheckpointRecoveryNotification from "./CheckpointRecoveryNotification";
 import Workspace from "@/models/workspace";
 import { useParams } from "react-router-dom";
 import paths from "@/utils/paths";
@@ -274,6 +276,33 @@ function buildMessages({
           allowSkip={props.allowSkip}
           timeoutMs={props.timeoutMs}
           websocket={websocket}
+        />
+      );
+      return acc;
+    }
+
+    if (props.type === "humanReviewNotification") {
+      acc.push(
+        <HumanReviewCard
+          key={`human-review-${props.uuid || props.stepId}`}
+          stepId={props.stepId}
+          stepName={props.stepName}
+          reason={props.reason}
+          attempts={props.attempts || 2}
+        />
+      );
+      return acc;
+    }
+
+    if (props.type === "checkpointRecoveryNotification") {
+      acc.push(
+        <CheckpointRecoveryNotification
+          key={`checkpoint-rec-${props.uuid || index}`}
+          action={props.action}
+          stepName={props.stepName}
+          stepOrder={props.stepOrder}
+          stepTitle={props.stepTitle}
+          reason={props.reason}
         />
       );
       return acc;

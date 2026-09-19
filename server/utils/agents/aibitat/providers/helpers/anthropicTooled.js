@@ -1,4 +1,3 @@
-const Anthropic = require("@anthropic-ai/sdk");
 const { RetryError } = require("../../error.js");
 const { v4 } = require("uuid");
 const { safeJsonParse } = require("../../../../http");

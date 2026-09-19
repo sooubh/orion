@@ -34,6 +34,9 @@ function deliverablesEndpoints(app) {
                 const ext = path.extname(file).replace(".", "").toLowerCase();
                 const typeInfo = getDeliverableType(ext);
 
+                const { DeliverableVerifier } = require("../utils/verification/verifiers/deliverable");
+                const verification = DeliverableVerifier.verify({ filePath: fullPath });
+
                 deliverables.push({
                   id: file,
                   filename: file,
@@ -46,6 +49,9 @@ function deliverablesEndpoints(app) {
                   createdAt: stats.birthtime || stats.mtime,
                   downloadUrl: `/api/agent-skills/generated-files/${file}`,
                   origin: "Agent Tool Execution",
+                  verificationStatus: verification.status,
+                  verificationConfidence: verification.confidence,
+                  verificationReason: verification.reason,
                 });
               }
             } catch (err) {
@@ -63,6 +69,34 @@ function deliverablesEndpoints(app) {
       } catch (error) {
         console.error("[deliverablesEndpoints] Error:", error.message);
         return response.status(500).json({ error: "Failed to list deliverables." });
+      }
+    }
+  );
+
+  /**
+   * POST /api/deliverables/:filename/verify
+   * On-demand deliverable verification and integrity check
+   */
+  app.post(
+    "/deliverables/:filename/verify",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async (request, response) => {
+      try {
+        const { filename } = request.params;
+        const storageRoot =
+          process.env.STORAGE_DIR || path.resolve(__dirname, "../../storage");
+        const fullPath = path.join(storageRoot, "generated-files", path.basename(filename));
+
+        const { DeliverableVerifier } = require("../utils/verification/verifiers/deliverable");
+        const verification = DeliverableVerifier.verify({ filePath: fullPath });
+
+        return response.status(200).json({
+          filename,
+          verification,
+        });
+      } catch (error) {
+        console.error("[deliverablesEndpoints] Verify Error:", error.message);
+        return response.status(500).json({ error: "Failed to verify deliverable." });
       }
     }
   );

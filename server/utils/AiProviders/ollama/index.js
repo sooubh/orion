@@ -17,7 +17,7 @@ class OllamaAILLM {
 
   constructor(embedder = null, modelPreference = null) {
     if (!process.env.OLLAMA_BASE_PATH)
-      throw new Error("No Ollama Base Path was set.");
+      process.env.OLLAMA_BASE_PATH = "http://127.0.0.1:11434";
 
     this.className = "OllamaAILLM";
     this.authToken = process.env.OLLAMA_AUTH_TOKEN;

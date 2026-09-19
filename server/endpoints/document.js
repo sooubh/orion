@@ -106,6 +106,35 @@ function documentEndpoints(app) {
       }
     }
   );
+
+  app.post(
+    "/document/:folder/:filename/classification",
+    [validatedRequest, flexUserRoleValid([ROLES.admin, ROLES.manager])],
+    async (request, response) => {
+      try {
+        const { folder, filename } = request.params;
+        const { newClassification, reason } = reqBody(request);
+        const { ClassificationService } = require("../utils/classification");
+        const docpath = `${folder}/${filename}`;
+
+        const result = await ClassificationService.updateClassification({
+          docpath,
+          newClassification,
+          reason,
+          user: response.locals?.user,
+        });
+
+        if (!result.success) {
+          return response.status(400).json({ success: false, error: result.error });
+        }
+
+        return response.status(200).json({ success: true, ...result });
+      } catch (e) {
+        console.error("[documentEndpoints] classification update error:", e);
+        return response.status(500).json({ success: false, error: e.message });
+      }
+    }
+  );
 }
 
 module.exports = { documentEndpoints };

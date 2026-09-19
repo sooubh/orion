@@ -922,6 +922,16 @@ ${this.getHistory({ to: route.to })
       ?.map((name) => this.functions.get(this.#parseFunctionName(name)))
       .filter((a) => !!a);
 
+    // Policy Engine: Pre-filter tools based on active data sensitivity
+    const { PolicyEngine } = require("../../policy");
+    const activeClassification = this.handlerProps?.classification || "INTERNAL";
+    const activeUser = this.handlerProps?.user || null;
+    if (functions?.length) {
+      functions = functions.filter((fn) =>
+        PolicyEngine.isToolPermitted(fn.name, activeClassification, activeUser)
+      );
+    }
+
     // Rerank tools based on user prompt if enabled
     if (ToolReranker.isEnabled() && functions?.length) {
       const toolReranker = new ToolReranker();
@@ -1084,6 +1094,52 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
       this.handlerProps?.log?.(
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool ${JSON.stringify(args, null, 2)}`
       );
+
+      // Policy Engine Gate: Validate tool permission before execution
+      const { PolicyEngine } = require("../../policy");
+      const activeClassification = this.handlerProps?.classification || "INTERNAL";
+      const activeUser = this.handlerProps?.user || null;
+
+      const toolPolicy = PolicyEngine.evaluatePolicy({
+        requestedCapability: "tool",
+        tool: name,
+        classification: activeClassification,
+        user: activeUser,
+        workspace: this.handlerProps?.workspace,
+      });
+
+      if (toolPolicy.decision !== "ALLOW") {
+        const { EventLogs } = require("../../../models/eventLogs");
+        this.handlerProps?.log?.(
+          `[Policy Engine BLOCKED]: Tool \`${name}\` blocked for ${activeClassification} data: ${toolPolicy.reason}`
+        );
+        EventLogs.logEvent(
+          "tool_blocked",
+          {
+            tool: name,
+            classification: activeClassification,
+            reason: toolPolicy.reason,
+            policyRule: toolPolicy.policyRule,
+          },
+          activeUser?.id ? Number(activeUser.id) : null
+        );
+
+        const safeBlockMessage = `ACTION BLOCKED BY POLICY: Tool "${name}" is not permitted for ${activeClassification} information. Reason: ${toolPolicy.reason}`;
+        return await this.handleAsyncExecution(
+          [
+            ...messages,
+            {
+              name,
+              role: "function",
+              content: safeBlockMessage,
+              originalFunctionCall: completionStream.functionCall,
+            },
+          ],
+          reachedToolLimit ? [] : functions,
+          byAgent,
+          depth + 1
+        );
+      }
 
       const result = await fn.handler(args);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
@@ -1252,6 +1308,53 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool`
       );
 
+      // Policy Engine Gate: Validate tool permission before execution
+      const { PolicyEngine } = require("../../policy");
+      const activeClassification = this.handlerProps?.classification || "INTERNAL";
+      const activeUser = this.handlerProps?.user || null;
+
+      const toolPolicy = PolicyEngine.evaluatePolicy({
+        requestedCapability: "tool",
+        tool: name,
+        classification: activeClassification,
+        user: activeUser,
+        workspace: this.handlerProps?.workspace,
+      });
+
+      if (toolPolicy.decision !== "ALLOW") {
+        const { EventLogs } = require("../../../models/eventLogs");
+        this.handlerProps?.log?.(
+          `[Policy Engine BLOCKED]: Tool \`${name}\` blocked for ${activeClassification} data: ${toolPolicy.reason}`
+        );
+        EventLogs.logEvent(
+          "tool_blocked",
+          {
+            tool: name,
+            classification: activeClassification,
+            reason: toolPolicy.reason,
+            policyRule: toolPolicy.policyRule,
+          },
+          activeUser?.id ? Number(activeUser.id) : null
+        );
+
+        const safeBlockMessage = `ACTION BLOCKED BY POLICY: Tool "${name}" is not permitted for ${activeClassification} information. Reason: ${toolPolicy.reason}`;
+        return await this.handleExecution(
+          [
+            ...messages,
+            {
+              name,
+              role: "function",
+              content: safeBlockMessage,
+              originalFunctionCall: completion.functionCall,
+            },
+          ],
+          reachedToolLimit ? [] : functions,
+          byAgent,
+          depth + 1,
+          msgUUID
+        );
+      }
+
       const result = await fn.handler(args);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
       this.emitter.emit("toolCallResult", {
@@ -1259,6 +1362,179 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
         arguments: args,
         result,
       });
+
+      // Closed-Loop Verification & Self-Repair Hook
+      const {
+        VerificationManager,
+        StepType,
+        VerificationStatus,
+      } = require("../../verification");
+
+      const isDeliverableTool = /create_file|save_file|file|document|docx|xlsx|pptx|pdf/i.test(name);
+      let stepType = StepType.TOOL_CALL;
+      let filePath = null;
+
+      if (isDeliverableTool) {
+        stepType = StepType.DELIVERABLE;
+        filePath =
+          args?.filePath ||
+          args?.filename ||
+          (typeof result === "string" &&
+          (result.endsWith(".docx") ||
+            result.endsWith(".xlsx") ||
+            result.endsWith(".pptx") ||
+            result.endsWith(".pdf") ||
+            result.endsWith(".json") ||
+            result.endsWith(".js"))
+            ? result
+            : null);
+      }
+
+      const stepDef = {
+        stepId: `${msgUUID}_step_${depth}_${name}`,
+        type: stepType,
+        toolName: name,
+        input: args,
+        filePath,
+      };
+
+      const verification = await VerificationManager.verifyStep({
+        step: stepDef,
+        output: result,
+        context: {
+          user: activeUser,
+          workspace: this.handlerProps?.workspace,
+          classification: activeClassification,
+        },
+        socket: this.socket,
+      });
+
+      let toolContentForNextTurn = result;
+
+      if (verification.status === VerificationStatus.PASSED) {
+        // Record validated checkpoint at step boundary
+        const { CheckpointManager } = require("../../checkpoints");
+        try {
+          await CheckpointManager.onStepVerified({
+            taskId: msgUUID,
+            step: {
+              ...stepDef,
+              stepOrder: depth + 1,
+              stepTitle: `Tool: ${name}`,
+            },
+            output: result,
+            verificationResult: verification,
+            context: {
+              user: activeUser,
+              workspace: this.handlerProps?.workspace,
+              classification: activeClassification,
+              model: this.providerInstance?.model,
+              messages,
+            },
+            socket: this.socket,
+          });
+        } catch (cpErr) {
+          console.warn("[AIbitat] Checkpoint creation warning:", cpErr.message);
+        }
+      } else {
+        this.handlerProps?.log?.(
+          `[Verification FAILED]: Tool \`${name}\` failed verification: ${verification.reason}`
+        );
+        this?.introspect?.(
+          `Step "${name}" failed verification: ${verification.reason}. Initiating safe checkpoint recovery...`
+        );
+
+        const { CheckpointManager } = require("../../checkpoints");
+        let recoveryOutcome = null;
+        try {
+          recoveryOutcome = await CheckpointManager.handleStepFailure({
+            taskId: msgUUID,
+            failedStep: stepDef,
+            verificationResult: verification,
+            context: {
+              user: activeUser,
+              workspace: this.handlerProps?.workspace,
+              classification: activeClassification,
+            },
+            socket: this.socket,
+          });
+        } catch (recErr) {
+          console.warn("[AIbitat] Checkpoint handleStepFailure error:", recErr.message);
+        }
+
+        if (recoveryOutcome?.status === "REQUIRES_HUMAN_REVIEW") {
+          this.handlerProps?.log?.(
+            `[Recovery REQUIRES_HUMAN_REVIEW]: Step \`${name}\` recovery exhausted or unsafe. Halting execution for human review.`
+          );
+          this?.introspect?.(
+            `Step "${name}" recovery exhausted or unsafe. Escalating to Human Review.`
+          );
+
+          eventHandler?.("reportStreamEvent", {
+            type: "humanReviewNotification",
+            uuid: msgUUID,
+            stepId: stepDef.stepId,
+            stepName: name,
+            reason: recoveryOutcome.reason,
+          });
+
+          return `[EXECUTION HALTED - REQUIRES HUMAN REVIEW]: Step "${name}" recovery halted: ${recoveryOutcome.reason}`;
+        }
+
+        const repairResult = await VerificationManager.diagnoseAndRepair({
+          step: stepDef,
+          verificationResult: verification,
+          context: {
+            user: activeUser,
+            workspace: this.handlerProps?.workspace,
+            classification: activeClassification,
+          },
+          socket: this.socket,
+        });
+
+        if (repairResult.status === VerificationStatus.REQUIRES_HUMAN_REVIEW) {
+          this.handlerProps?.log?.(
+            `[Verification REQUIRES_HUMAN_REVIEW]: Step \`${name}\` exceeded max repair attempts. Halting execution for human review.`
+          );
+          this?.introspect?.(
+            `Step "${name}" failed verification after maximum automated repair attempts. Escalating to Human Review.`
+          );
+
+          eventHandler?.("reportStreamEvent", {
+            type: "humanReviewNotification",
+            uuid: msgUUID,
+            stepId: stepDef.stepId,
+            stepName: name,
+            reason: repairResult.reason,
+          });
+
+          return `[EXECUTION HALTED - REQUIRES HUMAN REVIEW]: Step "${name}" failed verification after ${repairResult.attempts} attempts. Reason: ${repairResult.reason}`;
+        } else if (repairResult.canRetry) {
+          if (recoveryOutcome?.action) {
+            eventHandler?.("reportStreamEvent", {
+              type: "checkpointRecoveryNotification",
+              uuid: msgUUID,
+              action: recoveryOutcome.action,
+              stepName: name,
+              stepOrder: recoveryOutcome.lastValidCheckpoint?.stepOrder || depth,
+              stepTitle: recoveryOutcome.lastValidCheckpoint?.stepTitle || "Previous Step",
+              reason: recoveryOutcome.reason,
+            });
+          }
+
+          toolContentForNextTurn =
+            `TOOL RESULT: ${typeof result === "object" ? JSON.stringify(result) : result}\n\n` +
+            (recoveryOutcome?.action
+              ? `[CHECKPOINT RECOVERY: ${recoveryOutcome.action}]\n` +
+                `Restored from verified checkpoint [Step ${recoveryOutcome.lastValidCheckpoint?.stepOrder || depth}: ${recoveryOutcome.lastValidCheckpoint?.stepTitle || "Valid State"}]\n`
+              : "") +
+            `[STEP VERIFICATION FAILED - ATTEMPT ${repairResult.attempts}/${repairResult.maxAttempts}]\n` +
+            `Root Cause: ${repairResult.diagnosis.rootCause}\n` +
+            `Diagnostic Summary: ${repairResult.diagnosis.diagnosisSummary}\n` +
+            `Repair Instruction: ${repairResult.repair.feedbackPrompt}\n` +
+            `Please apply this repair and re-attempt the step from the restored state.`;
+        }
+      }
 
       if (this.skipHandleExecution) {
         this.skipHandleExecution = false;
@@ -1284,7 +1560,7 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
         {
           name,
           role: "function",
-          content: result,
+          content: toolContentForNextTurn,
           originalFunctionCall: completion.functionCall,
         },
       ];
@@ -1307,6 +1583,65 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
         depth + 1,
         msgUUID
       );
+    }
+
+    // Closed-Loop Verification for calculations in text responses
+    const { CalculationVerifier } = require("../../verification/verifiers/calculation");
+    const { VerificationManager, StepType } = require("../../verification");
+    const textOutput = completion?.textResponse || "";
+    const calcDetections = CalculationVerifier.extractAndVerifyCalculations(textOutput);
+    const calcFailure = calcDetections.find((c) => c.verification.status === "FAILED");
+
+    if (calcFailure && depth < this.maxToolCalls) {
+      const calcStepId = `${msgUUID}_calc_${depth}`;
+      const calcStep = {
+        stepId: calcStepId,
+        type: StepType.CALCULATION,
+        input: calcFailure.rawText,
+        expression: calcFailure.expr,
+        expectedResult: calcFailure.verification.expected,
+      };
+
+      const repairResult = await VerificationManager.diagnoseAndRepair({
+        step: calcStep,
+        verificationResult: calcFailure.verification,
+        context: {
+          user: this.handlerProps?.user || null,
+          workspace: this.handlerProps?.workspace,
+          classification: this.handlerProps?.classification || "INTERNAL",
+        },
+        socket: this.socket,
+      });
+
+      if (repairResult.canRetry) {
+        this.handlerProps?.log?.(
+          `[Calculation Mismatch]: "${calcFailure.rawText}" is incorrect. Auto-repairing...`
+        );
+        this?.introspect?.(
+          `Detected calculation mismatch in response (${calcFailure.rawText}). Self-repairing...`
+        );
+
+        return await this.handleExecution(
+          [
+            ...messages,
+            {
+              role: "assistant",
+              content: textOutput,
+            },
+            {
+              role: "user",
+              content:
+                `[VERIFICATION ERROR DETECTED]: In your response, "${calcFailure.rawText}" is mathematically incorrect. ` +
+                `The correct calculated value is ${calcFailure.verification.expected}. ` +
+                `Please correct this calculation and re-state your answer.`,
+            },
+          ],
+          functions,
+          byAgent,
+          depth + 1,
+          msgUUID
+        );
+      }
     }
 
     eventHandler?.("reportStreamEvent", {
