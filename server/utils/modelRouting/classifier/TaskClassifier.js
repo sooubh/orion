@@ -1,0 +1,114 @@
+const { TASK_TYPES, TASK_COMPLEXITIES } = require("../contracts/types");
+const { TASK_PATTERNS, CODE_INDICATORS } = require("./taxonomy");
+
+class TaskClassifier {
+  /**
+   * Deterministic, zero-LLM classification of prompt and attachments.
+   * Execution time: < 1ms.
+   *
+   * @param {Object} input
+   * @param {string} [input.prompt]
+   * @param {Array<Object>} [input.attachments]
+   * @param {number} [input.conversationTokenCount]
+   * @param {Array<string>} [input.contextTexts]
+   * @param {boolean} [input.requiresVisionOverride]
+   * @param {boolean} [input.requiresCodeOverride]
+   * @returns {Object} normalized TaskContext
+   */
+  static classify({
+    prompt = "",
+    attachments = [],
+    conversationTokenCount = 0,
+    requiresVisionOverride,
+    requiresCodeOverride,
+  } = {}) {
+    const promptStr = typeof prompt === "string" ? prompt : "";
+    const promptLower = promptStr.toLowerCase();
+
+    // 1. Modality detection (Vision)
+    const hasImageAttachment = attachments.some(
+      (a) =>
+        a?.mime?.startsWith("image/") ||
+        /\.(png|jpe?g|webp|gif|bmp|tiff)$/i.test(a?.name || ""),
+    );
+    const mentionsVision =
+      /\b(image|picture|photo|screenshot|diagram|drawing|chart|scanned|scan|ocr|visual)\b/i.test(
+        promptLower,
+      );
+    const requiresVision =
+      requiresVisionOverride ?? (hasImageAttachment || mentionsVision);
+
+    // 2. Code detection
+    const hasCodeIndicator = CODE_INDICATORS.some((pattern) =>
+      pattern.test(promptStr),
+    );
+    const mentionsCode =
+      /\b(code|function|class|method|script|sql|python|javascript|typescript|c\+\+|rust|golang|bug|debug|refactor)\b/i.test(
+        promptLower,
+      );
+    const requiresCode =
+      requiresCodeOverride ?? (hasCodeIndicator || mentionsCode);
+
+    // 3. Task Type categorization
+    let detectedType = TASK_TYPES.TEXT_QA;
+
+    if (requiresVision) {
+      detectedType = TASK_TYPES.MULTIMODAL_ANALYSIS;
+    } else if (requiresCode) {
+      detectedType = /\b(review|audit|lint|analyze|inspect)\b/i.test(
+        promptLower,
+      )
+        ? TASK_TYPES.CODE_REVIEW
+        : TASK_TYPES.CODE_GENERATION;
+    } else {
+      for (const rule of TASK_PATTERNS) {
+        if (rule.pattern.test(promptStr)) {
+          detectedType = rule.type;
+          break;
+        }
+      }
+    }
+
+    // 4. Token estimation and long context flag
+    const estimatedTokens =
+      conversationTokenCount || Math.ceil(promptStr.length / 4);
+    const requiresLongContext = estimatedTokens > 8192;
+
+    // 5. Complexity determination
+    let complexity = TASK_COMPLEXITIES.LOW;
+    if (
+      estimatedTokens > 16384 ||
+      detectedType === TASK_TYPES.GENERAL_REASONING ||
+      (requiresVision && requiresCode) ||
+      detectedType === TASK_TYPES.REPORT_GENERATION
+    ) {
+      complexity = TASK_COMPLEXITIES.HIGH;
+    } else if (
+      estimatedTokens > 4096 ||
+      detectedType === TASK_TYPES.DOCUMENT_SUMMARY ||
+      detectedType === TASK_TYPES.CODE_REVIEW ||
+      detectedType === TASK_TYPES.DATA_ANALYSIS ||
+      detectedType === TASK_TYPES.CODE_GENERATION
+    ) {
+      complexity = TASK_COMPLEXITIES.MEDIUM;
+    }
+
+    // 6. Tool use detection
+    const requiresTools =
+      /\b(search the web|browse|execute query|run sql|database query|call tool|fetch url)\b/i.test(
+        promptLower,
+      );
+
+    return {
+      type: detectedType,
+      complexity,
+      requiresVision,
+      requiresCode,
+      requiresLongContext,
+      requiresTools,
+      estimatedTokens,
+    };
+  }
+}
+
+module.exports = { TaskClassifier };

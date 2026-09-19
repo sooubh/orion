@@ -164,12 +164,13 @@ function getLLMProvider({ provider = null, model = null } = {}) {
     case "omlx":
       const { OMLXLLM } = require("../AiProviders/omlx");
       return new OMLXLLM(embedder, model);
+    case "adaptive-router":
     case "orion-router":
     case "anythingllm-router":
-      // Model router is handled separately in stream.js via OrionModelRouter.
+      // Model router is handled separately in stream.js via OrionModelRouter or resolveProviderConnector.
       // This case should not be hit directly - if it is, throw a descriptive error.
       throw new Error(
-        "orion-router provider must be resolved via OrionModelRouter class, not getLLMProvider directly."
+        "orion-router and adaptive-router providers must be resolved via resolveProviderConnector, not getLLMProvider directly."
       );
     default:
       console.error(
@@ -563,6 +564,65 @@ async function resolveProviderConnector({
   apiSessionId = null,
 }) {
   const effectiveProvider = workspace?.chatProvider || process.env.LLM_PROVIDER;
+
+  if (
+    effectiveProvider === "adaptive-router" ||
+    (process.env.ADAPTIVE_ROUTING_ENABLED === "true" &&
+      (effectiveProvider === "orion-router" ||
+        effectiveProvider === "anythingllm-router" ||
+        process.env.ROUTER_GLOBAL_OVERRIDE === "true"))
+  ) {
+    const { AdaptiveModelRouter, OrionContextAdapter } = require("../modelRouting");
+    const { ModelRouterService } = require("../router");
+
+    const ctx = await ModelRouterService.gatherRoutingContext({
+      workspace,
+      user,
+      thread,
+      message: prompt,
+      chatHistoryOverride,
+      messageCountOverride,
+      apiSessionId,
+    });
+
+    const routingContext = await OrionContextAdapter.fromRequest({
+      workspace,
+      prompt,
+      user,
+      thread,
+      attachments,
+      pinnedDocs: ctx.pinnedDocs,
+      parsedFiles: ctx.parsedFiles,
+      conversationTokenCount: ctx.conversationTokenCount,
+    });
+
+    const decision = await AdaptiveModelRouter.getInstance().route(routingContext);
+
+    if (decision.status === "NO_ELIGIBLE_MODEL") {
+      throw new Error(`[Adaptive Model Router] Request blocked: ${decision.reason}`);
+    }
+
+    const connector = getLLMProvider({
+      provider: decision.selectedModel.provider,
+      model: decision.selectedModel.model,
+    });
+
+    return {
+      connector,
+      routingMetadata: {
+        routedTo: {
+          provider: decision.selectedModel.provider,
+          model: decision.selectedModel.model,
+          ruleTitle: `Adaptive: ${decision.selectedModel.displayName}`,
+          ruleType: "adaptive",
+          shouldNotify: true,
+          score: decision.selectedModel.score,
+        },
+        decision,
+      },
+      prefetchedContext: ctx,
+    };
+  }
 
   if (effectiveProvider !== "orion-router" && effectiveProvider !== "anythingllm-router") {
     return {

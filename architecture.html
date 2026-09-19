@@ -629,6 +629,9 @@
       <div class="brand-title">Orion Documentation</div>
       <div class="brand-tagline">Private Intelligence Platform · Architecture Specification v2.0</div>
     </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-outline">&larr; Return to Website</a>
+    </div>
   </header>
 
   <!-- Container -->
@@ -683,6 +686,11 @@
             <li>
               <a href="#server-bree" class="sidebar-link">
                 <span class="sidebar-num">3.3</span> Bree Background Jobs
+              </a>
+            </li>
+            <li>
+              <a href="#server-router" class="sidebar-link">
+                <span class="sidebar-num">3.4</span> Adaptive Model Router
               </a>
             </li>
           </ul>
@@ -746,6 +754,21 @@
                 <span class="sidebar-num">6.2</span> Cryptographic IPC
               </a>
             </li>
+            <li>
+              <a href="#sec-threats" class="sidebar-link">
+                <span class="sidebar-num">6.3</span> Threat Mitigation Matrix
+              </a>
+            </li>
+            <li>
+              <a href="#sec-sandbox" class="sidebar-link">
+                <span class="sidebar-num">6.4</span> Ephemeral Tool Sandbox
+              </a>
+            </li>
+            <li>
+              <a href="#sec-proof-matrix" class="sidebar-link">
+                <span class="sidebar-num">6.5</span> Sovereign Verification Protocol
+              </a>
+            </li>
           </ul>
         </li>
         <li>
@@ -755,8 +778,20 @@
         </li>
         <li>
           <a href="#deployment-ports" class="sidebar-link">
-            <span class="sidebar-num">8</span> Deployment &amp; Ports
+            <span class="sidebar-num">8</span> Deployment &amp; Sizing
           </a>
+          <ul>
+            <li>
+              <a href="#deployment-ports" class="sidebar-link">
+                <span class="sidebar-num">8.1</span> Service Ports &amp; Commands
+              </a>
+            </li>
+            <li>
+              <a href="#deployment-hardware" class="sidebar-link">
+                <span class="sidebar-num">8.2</span> Hardware Sizing Profiles
+              </a>
+            </li>
+          </ul>
         </li>
         <li>
           <a href="#appendix-compatibility" class="sidebar-link">
@@ -1077,6 +1112,112 @@ sequenceDiagram
         <li><code>run-scheduled-job.js</code>: Executes cron-based scheduled agent tasks.</li>
       </ul>
 
+      <h3 class="subsection-heading" id="server-router">3.4 Adaptive Task-Based Model Routing Engine</h3>
+      <p>
+        Orion implements an isolated, policy-driven model routing layer positioned between incoming task intent parsing and agentic inference execution. Rather than dispatching all industrial tasks to a single monolithic model, the router enforces the core sovereign allocation formula:
+      </p>
+
+      <div class="outline-box" style="font-family: var(--font-mono); font-weight: 700; font-size: 13px; text-align: center;">
+        Task + Sensitivity + Capability + Hardware + Permission &rarr; Best Model
+      </div>
+
+      <p>
+        The decision lifecycle executes through five deterministic gates before allocating GPU compute:
+      </p>
+      <ol>
+        <li><strong>Intent &amp; Modality Analysis:</strong> Classifies prompt intent (summarization, vision extraction, code generation, multi-hop reasoning, spreadsheet synthesis).</li>
+        <li><strong>Data Sensitivity Verification:</strong> Cross-references attached document metadata against workspace classification (Public, Internal, Confidential, Restricted).</li>
+        <li><strong>Hardware &amp; VRAM Boundary Check:</strong> Probes local GPU memory via Ollama / vLLM API to confirm sufficient available VRAM for the target model's quantization profile (e.g. Q4_K_M vs FP16).</li>
+        <li><strong>Permission &amp; Clearance Verification:</strong> Validates user RBAC role and session authorization for the requested model tier.</li>
+        <li><strong>Dispatch &amp; Fallback Binding:</strong> Binds the cleared model to the AIbitat agent session; gracefully degrades to a smaller local fallback if GPU memory is saturated.</li>
+      </ol>
+
+      <!-- Model Category Matrix -->
+      <table class="outline-table">
+        <thead>
+          <tr>
+            <th>Model Category</th>
+            <th>Workload Characteristics</th>
+            <th>Representative Models</th>
+            <th>Resource Profile</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Reasoning Engines</strong></td>
+            <td>Multi-hop RAG, root-cause failure analysis, regulatory compliance synthesis, complex procedural planning.</td>
+            <td>Llama-3.3-70B, Qwen2.5-32B, DeepSeek-V3</td>
+            <td>High VRAM (24GB&ndash;48GB+); deployed on department/enterprise nodes.</td>
+          </tr>
+          <tr>
+            <td><strong>Vision / Multimodal</strong></td>
+            <td>P&amp;ID engineering schematics, architectural drawings, scanned maintenance logs, plant inspection photographs.</td>
+            <td>Qwen2.5-VL (7B/72B), LLaVA-NeXT, InternVL</td>
+            <td>Medium-High VRAM (12GB&ndash;24GB); requires visual token budgeting.</td>
+          </tr>
+          <tr>
+            <td><strong>Code Specialists</strong></td>
+            <td>Python script generation, sandboxed numerical calculations, Excel workbook formula compilation, SQL queries.</td>
+            <td>Qwen2.5-Coder (7B/32B), DeepSeek-Coder-V2</td>
+            <td>Medium VRAM (8GB&ndash;16GB); optimized for deterministic syntax.</td>
+          </tr>
+          <tr>
+            <td><strong>Domain / Fast Models</strong></td>
+            <td>Rapid document classification, metadata tagging, entity extraction, conversation titles, simple Q&amp;A.</td>
+            <td>Llama-3.2 (1B/3B), Gemma-2 (2B/9B)</td>
+            <td>Low VRAM (4GB&ndash;8GB); near-instant time-to-first-token.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- DIAGRAM 3.1: ADAPTIVE MODEL ROUTING SEQUENCE -->
+      <div class="diagram-panel" id="panel-router-flow">
+        <div class="diagram-toolbar">
+          <span class="diagram-title">Figure 3.1: Adaptive Task-Based Model Routing Sequence &amp; Decision Engine</span>
+          <div class="diagram-actions">
+            <button class="ctrl-btn" onclick="zoomInlineDiagram('canvas-router-flow', 0.2)">Zoom In (+)</button>
+            <button class="ctrl-btn" onclick="zoomInlineDiagram('canvas-router-flow', -0.2)">Zoom Out (-)</button>
+            <button class="ctrl-btn" onclick="resetInlineDiagram('canvas-router-flow')">Reset</button>
+            <button class="ctrl-btn" style="background:#111111; color:#ffffff;" onclick="openDiagramModal('canvas-router-flow', 'Figure 3.1: Adaptive Task-Based Model Routing Sequence & Decision Engine')">Full Page Preview</button>
+          </div>
+        </div>
+        <div class="diagram-viewport">
+          <div class="diagram-canvas" id="canvas-router-flow">
+            <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as User / Frontend [:3000]
+    participant S as Server API Gateway [:3001]
+    participant T as Task Intent Deconstructor
+    participant R as Adaptive Model Router
+    participant HW as Hardware & VRAM Probe
+    participant P as Policy & RBAC Gate
+    participant LLM as Local Model Runner (Ollama / vLLM)
+    participant A as AIbitat Agent Core
+
+    U->>S: POST /api/workspace/:slug/chat (Prompt + Context Attachments)
+    S->>T: Analyze Intent & Required Modality
+    T-->>R: Intent Vector: {Code: 0.85, Math: 0.90, Vision: 0.0}
+    S->>R: Ingested Document Metadata: {Classification: "Confidential", Dept: "Plant"}
+    R->>HW: Check Available VRAM on localhost:11434
+    HW-->>R: Available: 22.4 GB VRAM (RTX 4090)
+    R->>P: Check User Clearance for Tier 2 Code Specialist Model
+    P-->>R: Policy Authorized (Role: Engineer)
+    R-->>S: Selected Model: "qwen2.5-coder:32b" (Fallback: "qwen2.5-coder:7b")
+    S->>A: Initialize Agent Workflow with Selected Model
+    A->>LLM: Stream Inference Request to Selected Target
+    LLM-->>A: Generated Sandbox Code / Deliverable Stream
+    A-->>S: Execution Stream
+    S-->>U: SSE Token Stream Delivered to Client
+            </pre>
+          </div>
+        </div>
+        <div class="diagram-footer">
+          <span>Figure 3.1: 5-Gate Adaptive Model Routing Lifecycle ensuring optimal performance, clearance adherence, and VRAM stability</span>
+          <span>Click "Full Page Preview" for interactive zoom &amp; drag</span>
+        </div>
+      </div>
+
       <!-- SECTION 4: COLLECTOR TIER -->
       <h2 class="section-heading" id="collector-tier">4. Collector Ingestion Microservice (`collector/`)</h2>
       <p>
@@ -1296,6 +1437,113 @@ sequenceDiagram
         <li><strong>Authentication:</strong> JWT session tokens with <code>bcryptjs</code> salted password hashes.</li>
       </ul>
 
+      <h3 class="subsection-heading" id="sec-threats">6.3 Industrial Threat Mitigation Matrix</h3>
+      <p>
+        Orion is specifically hardened against failure modes unique to autonomous agentic systems operating over confidential industrial datasets:
+      </p>
+
+      <table class="outline-table">
+        <thead>
+          <tr>
+            <th style="width: 24%;">Threat Vector</th>
+            <th style="width: 36%;">Industrial Impact Scenario</th>
+            <th>Orion Architectural Countermeasure</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Indirect Prompt Injection</strong></td>
+            <td>Adversarial instructions concealed inside vendor PDFs, engineering drawings, or scraped web pages instructing the agent to exfiltrate private tokens or execute malicious shell commands.</td>
+            <td>Strict parser sanitization in isolated Collector; deny-by-default execution privileges; code execution confined to ephemeral sandboxes; state-altering tool calls require human authorization.</td>
+          </tr>
+          <tr>
+            <td><strong>Context Data Contamination</strong></td>
+            <td>Classified blueprints or confidential telemetry unintentionally leaked to unauthorized workspace users during multi-turn RAG retrieval.</td>
+            <td>Document sensitivity tags inherited across context tokens; workspace-level cryptographic isolation; LanceDB vector queries scoped strictly to active user RBAC filters.</td>
+          </tr>
+          <tr>
+            <td><strong>Hallucinated Technical Metrics</strong></td>
+            <td>Model hallucinates equipment calibration numbers, pressure thresholds, or formulas, leading to hazardous real-world operations.</td>
+            <td>Mathematical computations offloaded to deterministic sandboxed Python scripts; Specialist Review pipeline enforces citation grounding against raw source pages.</td>
+          </tr>
+          <tr>
+            <td><strong>Silent Network Telemetry</strong></td>
+            <td>Third-party libraries, model runners, or dependencies transmit background telemetry beacons or crash diagnostics to external cloud endpoints.</td>
+            <td>Zero outbound networking enforced at host OS socket level; elimination of all telemetry endpoints; signed RSA-SHA256 IPC used exclusively between internal microservices.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="subsection-heading" id="sec-sandbox">6.4 Ephemeral Tool Sandbox Isolation &amp; MCP Protocol</h3>
+      <p>
+        Tools capable of executing arbitrary code or querying production systems operate inside decoupled boundaries:
+      </p>
+      <ul>
+        <li><strong>Model Context Protocol (MCP) Standard:</strong> All external skills adhere to Anthropic's open standard, formalizing JSON-RPC tool schemas, input validations, and error boundaries.</li>
+        <li><strong>Isolated Container Execution:</strong> Python execution tools run in ephemeral, restricted containers without network access, with restricted CPU/memory quotas, and read-only filesystem mounts.</li>
+        <li><strong>Human-in-the-Loop Sign-Off:</strong> Actions categorized as high-impact (database mutations, file deletions, email dispatch) trigger an explicit interactive confirmation modal before execution proceeds.</li>
+      </ul>
+
+      <h3 class="subsection-heading" id="sec-proof-matrix">6.5 Demonstrable Sovereign Verification Protocol</h3>
+      <p>
+        Sovereignty is verified through empirical testing across seven operational criteria rather than subjective claims:
+      </p>
+
+      <table class="outline-table">
+        <thead>
+          <tr>
+            <th style="width: 8%;">#</th>
+            <th style="width: 26%;">Verification Criterion</th>
+            <th style="width: 36%;">Expected Operational Behavior</th>
+            <th>Empirical Verification Method</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td><strong>Zero External Egress</strong></td>
+            <td>No network traffic crosses external gateway during ingestion, RAG chat, or agentic tool runs.</td>
+            <td>Monitor network interfaces with <code>netstat -ano</code> or Wireshark; confirm zero non-localhost connections.</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td><strong>Data Classification Integrity</strong></td>
+            <td>Ingested files inherit sensitivity tags stored immutably in SQLite metadata.</td>
+            <td>Inspect <code>workspace_documents</code> table for <code>metadata.classification</code> assignments.</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td><strong>Context-Aware Model Allocation</strong></td>
+            <td>Router allocates coding tasks to code models, diagrams to multimodal, and logic to reasoning models.</td>
+            <td>Review Server API execution logs to confirm model dispatch matching prompt modality.</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td><strong>Tool Permission Gate</strong></td>
+            <td>Unauthorized tool requests trigger immediate block events without executing on the host.</td>
+            <td>Trigger an un-cleared tool action; verify 403 Forbidden event in audit trail.</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td><strong>Multi-Step Error Recovery</strong></td>
+            <td>Intermediate tool exceptions or missing context trigger local repair cycles rather than workflow failure.</td>
+            <td>Simulate tool syntax error; verify AIbitat agent autonomous retry in execution logs.</td>
+          </tr>
+          <tr>
+            <td><strong>6</strong></td>
+            <td><strong>Citation &amp; Deliverable Grounding</strong></td>
+            <td>Generated Word and Excel deliverables include explicit page/section source references.</td>
+            <td>Inspect generated <code>.docx</code> or <code>.xlsx</code> deliverables for source footnote traceability.</td>
+          </tr>
+          <tr>
+            <td><strong>7</strong></td>
+            <td><strong>Cryptographic Audit Logging</strong></td>
+            <td>Every actor, touched file, model checkpoint, and tool call is captured in structured JSONL/SQLite logs.</td>
+            <td>Verify audit logs under <code>server/storage/logs/</code> for chronological cryptographic event records.</td>
+          </tr>
+        </tbody>
+      </table>
+
       <!-- SECTION 7: PERSISTENCE & SCHEMA -->
       <h2 class="section-heading" id="database-schema">7. Persistence &amp; Relational Schema (SQLite / Prisma)</h2>
       <p>
@@ -1377,6 +1625,44 @@ erDiagram
 
       <div class="outline-box">
         <strong>Unified Launch:</strong> Running <code>npm run dev</code> from the root directory launches all three services simultaneously using <code>concurrently</code>.
+      </div>
+
+      <h3 class="subsection-heading" id="deployment-hardware">8.2 On-Premise Hardware Sizing &amp; Deployment Profiles</h3>
+      <p>
+        Orion is designed to scale across diverse industrial computing environments through quantized open-weight inference:
+      </p>
+
+      <div class="spec-box">
+        <div class="spec-box-header">
+          <span>Enterprise Hardware Tiering Matrix</span>
+          <span class="outline-tag">Quantized Compute</span>
+        </div>
+        <table class="spec-table">
+          <tr>
+            <th>Profile</th>
+            <th>Target Hardware Specification</th>
+            <th>Supported Model Tiers</th>
+            <th>Recommended Operational Role</th>
+          </tr>
+          <tr>
+            <td><strong>Edge / Workstation</strong></td>
+            <td>1x NVIDIA RTX 3060 / 4070 (12GB VRAM) or Apple Silicon (16GB&ndash;32GB Unified Memory). Intel/AMD 8-core CPU, 32GB RAM.</td>
+            <td>7B&ndash;8B parameter models (Q4_K_M quantization), native ONNX embeddings (<code>all-MiniLM-L6-v2</code>), local LanceDB vector store.</td>
+            <td>Field maintenance stations, remote site offices, standalone inspection kiosks.</td>
+          </tr>
+          <tr>
+            <td><strong>Department Server</strong></td>
+            <td>1x&ndash;2x NVIDIA RTX 3090 / 4090 (24GB&ndash;48GB VRAM) or RTX A5000. 16-core CPU, 64GB&ndash;128GB RAM, NVMe storage.</td>
+            <td>14B&ndash;32B parameter models (Qwen2.5-Coder:32B, Qwen2.5-VL), concurrent workspace RAG chats, background Bree OCR workers.</td>
+            <td>Plant engineering departments, technical drawing analysis teams, internal corporate divisions.</td>
+          </tr>
+          <tr>
+            <td><strong>Air-Gapped Enterprise</strong></td>
+            <td>Dual Xeon / EPYC rack server, 2x&ndash;4x NVIDIA A100 / H100 (80GB VRAM) or L40S cluster. 256GB+ ECC RAM, redundant NVMe arrays.</td>
+            <td>70B+ parameter foundation models (Llama-3.3-70B, DeepSeek-V3), high-throughput batch document OCR, site-wide multi-agent workflows.</td>
+            <td>Defence installations, corporate intelligence hubs, sovereign government and utility networks.</td>
+          </tr>
+        </table>
       </div>
 
       <!-- SECTION 9: APPENDIX (LEAST IMPORTANT) -->

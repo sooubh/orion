@@ -85,7 +85,41 @@ class OrionModelRouter {
       return;
     }
 
-    // Step 4: Sticky expired — use fallback
+    // Step 4: If adaptive routing is enabled, route via AdaptiveModelRouter
+    if (process.env.ADAPTIVE_ROUTING_ENABLED === "true") {
+      try {
+        const { AdaptiveModelRouter, OrionContextAdapter } = require("../../modelRouting");
+        const routingContext = await OrionContextAdapter.fromRequest({
+          workspace: this.workspace,
+          prompt: context.prompt,
+          user,
+          thread,
+          attachments: context.attachments || [],
+          conversationTokenCount: context.conversationTokenCount,
+        });
+
+        const decision = await AdaptiveModelRouter.getInstance().route(routingContext);
+        if (decision.status === "SELECTED") {
+          this.resolvedRoute = {
+            provider: decision.selectedModel.provider,
+            model: decision.selectedModel.model,
+            ruleTitle: `Adaptive: ${decision.selectedModel.displayName}`,
+            ruleType: "adaptive",
+            isFallback: false,
+            score: decision.selectedModel.score,
+          };
+          this.routerService.log(
+            `No rules matched → Adaptive Model Router selected: ${this.resolvedRoute.provider}/${this.resolvedRoute.model} (score: ${decision.selectedModel.score})`
+          );
+          this.#finalize();
+          return;
+        }
+      } catch (err) {
+        this.routerService.log(`Adaptive Model Router evaluation error: ${err.message}`);
+      }
+    }
+
+    // Step 5: Sticky expired — use fallback
     this.resolvedRoute = {
       provider: this.router.fallback_provider,
       model: this.router.fallback_model,

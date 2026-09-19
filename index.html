@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORION — Sovereign On-Premise Industrial AI Workbench</title>
+  <meta name="description" content="ORION is an on-premise, policy-controlled agentic AI workbench using open-weight multimodal LLMs for confidential industrial work.">
+  
+  <!-- Mermaid.js for Minimal Monochrome Architectural & Flow Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#111111',
+        primaryTextColor: '#111111',
+        lineColor: '#111111',
+        secondaryColor: '#f4f4f5',
+        tertiaryColor: '#ffffff',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }
+    });
+  </script>
+  <style>
+    /* ==========================================================================
+       MINIMALIST MONOCHROME OUTLINE DESIGN (MATCHING ARCHITECTURE SPECIFICATION)
+       ========================================================================== */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-serif: 'Georgia', 'Times New Roman', Times, serif;
+      --font-mono: 'Consolas', 'Courier New', Menlo, monospace;
+      --color-black: #111111;
+      --color-dark: #222222;
+      --color-gray: #666666;
+      --color-light-gray: #e5e7eb;
+      --color-bg-page: #f9fafb;
+      --color-bg-box: #ffffff;
+      --color-border: #111111;
+      --color-border-subtle: #d1d5db;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      line-height: 1.68;
+      color: var(--color-black);
+      background-color: var(--color-bg-page);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Minimal Top Navigation */
+    .top-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--color-border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--color-black);
+      text-transform: uppercase;
+    }
+
+    .brand-tagline {
+      font-size: 11px;
+      color: var(--color-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: var(--color-black);
+      font-size: 12.5px;
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .btn-outline:hover {
+      background: #111111;
+      color: #ffffff;
+    }
+
+    .btn-primary {
+      background: #111111;
+      border: 1px solid var(--color-border);
+      color: #ffffff;
+      font-size: 12.5px;
+      padding: 6px 16px;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.1s ease;
+    }
+
+    .btn-primary:hover {
+      background: #333333;
+      color: #ffffff;
+    }
+
+    /* Outer Page Container */
+    .page-layout {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: var(--color-bg-box);
+      border-left: 1px solid var(--color-border-subtle);
+      border-right: 1px solid var(--color-border-subtle);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Left Sidebar Navigation (6 Core Sections) */
+    .doc-sidebar {
+      width: 290px;
+      padding: 24px 18px;
+      border-right: 1px solid var(--color-border);
+      background: #ffffff;
+      font-size: 13px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 61px;
+      height: calc(100vh - 61px);
+      overflow-y: auto;
+    }
+
+    .sidebar-heading {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-black);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .sidebar-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .sidebar-list li {
+      margin: 8px 0;
+    }
+
+    .sidebar-num {
+      color: var(--color-black);
+      font-weight: 700;
+      margin-right: 8px;
+      font-size: 11.5px;
+    }
+
+    .sidebar-link {
+      color: var(--color-black);
+      text-decoration: none;
+      font-size: 12.5px;
+      display: block;
+      padding: 5px 7px;
+      border-radius: 2px;
+      transition: background-color 0.1s ease;
+    }
+
+    .sidebar-link:hover {
+      text-decoration: none;
+      background: #f4f4f5;
+    }
+
+    .sidebar-link.active {
+      background: #111111;
+      color: #ffffff;
+    }
+
+    .sidebar-link.active .sidebar-num {
+      color: #ffffff;
+    }
+
+    .sidebar-footer-box {
+      margin-top: 36px;
+      padding: 14px;
+      border: 1px solid var(--color-border-subtle);
+      background: #f9fafb;
+      font-size: 11.5px;
+      line-height: 1.55;
+    }
+
+    /* Main Content */
+    .doc-content {
+      flex: 1;
+      padding: 40px 60px 100px 60px;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--color-gray);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: 34px;
+      font-weight: normal;
+      line-height: 1.25;
+      color: var(--color-black);
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-dark);
+      margin-bottom: 24px;
+    }
+
+    /* Box Outline Callout */
+    .outline-box {
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      padding: 18px 22px;
+      margin: 22px 0 28px 0;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .outline-box strong {
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-size: 12px;
+    }
+
+    .outline-box.highlight {
+      background: #f4f4f5;
+      border-left: 4px solid var(--color-black);
+    }
+
+    /* Full-Width Minimalist Specification Box */
+    .spec-box {
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      margin: 24px 0 36px 0;
+    }
+
+    .spec-box-header {
+      background: #f4f4f5;
+      border-bottom: 1px solid var(--color-border);
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .spec-box-body {
+      padding: 18px 20px;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .spec-table th {
+      width: 25%;
+      background: #ffffff;
+      color: var(--color-black);
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      border-right: 1px solid var(--color-border-subtle);
+      vertical-align: top;
+    }
+
+    .spec-table td {
+      width: 25%;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      border-right: 1px solid var(--color-border-subtle);
+      color: var(--color-dark);
+      background: #ffffff;
+      vertical-align: top;
+    }
+
+    .spec-table td:last-child {
+      border-right: none;
+    }
+
+    .spec-table tr:last-child th,
+    .spec-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Section Headings */
+    h2.section-heading {
+      font-family: var(--font-serif);
+      font-size: 25px;
+      font-weight: normal;
+      color: var(--color-black);
+      border-bottom: 1px solid var(--color-border);
+      margin: 56px 0 22px 0;
+      padding-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    h2.section-heading .section-index {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-gray);
+      text-transform: uppercase;
+    }
+
+    h3.subsection-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-black);
+      margin: 28px 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      line-height: 1.7;
+      color: var(--color-dark);
+    }
+
+    p.lead-text {
+      font-size: 15.5px;
+      font-weight: 500;
+      color: var(--color-black);
+    }
+
+    /* Grid Layouts for Cards & Blocks */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin: 22px 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 22px 0;
+    }
+
+    .card-outline {
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .card-outline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid var(--color-border);
+      padding: 1px 6px;
+      background: #f4f4f5;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-black);
+    }
+
+    .card-content {
+      font-size: 13.5px;
+      color: var(--color-dark);
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    .card-footer-tag {
+      margin-top: 14px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--color-border-subtle);
+      font-size: 12px;
+      color: var(--color-dark);
+      font-family: var(--font-mono);
+      background: #fafafa;
+      padding: 8px;
+      border-radius: 2px;
+    }
+
+    /* Workflow Specific Card Styling */
+    .workflow-card {
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      margin-bottom: 24px;
+    }
+
+    .workflow-header {
+      background: #f4f4f5;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .workflow-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .workflow-body {
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr 1fr;
+      gap: 18px;
+    }
+
+    .workflow-col {
+      font-size: 13px;
+    }
+
+    .workflow-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--color-gray);
+      margin-bottom: 8px;
+      display: block;
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding-bottom: 4px;
+    }
+
+    .workflow-tech-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: #f4f4f5;
+      border: 1px solid var(--color-border-subtle);
+      padding: 2px 6px;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+
+    /* Minimalist Diagram Box */
+    .diagram-panel {
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      margin: 26px 0 32px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .diagram-toolbar {
+      background: #f4f4f5;
+      border-bottom: 1px solid var(--color-border);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .diagram-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-black);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .diagram-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-btn {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: var(--color-black);
+      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: background-color 0.1s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: #111111;
+      color: #ffffff;
+    }
+
+    .diagram-viewport {
+      width: 100%;
+      min-height: 280px;
+      max-height: 560px;
+      overflow: auto;
+      padding: 24px;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    .diagram-canvas {
+      display: inline-block;
+      min-width: 100%;
+      transition: transform 0.15s ease-out;
+      transform-origin: center top;
+    }
+
+    .diagram-canvas svg {
+      max-width: 100% !important;
+      height: auto !important;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .diagram-footer {
+      background: #ffffff;
+      border-top: 1px solid var(--color-border);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      color: var(--color-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Minimal Outline Badge & Code */
+    .outline-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      border: 1px solid var(--color-border);
+      text-transform: uppercase;
+      background: #ffffff;
+      color: #000000;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #f4f4f5;
+      padding: 2px 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 2px;
+      color: #000000;
+    }
+
+    ul, ol {
+      margin-left: 22px;
+      margin-bottom: 16px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: var(--color-dark);
+    }
+
+    /* Tables */
+    .outline-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+    }
+
+    .outline-table th {
+      background: #f4f4f5;
+      color: var(--color-black);
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      text-transform: uppercase;
+      font-size: 11.5px;
+      letter-spacing: 0.4px;
+    }
+
+    .outline-table td {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      background: #ffffff;
+      color: var(--color-dark);
+      vertical-align: top;
+    }
+
+    /* CTA Section Container */
+    .cta-banner {
+      border: 2px solid var(--color-border);
+      background: #ffffff;
+      padding: 36px 32px;
+      margin: 40px 0 20px 0;
+      text-align: left;
+    }
+
+    .cta-banner-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: normal;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .cta-banner-text {
+      font-size: 15px;
+      color: var(--color-dark);
+      max-width: 840px;
+      margin-bottom: 24px;
+    }
+
+    .cta-buttons-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       FULLSCREEN PREVIEW MODAL (INTERACTIVE PAN & ZOOM)
+       ========================================================================== */
+    .preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.75);
+    }
+
+    .preview-window {
+      width: 95vw;
+      height: 94vh;
+      background: #ffffff;
+      border: 2px solid #000000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .preview-header {
+      background: #f4f4f5;
+      border-bottom: 1px solid #000000;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .preview-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .preview-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-zoom-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      background: #ffffff;
+      border: 1px solid #000000;
+      padding: 4px 10px;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    .preview-btn {
+      background: #ffffff;
+      border: 1px solid #000000;
+      color: #000000;
+      font-size: 12px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      transition: all 0.1s ease;
+    }
+
+    .preview-btn:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .preview-close-btn {
+      background: #000000;
+      color: #ffffff;
+      border: 1px solid #000000;
+      font-size: 12px;
+      padding: 4px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .preview-close-btn:hover {
+      background: #333333;
+    }
+
+    .preview-instructions {
+      background: #ffffff;
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 6px 16px;
+      font-size: 11.5px;
+      color: var(--color-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .preview-stage {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 85px);
+      overflow: hidden;
+      background: #ffffff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .preview-stage.active-drag {
+      cursor: grabbing;
+    }
+
+    .preview-canvas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .preview-canvas svg {
+      width: auto !important;
+      height: auto !important;
+      max-width: 85vw !important;
+      max-height: 75vh !important;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+
+    @media (max-width: 960px) {
+      .doc-sidebar { display: none; }
+      .doc-content { padding: 24px 20px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .workflow-body { grid-template-columns: 1fr; gap: 14px; }
+      .spec-table th, .spec-table td { display: block; width: 100%; border-right: none; }
+      .preview-window { width: 98vw; height: 96vh; }
+      .cta-buttons-group { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Minimal Monochrome Top Header -->
+  <header class="top-navbar">
+    <div class="brand-section">
+      <div class="brand-title">ORION</div>
+      <div class="brand-tagline">AI That Lives in Your Environment · Sovereign Industrial AI</div>
+    </div>
+    <div class="header-actions">
+      <a href="#how-it-works" class="btn-outline">How It Works</a>
+      <a href="architecture.html" class="btn-outline">System Architecture &rarr;</a>
+    </div>
+  </header>
+
+  <!-- Outer Page Container -->
+  <div class="page-layout">
+
+    <!-- LEFT SIDEBAR NAVIGATION: 6 CORE SECTIONS -->
+    <nav class="doc-sidebar">
+      <div class="sidebar-heading">Contents</div>
+      <ul class="sidebar-list">
+        <li>
+          <a href="#problem" class="sidebar-link active" onclick="setActiveLink(this)">
+            <span class="sidebar-num">1</span> Hero / Problem
+          </a>
+        </li>
+        <li>
+          <a href="#gap" class="sidebar-link" onclick="setActiveLink(this)">
+            <span class="sidebar-num">2</span> The Gap
+          </a>
+        </li>
+        <li>
+          <a href="#how-it-works" class="sidebar-link" onclick="setActiveLink(this)">
+            <span class="sidebar-num">3</span> How ORION Works
+          </a>
+        </li>
+        <li>
+          <a href="#workflows" class="sidebar-link" onclick="setActiveLink(this)">
+            <span class="sidebar-num">4</span> Real Workflows
+          </a>
+        </li>
+        <li>
+          <a href="#control-audit" class="sidebar-link" onclick="setActiveLink(this)">
+            <span class="sidebar-num">5</span> Control &amp; Audit
+          </a>
+        </li>
+        <li>
+          <a href="#deployment" class="sidebar-link" onclick="setActiveLink(this)">
+            <span class="sidebar-num">6</span> Deployment &amp; Closing
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer-box">
+        <strong>SIH26117 Specification</strong><br>
+        Sovereign On-Premise Agentic AI Workbench using Open-Weight Multimodal LLMs for Confidential Industrial Work.
+        <br><br>
+        <span class="outline-tag">Zero External Egress</span>
+        <span class="outline-tag" style="margin-top: 4px;">Air-Gap Ready</span>
+      </div>
+    </nav>
+
+    <!-- MAIN ARTICLE CONTENT -->
+    <main class="doc-content">
+
+      <!-- ====================================================================
+           SECTION 1 — HERO / THE CORE PROBLEM
+           ==================================================================== -->
+      <section id="problem">
+        <span class="eyebrow">CONFIDENTIAL INDUSTRIAL AI</span>
+        <h1 class="hero-title">AI assistance should not require sending confidential work outside the organization.</h1>
+
+        <p class="hero-subtitle">
+          Industrial teams work with inspection reports, engineering drawings, P&amp;IDs, financial documents, internal code, vendor communications, approval notes, and unreleased designs.
+        </p>
+
+        <p>
+          For defence installations, manufacturing plants, utilities, and regulated enterprises, that data cannot simply be sent across public networks to external third-party AI APIs. When proprietary assets leave the local perimeter, organizations lose control over confidentiality, model retention, access policy, and tool execution.
+        </p>
+
+        <div class="outline-box highlight">
+          <strong>The Practical Gap:</strong> Keep critical knowledge work entirely manual, or adopt commercial cloud AI without organizational sovereignty over data boundary and execution control.
+        </div>
+
+        <div class="outline-box">
+          <strong>ORION Statement:</strong> ORION brings agentic AI into the organization’s own environment — with local open-weight models, local vectorized knowledge, policy-controlled tools, and auditable execution.
+          <br><br>
+          <span class="outline-tag">On-Premise</span>
+          <span class="outline-tag">Open-Weight</span>
+          <span class="outline-tag">Multimodal</span>
+          <span class="outline-tag">Policy-Controlled</span>
+          <span class="outline-tag">Zero Egress</span>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center; margin: 24px 0 32px 0; flex-wrap: wrap;">
+          <a href="#how-it-works" class="btn-primary">See How ORION Works &darr;</a>
+          <a href="#workflows" class="btn-outline">View Real Workflows</a>
+          <a href="architecture.html" class="btn-outline">Technical Architecture &rarr;</a>
+        </div>
+
+        <p style="font-size: 12px; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.5px;">
+          Designed for confidential knowledge work inside industrial and enterprise environments.
+        </p>
+
+        <!-- Platform Profile Spec Table Derived from Architecture Specification -->
+        <div class="spec-box">
+          <div class="spec-box-header">
+            <span>ORION Sovereign Architecture Profile</span>
+            <span class="outline-tag">Tier 1 Perimeter</span>
+          </div>
+          <table class="spec-table">
+            <tr>
+              <th>Deployment Perimeter</th>
+              <td>100% On-Premise, Air-Gap Ready, Zero-Egress Network Isolation</td>
+              <th>Model Ecosystem</th>
+              <td>Open-Weight LLMs (Ollama / vLLM / LM Studio / ONNX Native)</td>
+            </tr>
+            <tr>
+              <th>Knowledge Engine</th>
+              <td>Embedded LanceDB Vector Store + SQLite Metadata Repository</td>
+              <th>Ingestion Microservice</th>
+              <td>Decoupled Collector (PDF, DOCX, XLSX, Tesseract OCR, Whisper)</td>
+            </tr>
+            <tr>
+              <th>Inter-Process Security</th>
+              <td>RSA-SHA256 Signed Timestamped IPC Between Reasoning &amp; Ingestion</td>
+              <th>Agent Execution Tier</th>
+              <td>AIbitat Multi-Agent Engine + Sandboxed Tool Runner (MCP Compliant)</td>
+            </tr>
+            <tr>
+              <th>Policy &amp; Governance</th>
+              <td>Continuous Runtime Policy Evaluation for Data &amp; Tool Invocations</td>
+              <th>Deliverable Verification</th>
+              <td>Automated Citation Tracing, Numerical Sanity &amp; Human Escalation</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 2 — THE GAP
+           ==================================================================== -->
+      <section id="gap">
+        <h2 class="section-heading">
+          <span class="section-index">02</span>
+          The gap is bigger than “cloud vs local.”
+        </h2>
+
+        <p class="lead-text">
+          Running an open-weight model on an organization’s own hardware addresses where inference compute physically takes place.
+        </p>
+
+        <p>
+          However, hosting weights locally does <strong>not by itself answer</strong> the operational security questions that arise when autonomous AI starts reading, modifying, and calculating over sensitive enterprise assets:
+        </p>
+
+        <ul style="margin-top: 10px;">
+          <li><strong>Data Clearance:</strong> Which specific model is allowed to process this proprietary document or classified telemetry?</li>
+          <li><strong>Delegated Authority:</strong> Can this authenticated user authorize the model to access that restricted dataset?</li>
+          <li><strong>Tool Authorization:</strong> Which runtime tools (file writer, shell, SQL client, network bridge) can the agent call?</li>
+          <li><strong>Prompt Injection Defense:</strong> What happens when an ingested document contains instructions crafted to manipulate the agent?</li>
+          <li><strong>Deliverable Verification:</strong> How is a long, multi-step task verified for accuracy and completeness before its output is delivered?</li>
+          <li><strong>Regulatory Auditability:</strong> What immutable evidence gets recorded for compliance, traceability, and forensic audit?</li>
+          <li><strong>Model Admission:</strong> How are newly published open-weight models introduced without bypassing existing organizational guardrails?</li>
+        </ul>
+
+        <div class="outline-box highlight">
+          <strong>ORION is designed around this missing control layer.</strong> Local inference alone provides privacy; ORION wraps local inference in an enterprise-grade policy, routing, verification, and audit fabric.
+        </div>
+
+        <!-- 4 Gap Breakdown Cards -->
+        <div class="grid-2">
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">01 — Local AI Without Execution Control</span>
+              <span class="card-badge">Policy Layer</span>
+            </div>
+            <div class="card-content">
+              A standalone local LLM can keep inference tokens inside the server room, but the surrounding workflow still needs deterministic rules for data access, tool invocations, state modifications, and human sign-offs. Without this, agents can execute arbitrary commands or leak data across internal department boundaries.
+            </div>
+            <div class="card-footer-tag">
+              <strong>ORION Solution:</strong> Policy checks happen dynamically during execution, not merely at initial login or file upload.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">02 — One Model Is Not Right For Every Task</span>
+              <span class="card-badge">Intelligent Router</span>
+            </div>
+            <div class="card-content">
+              Industrial workloads are heterogeneous. A multi-page P&amp;ID scanned drawing, a Python script audit, and a standard operational summary demand vastly different context windows, vision capabilities, and GPU VRAM resources. Sending every task to a monolithic model wastes compute and causes context degradation.
+            </div>
+            <div class="card-footer-tag">
+              <strong>ORION Solution:</strong> Dynamic router maps: <code>Task + Sensitivity + Capability + Hardware + Permission &rarr; Model</code>.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">03 — Generated Answer &ne; Verified Work Product</span>
+              <span class="card-badge">Verification Engine</span>
+            </div>
+            <div class="card-content">
+              Unchecked agentic workflows can fail midway, retrieve incomplete evidence from vector storage, or produce text that subtly hallucinates technical values. In engineering and maintenance, a raw chatbot completion cannot be directly pasted into an official approval note without formal verification.
+            </div>
+            <div class="card-footer-tag">
+              <strong>ORION Solution:</strong> Cross-checks source citations, constraints, and numerical calculations with automated repair paths.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">04 — “Offline” Must Be Demonstrable</span>
+              <span class="card-badge">Zero-Egress Proof</span>
+            </div>
+            <div class="card-content">
+              Sovereign compliance cannot rely on passive trust or marketing claims. Regulated facilities require auditable proof that the system does not emit background telemetry, query external license servers, call third-party cloud embeddings, or communicate over unauthorized network sockets.
+            </div>
+            <div class="card-footer-tag">
+              <strong>ORION Solution:</strong> Built on deny-by-default network egress, local embedded models, and transparent socket audit logs.
+            </div>
+          </div>
+        </div>
+
+        <p class="lead-text" style="margin-top: 18px;">
+          The goal is not simply to run an LLM locally. The goal is to make AI usable, governed, and accountable inside a controlled organizational environment.
+        </p>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 3 — HOW ORION WORKS
+           ==================================================================== -->
+      <section id="how-it-works">
+        <h2 class="section-heading">
+          <span class="section-index">03</span>
+          From document to verified work — under organizational control.
+        </h2>
+
+        <p class="lead-text">
+          ORION treats every AI interaction as an orchestrated, policy-governed execution flow across decoupled architectural tiers.
+        </p>
+
+        <p>
+          Rather than streaming unmonitored prompts to an isolated chatbot, the system evaluates identity, sensitivity, task intent, model availability, tool permissions, and organizational rules before authorizing each micro-step.
+        </p>
+
+        <!-- 6 Step Execution Pipeline Table with Architecture Mappings -->
+        <table class="outline-table">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Step</th>
+              <th style="width: 24%;">Execution Stage</th>
+              <th>How ORION Enforces Control</th>
+              <th style="width: 26%;">Architecture &amp; Operational Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>01</strong></td>
+              <td><strong>Data is classified upon ingestion</strong></td>
+              <td>When documents enter ORION, they are ingested by the isolated Collector microservice via signed RSA-SHA256 IPC and tagged by sensitivity, department, project, and document class.</td>
+              <td>Parsed via native format extractors (PDF, DOCX, XLSX) or Tesseract OCR. Metadata bound in SQLite via Prisma ORM: <code>Confidential &rarr; Plant Operations &rarr; Inspection</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>02</strong></td>
+              <td><strong>The task intent is deconstructed</strong></td>
+              <td>ORION extracts the structured objective: whether the user is asking to extract failure causes, synthesize SOPs, audit code, prepare calculation workbooks, or generate an approval document.</td>
+              <td>The reasoning server parses operational intent, required output schema (Word, Excel, JSON), and identifies required tool capabilities before dispatching.</td>
+            </tr>
+            <tr>
+              <td><strong>03</strong></td>
+              <td><strong>Adaptive model routing is resolved</strong></td>
+              <td>The Model Router evaluates: <code>Task + Sensitivity + Capability + Hardware + Permission &rarr; Best Model</code>. It dynamically routes between Reasoning, Vision, Code, and Fast model categories.</td>
+              <td>Enforces VRAM boundaries (Ollama / vLLM / LM Studio) and guarantees sensitive industrial assets are never routed to unauthorized or unverified weight checkpoints.</td>
+            </tr>
+            <tr>
+              <td><strong>04</strong></td>
+              <td><strong>Tool access &amp; sandbox are checked</strong></td>
+              <td>Before any agent tool runs, the permission gate verifies whether the active user and selected model are authorized to use the tool with that specific document classification.</td>
+              <td>Read file: permitted; Vector query: RBAC scoped to workspace; Arbitrary code: isolated in ephemeral execution container; Destructive action: requires human approval.</td>
+            </tr>
+            <tr>
+              <td><strong>05</strong></td>
+              <td><strong>The agent executes and iterates</strong></td>
+              <td>The AIbitat agentic core executes a resilient loop: <code>Plan &rarr; Retrieve &rarr; Generate &rarr; Execute &rarr; Check &rarr; Repair</code>. Intermediate tool failures trigger localized context recovery without restarting.</td>
+              <td>Dense vector retrieval via embedded LanceDB with native ONNX embeddings (<code>all-MiniLM-L6-v2</code>). Background jobs orchestrated asynchronously via Bree worker threads.</td>
+            </tr>
+            <tr>
+              <td><strong>06</strong></td>
+              <td><strong>The result is verified before delivery</strong></td>
+              <td>The Specialist Review engine inspects citation coverage, context faithfulness against retrieved passages, policy rules, and numerical sanity before user delivery.</td>
+              <td>Failed verification triggers context repair or automatically routes the draft to a human-in-the-loop review queue with an audit notification.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Model Routing Matrix Box -->
+        <div class="spec-box">
+          <div class="spec-box-header">
+            <span>Adaptive Model Routing Categories · Task + Sensitivity + Capability + Hardware &rarr; Best Model</span>
+            <span class="outline-tag">Intelligent Router</span>
+          </div>
+          <table class="spec-table">
+            <tr>
+              <th>Reasoning Models</th>
+              <td><strong>Profile:</strong> Deep multi-hop logic, root-cause analysis, procedural workflows.<br><span style="font-size:11.5px;color:var(--color-gray);">e.g., Llama-3.3-70B, Qwen2.5-32B</span></td>
+              <th>Vision / Multimodal</th>
+              <td><strong>Profile:</strong> Scanned P&amp;ID schematics, engineering blueprints, damage photos.<br><span style="font-size:11.5px;color:var(--color-gray);">e.g., Qwen2.5-VL, LLaVA-NeXT</span></td>
+            </tr>
+            <tr>
+              <th>Code Specialist Models</th>
+              <td><strong>Profile:</strong> Python calculation scripts, SQL query generation, data extraction.<br><span style="font-size:11.5px;color:var(--color-gray);">e.g., Qwen2.5-Coder, DeepSeek-Coder</span></td>
+              <th>Domain / Fast Models</th>
+              <td><strong>Profile:</strong> High-throughput text classification, entity tagging, rapid summarization.<br><span style="font-size:11.5px;color:var(--color-gray);">e.g., Llama-3.2-3B, Gemma-2-9B</span></td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 3-Tier Architecture Alignment Box -->
+        <div class="spec-box">
+          <div class="spec-box-header">
+            <span>3-Tier Decoupled Microservices Topology</span>
+            <span class="outline-tag">Port &amp; Process Isolation</span>
+          </div>
+          <table class="spec-table">
+            <tr>
+              <th>Tier 1: Frontend Client (:3000)</th>
+              <td>React 18 SPA (Vite, Tailwind, Context Providers) managing streaming workspace chat, command center metrics, deliverable inspect panels, and security audit telemetry.</td>
+              <th>Tier 2: Reasoning Server (:3001)</th>
+              <td>Node.js / Express gateway hosting AIbitat Agent Engine, Model Context Protocol (MCP) skills, Bree worker threads, Specialist Review engine, and LanceDB dense vector cache.</td>
+            </tr>
+            <tr>
+              <th>Tier 3: Ingestion Collector (:8888)</th>
+              <td>Isolated heavy-compute worker for multi-threaded Tesseract.js OCR, Whisper audio transcription, and document parsing (PDF, DOCX, XLSX) strictly gated by RSA-SHA256 signed IPC.</td>
+              <th>Storage &amp; Persistence</th>
+              <td>Embedded disk-backed LanceDB for vector similarity, SQLite (30+ relational tables via Prisma ORM), and encrypted local document storage (<code>server/storage/documents</code>).</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Mermaid Diagram: Controlled Execution Flow -->
+        <div class="diagram-panel" id="panel-execution-flow">
+          <div class="diagram-toolbar">
+            <span class="diagram-title">Figure 1: ORION Controlled Execution, Tool Gating &amp; Verification Lifecycle</span>
+            <div class="diagram-actions">
+              <button class="ctrl-btn" onclick="zoomInlineDiagram('canvas-execution-flow', 0.2)">Zoom (+)</button>
+              <button class="ctrl-btn" onclick="zoomInlineDiagram('canvas-execution-flow', -0.2)">Zoom (-)</button>
+              <button class="ctrl-btn" onclick="resetInlineDiagram('canvas-execution-flow')">Reset</button>
+              <button class="ctrl-btn" style="background:#111111; color:#ffffff;" onclick="openDiagramModal('canvas-execution-flow', 'Figure 1: ORION Controlled Execution, Tool Gating & Verification Lifecycle')">Full Preview</button>
+            </div>
+          </div>
+          <div class="diagram-viewport">
+            <div class="diagram-canvas" id="canvas-execution-flow">
+              <pre class="mermaid">
+flowchart TD
+    A["User Prompt / Ingested Document"] --> B["Collector Microservice [:8888]<br/>(Tesseract OCR + Parsers + Signed IPC)"]
+    B --> C["01. Metadata & Sensitivity Classification<br/>(Confidential / Restricted / Plant Scope)"]
+    C --> D["02. Task Intent Deconstruction<br/>(Extract, Calculate, Review, Synthesize)"]
+    
+    subgraph "Adaptive Model Router Layer"
+        D --> E{"03. Model Routing Matrix<br/>(Task + Sensitivity + VRAM)"}
+        E -->|"Complex Logic / Multi-Hop"| E1["Reasoning Model<br/>(e.g., Llama-3.3-70B)"]
+        E -->|"Blueprints / P&IDs / Photos"| E2["Multimodal Vision<br/>(e.g., Qwen2.5-VL)"]
+        E -->|"Python / SQL / Workbooks"| E3["Code Specialist<br/>(e.g., Qwen2.5-Coder)"]
+        E -->|"Rapid Summary / Tagging"| E4["Fast Domain Model<br/>(e.g., Llama-3.2-3B)"]
+    end
+    
+    subgraph "Zero-Egress Reasoning Perimeter [:3001]"
+        E1 & E2 & E3 & E4 --> F{"04. Runtime Policy Gate"}
+        F -->|"Allowlisted Read / Search"| G["LanceDB Dense Retrieval<br/>(RBAC Workspace Scoped)"]
+        F -->|"Code Execution"| H["Isolated Ephemeral Sandbox<br/>(Restricted Python Runner)"]
+        F -->|"State Modification"| I["Human Authorization Gate"]
+        
+        G & H & I --> J["05. AIbitat Agentic Core<br/>(Plan &rarr; Retrieve &rarr; Execute &rarr; Repair)"]
+        J --> K{"06. Specialist Review Engine"}
+        K -->|"Citation / Sanity Anomaly"| L["Autonomous Context Repair Loop"]
+        L --> J
+        K -->|"High Ambiguity Flag"| M["Human Supervisor Queue"]
+    end
+    
+    K -->|"Verification Passed"| N["Deliver Verifiable Work Product<br/>(.docx, .xlsx, grounded answer + citations)"]
+    M --> N
+    N --> O["Cryptographic Audit Trail<br/>(SQLite / Event Logs: Actor, Model, Tools, Checkpoints)"]
+              </pre>
+            </div>
+          </div>
+          <div class="diagram-footer">
+            <span>Figure 1: Complete end-to-end execution flow illustrating data classification, tool gating, and the verification feedback loop</span>
+            <span>Click "Full Preview" for interactive drag &amp; zoom</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 4 — REAL WORKFLOWS
+           ==================================================================== -->
+      <section id="workflows">
+        <h2 class="section-heading">
+          <span class="section-index">04</span>
+          Built around the work people already do.
+        </h2>
+
+        <p class="lead-text">
+          ORION is engineered for industrial workflows where autonomous agents require access to proprietary drawings, equipment databases, calculations, or internal tools — while keeping all processing strictly inside the sovereign perimeter.
+        </p>
+
+        <!-- Use Case 1 -->
+        <div class="workflow-card">
+          <div class="workflow-header">
+            <span class="workflow-title">Use Case 1 — Inspection Report &rarr; Formal Approval Note</span>
+            <div>
+              <span class="outline-tag">Plant Operations</span>
+              <span class="outline-tag">Multimodal Ingestion</span>
+            </div>
+          </div>
+          <div class="workflow-body">
+            <div class="workflow-col">
+              <span class="workflow-col-title">Input &amp; Ingestion</span>
+              <p>Scanned multi-page industrial maintenance inspection report containing typed maintenance logs, sensor tables, and handwritten plant operator remarks.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">PDF / Scanned Image</span>
+                <span class="workflow-tech-tag">Tesseract OCR</span>
+                <span class="workflow-tech-tag">Table Parser</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">ORION Agentic Execution</span>
+              <p>Collector extracts text and structured tables &rarr; classifies report sensitivity &rarr; Model Router selects multimodal model &rarr; retrieves relevant internal plant SOPs from LanceDB &rarr; detects anomaly causes &rarr; compiles formal approval note draft.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">LanceDB Retrieval</span>
+                <span class="workflow-tech-tag">AIbitat Drafting</span>
+                <span class="workflow-tech-tag">Source Grounding</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">Verified Output &amp; Evidence</span>
+              <p><strong>Work Product:</strong> Production-ready Word document (<code>.docx</code>) with formal executive summary and sign-off placeholders.</p>
+              <p style="font-family: var(--font-mono); font-size: 11.5px; color: var(--color-gray); margin-top: 6px;">
+                <strong>Traceable Evidence:</strong> <code>Inspection_Report_2026.pdf &mdash; Page 4 &mdash; Section 2.1</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Use Case 2 -->
+        <div class="workflow-card">
+          <div class="workflow-header">
+            <span class="workflow-title">Use Case 2 — Engineering Telemetry &rarr; Calculation Workbook</span>
+            <div>
+              <span class="outline-tag">Engineering &amp; Analytics</span>
+              <span class="outline-tag">Sandboxed Python</span>
+            </div>
+          </div>
+          <div class="workflow-body">
+            <div class="workflow-col">
+              <span class="workflow-col-title">Input &amp; Ingestion</span>
+              <p>Raw pump sensor telemetry, vibration metrics, and equipment design specifications provided in unformatted spreadsheets or technical manuals.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">XLSX / CSV</span>
+                <span class="workflow-tech-tag">Sensor Logs</span>
+                <span class="workflow-tech-tag">Technical Specs</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">ORION Agentic Execution</span>
+              <p>Ingests parameter tables &rarr; generates Python calculation script for efficiency curves and vibration thresholds &rarr; dispatches code into an isolated ephemeral sandbox &rarr; executes calculations &rarr; verifies numerical tolerances against baseline specs.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">Isolated Sandbox</span>
+                <span class="workflow-tech-tag">Python Compute</span>
+                <span class="workflow-tech-tag">Numerical Sanity</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">Verified Output &amp; Evidence</span>
+              <p><strong>Work Product:</strong> Structured Excel workbook (<code>efficiency_results.xlsx</code>) with embedded formula cells.</p>
+              <p style="font-size: 12px; color: var(--color-dark); margin-top: 6px;">
+                <strong>Key Difference:</strong> Calculation formulas can be mathematically inspected in Excel rather than relying on an opaque model-generated token estimate.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Use Case 3 -->
+        <div class="workflow-card">
+          <div class="workflow-header">
+            <span class="workflow-title">Use Case 3 — Internal Document Grounded Q&amp;A</span>
+            <div>
+              <span class="outline-tag">Knowledge Management</span>
+              <span class="outline-tag">Dense Vector RAG</span>
+            </div>
+          </div>
+          <div class="workflow-body">
+            <div class="workflow-col">
+              <span class="workflow-col-title">Input &amp; Ingestion</span>
+              <p>Natural language operational inquiry regarding plant safety manuals, legacy turbine repair protocols, or historical incident findings.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">Operator Query</span>
+                <span class="workflow-tech-tag">SOP Library</span>
+                <span class="workflow-tech-tag">Private Documents</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">ORION Agentic Execution</span>
+              <p>Embeds query via native local ONNX runtime (<code>all-MiniLM-L6-v2</code>) &rarr; queries embedded LanceDB vector index with strict workspace RBAC &rarr; retrieves top matching passages &rarr; synthesizes grounded answer with exact section pointers.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">ONNX Embedder</span>
+                <span class="workflow-tech-tag">RBAC Vector Scoping</span>
+                <span class="workflow-tech-tag">Citation Verification</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">Verified Output &amp; Evidence</span>
+              <p><strong>Work Product:</strong> Direct, grounded synthesis accompanied by clickable document snippets and exact page numbers.</p>
+              <p style="font-size: 12px; color: var(--color-gray); margin-top: 6px;">
+                <strong>Air-Gap Integrity:</strong> Complete semantic search runs disk-backed on the server without calling external vector cloud APIs.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Use Case 4 -->
+        <div class="workflow-card">
+          <div class="workflow-header">
+            <span class="workflow-title">Use Case 4 — Regulation &amp; Policy Impact Review</span>
+            <div>
+              <span class="outline-tag">Statutory &amp; Legal</span>
+              <span class="outline-tag">Compliance Mapping</span>
+            </div>
+          </div>
+          <div class="workflow-body">
+            <div class="workflow-col">
+              <span class="workflow-col-title">Input &amp; Ingestion</span>
+              <p>Newly gazetted industrial safety regulation, environmental directive, or updated corporate governance guideline.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">Regulatory PDF</span>
+                <span class="workflow-tech-tag">Statutory Clauses</span>
+                <span class="workflow-tech-tag">Corporate Guidelines</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">ORION Agentic Execution</span>
+              <p>Segments regulatory clauses into semantic obligations &rarr; performs similarity and cross-reference search across active internal SOPs &rarr; flags procedural discrepancies &rarr; generates categorized impact matrix.</p>
+              <div style="margin-top: 8px;">
+                <span class="workflow-tech-tag">Clause Extraction</span>
+                <span class="workflow-tech-tag">Discrepancy Matching</span>
+                <span class="workflow-tech-tag">Impact Classification</span>
+              </div>
+            </div>
+            <div class="workflow-col">
+              <span class="workflow-col-title">Verified Output &amp; Boundary</span>
+              <p><strong>Work Product:</strong> Structured compliance impact matrix highlighting specific internal operations requiring review.</p>
+              <p style="font-size: 12px; color: var(--color-gray); margin-top: 6px;">
+                <strong>Role Boundary:</strong> Identifies potential procedural impact areas for human compliance and legal teams; does not offer autonomous legal interpretation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 5 — CONTROL, TRUST & AUDIT
+           ==================================================================== -->
+      <section id="control-audit">
+        <h2 class="section-heading">
+          <span class="section-index">05</span>
+          Control is part of the execution — not an afterthought.
+        </h2>
+
+        <p class="lead-text">
+          Confidential industrial AI requires substantially more than installing model weights on a workstation.
+        </p>
+
+        <p>
+          ORION is architected so that data access, model routing, tool usage, sandbox execution, and deliverable emission are continuously governed and recorded at every tier of the platform.
+        </p>
+
+        <!-- 6 Deep Control Pillars Grid -->
+        <div class="grid-3">
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">01. Data-Aware Access</span>
+              <span class="card-badge">Classification</span>
+            </div>
+            <div class="card-content">
+              Document sensitivity tags are bound to the vectorized context tokens. Downstream routing checks verify that high-classification data is never routed to models or tools lacking corresponding clearance.
+            </div>
+            <div class="card-footer-tag">
+              Data carries policy from storage into runtime execution.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">02. Runtime Permissioning</span>
+              <span class="card-badge">Dynamic Auth</span>
+            </div>
+            <div class="card-content">
+              Permissions are evaluated dynamically at the exact millisecond an action is triggered:
+              <br><br>
+              <code>User + Data + Model + Tool + Scope &rarr; Permit / Block</code>
+            </div>
+            <div class="card-footer-tag">
+              Dynamic policy evaluation replaces static login credentials.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">03. Tool Isolation</span>
+              <span class="card-badge">Sandboxing</span>
+            </div>
+            <div class="card-content">
+              Python scripts and analytical tools run in isolated ephemeral execution environments. Tools adhere to the Model Context Protocol (MCP); state-modifying operations require mandatory human sign-off.
+            </div>
+            <div class="card-footer-tag">
+              Eliminates host exploitation and prompt injection tampering.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">04. Verification &amp; Repair</span>
+              <span class="card-badge">Integrity Loop</span>
+            </div>
+            <div class="card-content">
+              The Specialist Review engine validates evidence coverage, citation accuracy, and constraint adherence before deliverables leave the agent:
+              <br><br>
+              <code>Fail &rarr; Repair &rarr; Re-validate &rarr; Human Review</code>
+            </div>
+            <div class="card-footer-tag">
+              Automated repair handles anomalies before work emission.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">05. Cryptographic Audit Trail</span>
+              <span class="card-badge">Traceability</span>
+            </div>
+            <div class="card-content">
+              Every interaction logs immutable event records in SQLite: session initiator, accessed files, model version, invoked tool calls, policy decisions, and verification validation results.
+            </div>
+            <div class="card-footer-tag">
+              Provides complete forensic traceability for regulatory compliance.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">06. Air-Gap &amp; Network Boundary</span>
+              <span class="card-badge">Zero Egress</span>
+            </div>
+            <div class="card-content">
+              Strict deny-by-default outbound networking. Embeddings, vector storage (LanceDB), OCR, and LLMs operate locally without external licensing checks or telemetry beacons.
+            </div>
+            <div class="card-footer-tag">
+              Verified through socket monitoring and network log inspection.
+            </div>
+          </div>
+        </div>
+
+        <!-- Threat Mitigation Table Derived from Architecture Analysis -->
+        <h3 class="subsection-heading">Concrete Industrial Threat Mitigations</h3>
+        <p>ORION addresses the primary failure modes of autonomous enterprise AI through structural architectural controls:</p>
+
+        <table class="outline-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Threat Vector</th>
+              <th style="width: 35%;">Industrial Risk Scenario</th>
+              <th>ORION Architectural Mitigation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Indirect Prompt Injection</strong></td>
+              <td>Malicious hidden instructions in vendor PDFs instruct agent to leak documents or delete data.</td>
+              <td>Strict parser sanitization in Collector microservice; tool permission gates require human approval for state changes; code runs in isolated sandbox.</td>
+            </tr>
+            <tr>
+              <td><strong>Context Data Contamination</strong></td>
+              <td>Classified plant blueprint context accidentally exposed to lower-clearance users during multi-turn chat.</td>
+              <td>Workspace boundary enforcement and RBAC metadata filtering in LanceDB vector similarity search; context tokens inherit document sensitivity.</td>
+            </tr>
+            <tr>
+              <td><strong>Hallucinated Technical Metrics</strong></td>
+              <td>Model invents engineering parameters, causing faulty equipment calibration or hazardous calculations.</td>
+              <td>Analytical computations delegated to sandboxed Python rather than model token generation; Specialist Review cross-checks citations against source text.</td>
+            </tr>
+            <tr>
+              <td><strong>Silent Network Telemetry</strong></td>
+              <td>Dependencies or model libraries emit telemetry beacons or crash reports to external servers.</td>
+              <td>Deny-by-default network policies; all remote telemetry endpoints eliminated from codebase; signed RSA-SHA256 IPC used exclusively for internal services.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Accuracy & Claim Guardrail Callout Box -->
+        <div class="outline-box highlight">
+          <strong>Security Principle:</strong> ORION reduces data exposure through on-premise execution, policy-controlled access, isolated tools, and auditable workflows. We engineer verifiable boundary controls and deterministic fail-safes rather than making ungrounded claims of absolute immunity.
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 6 — DEPLOYMENT, PROOF & CLOSING
+           ==================================================================== -->
+      <section id="deployment">
+        <h2 class="section-heading">
+          <span class="section-index">06</span>
+          AI that can be deployed where the work already lives.
+        </h2>
+
+        <p class="lead-text">
+          ORION is built for organizations that need modern agentic AI capabilities without transferring confidential working data to an external provider's cloud infrastructure.
+        </p>
+
+        <p>
+          It is deployable on existing on-premise infrastructure — from single engineering workstations with consumer GPUs to enterprise air-gapped server racks — utilizing open-weight multimodal models and embedded vector runtimes.
+        </p>
+
+        <div class="outline-box" style="text-align: center; font-size: 15px; font-weight: 600; letter-spacing: 0.2px;">
+          Local Infrastructure &rarr; Local Models &rarr; Local Knowledge &rarr; Controlled Tools &rarr; Auditable Outputs
+        </div>
+
+        <h3 class="subsection-heading">The 7-Point Demonstrable Working Proof</h3>
+        <p>A credible ORION deployment demonstrates more than a cosmetic chatbot interface. The working proof validates seven tangible operational guarantees:</p>
+
+        <table class="outline-table">
+          <thead>
+            <tr>
+              <th style="width: 8%;">#</th>
+              <th style="width: 28%;">Proof Criterion</th>
+              <th style="width: 34%;">Operational Demonstration</th>
+              <th>Validation &amp; Verification Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1</strong></td>
+              <td><strong>Confidential Data Stays Local</strong></td>
+              <td>Ingested files, vectors, and chat transcripts remain strictly on the host filesystem.</td>
+              <td>Inspect <code>server/storage/documents</code> and <code>server/storage/vector-cache</code>; verify zero cloud egress.</td>
+            </tr>
+            <tr>
+              <td><strong>2</strong></td>
+              <td><strong>Automatic Data Classification</strong></td>
+              <td>The ingestion microservice categorizes documents with sensitivity labels upon upload.</td>
+              <td>Inspect SQLite database table <code>workspace_documents</code> for assigned metadata tags.</td>
+            </tr>
+            <tr>
+              <td><strong>3</strong></td>
+              <td><strong>Context-Aware Model Routing</strong></td>
+              <td>Tasks are dispatched to optimal open-weight models matching required capability and clearance.</td>
+              <td>Review Model Router execution logs verifying task-to-model allocation.</td>
+            </tr>
+            <tr>
+              <td><strong>4</strong></td>
+              <td><strong>Pre-Execution Tool Authorization</strong></td>
+              <td>Runtime permission gates verify user, document, and tool clearance prior to execution.</td>
+              <td>Verify permission gate block events when unauthorized tool invocations are requested.</td>
+            </tr>
+            <tr>
+              <td><strong>5</strong></td>
+              <td><strong>Multi-Step Agent Workflow</strong></td>
+              <td>Executes multi-turn plans (extraction &rarr; synthesis &rarr; sandboxed compute) with automated recovery.</td>
+              <td>Inspect AIbitat multi-step execution logs and autonomous error-repair loops.</td>
+            </tr>
+            <tr>
+              <td><strong>6</strong></td>
+              <td><strong>Verifiable Work Product</strong></td>
+              <td>Delivers structured deliverables (Word, Excel, grounded answers) with direct source citations.</td>
+              <td>Validate citation backlinks linking text assertions directly to page/paragraph sources.</td>
+            </tr>
+            <tr>
+              <td><strong>7</strong></td>
+              <td><strong>Network Audit Verification</strong></td>
+              <td>Network logs confirm zero unauthorized outbound calls occurred during the entire run.</td>
+              <td>Run network socket monitoring (<code>netstat</code> / packet capture) during workflow execution.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Hardware Footprint Matrix -->
+        <h3 class="subsection-heading">Flexible On-Premise Hardware Profiles</h3>
+        <p>ORION is engineered to scale across diverse organizational hardware environments through quantized open-weight inference:</p>
+
+        <div class="grid-3">
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">Edge / Workstation</span>
+              <span class="card-badge">Entry</span>
+            </div>
+            <div class="card-content">
+              <strong>Profile:</strong> Single workstation with 1x NVIDIA RTX 3060 / 4070 (12GB VRAM) or Apple Silicon (16GB-32GB Unified Memory).<br><br>
+              <strong>Capabilities:</strong> 8B-parameter open-weight LLMs (Qwen2.5 / Llama 3), embedded LanceDB, and local document parsing.
+            </div>
+            <div class="card-footer-tag">
+              Ideal for dedicated field units &amp; site offices.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">Department Server</span>
+              <span class="card-badge">Standard</span>
+            </div>
+            <div class="card-content">
+              <strong>Profile:</strong> Dedicated on-premise server with 1x-2x NVIDIA RTX 3090 / 4090 (24GB-48GB VRAM) or A5000.<br><br>
+              <strong>Capabilities:</strong> 14B-32B LLMs, multimodal vision models for technical drawings, concurrent workspace chats, and background Bree jobs.
+            </div>
+            <div class="card-footer-tag">
+              Ideal for engineering teams &amp; plant facilities.
+            </div>
+          </div>
+
+          <div class="card-outline">
+            <div class="card-outline-header">
+              <span class="card-title">Air-Gapped Enterprise</span>
+              <span class="card-badge">High Capacity</span>
+            </div>
+            <div class="card-content">
+              <strong>Profile:</strong> Dual Xeon/EPYC compute node with multi-GPU cluster (2x-4x A100 / H100 80GB) or internal server farm.<br><br>
+              <strong>Capabilities:</strong> 70B+ open-weight foundation models, high-throughput batch document parsing, and site-wide multi-agent orchestration.
+            </div>
+            <div class="card-footer-tag">
+              Ideal for defence &amp; corporate infrastructure.
+            </div>
+          </div>
+        </div>
+
+        <!-- Closing Statement Banner & Dual CTAs -->
+        <div class="cta-banner">
+          <div class="eyebrow">THE ORION COMMITMENT</div>
+          <h2 class="cta-banner-title">Bring AI to the work. Not the work to the AI provider.</h2>
+          <p class="cta-banner-text">
+            ORION is a sovereign AI workbench for organizations where confidentiality is not an optional setting, but an absolute requirement of the work itself. Keep your data, your tools, your models, and your verification under your own institutional control.
+          </p>
+          <div class="cta-buttons-group">
+            <a href="#how-it-works" class="btn-primary">Explore the ORION Workflow &uarr;</a>
+            <a href="architecture.html" class="btn-outline">View Technical Architecture Specification &rarr;</a>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       FULLSCREEN PREVIEW MODAL (INTERACTIVE PAN & ZOOM)
+       ========================================================================== -->
+  <div id="preview-modal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="modal-diagram-title">
+    <div class="preview-window">
+      <div class="preview-header">
+        <span id="modal-diagram-title" class="preview-title">Figure 1: ORION Controlled Execution, Tool Gating &amp; Verification Lifecycle</span>
+        <div class="preview-controls">
+          <button class="preview-btn" onclick="stepModalZoom(0.25)" title="Zoom In (+)">Zoom +</button>
+          <button class="preview-btn" onclick="stepModalZoom(-0.25)" title="Zoom Out (-)">Zoom -</button>
+          <span id="modal-zoom-display" class="preview-zoom-label">100%</span>
+          <button class="preview-btn" onclick="resetModalZoom()" title="Reset Zoom">Reset</button>
+          <button class="preview-btn" onclick="toggleNativeFullscreen()" title="Toggle Fullscreen">Fullscreen</button>
+          <button class="preview-close-btn" onclick="closeDiagramModal()" title="Close (Esc)">Close &times;</button>
+        </div>
+      </div>
+      <div class="preview-instructions">
+        <span>Click and drag to pan &bull; Scroll wheel or +/- to zoom &bull; Double-click to toggle fit &bull; Esc to close</span>
+        <span>Monochrome Architecture Preview</span>
+      </div>
+      <div id="preview-stage" class="preview-stage">
+        <div id="preview-canvas" class="preview-canvas"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       INTERACTIVE JAVASCRIPT: PAN/ZOOM & SIDEBAR SCROLL SPY
+       ========================================================================== -->
+  <script>
+    // Inline Diagram Zoom Controls
+    const inlineZoomState = {};
+
+    function zoomInlineDiagram(canvasId, delta) {
+      if (!inlineZoomState[canvasId]) inlineZoomState[canvasId] = 1.0;
+      inlineZoomState[canvasId] = Math.min(Math.max(0.4, inlineZoomState[canvasId] + delta), 3.0);
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        canvas.style.transform = `scale(${inlineZoomState[canvasId]})`;
+      }
+    }
+
+    function resetInlineDiagram(canvasId) {
+      inlineZoomState[canvasId] = 1.0;
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        canvas.style.transform = 'scale(1)';
+      }
+    }
+
+    // Modal Interactive Zoom and Pan State
+    let modalScale = 1.0;
+    let modalPanX = 0;
+    let modalPanY = 0;
+    let isModalDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    const modal = document.getElementById('preview-modal');
+    const modalStage = document.getElementById('preview-stage');
+    const modalCanvas = document.getElementById('preview-canvas');
+    const modalTitle = document.getElementById('modal-diagram-title');
+    const modalZoomDisplay = document.getElementById('modal-zoom-display');
+
+    function openDiagramModal(sourceCanvasId, titleText) {
+      const sourceCanvas = document.getElementById(sourceCanvasId);
+      if (!sourceCanvas) return;
+
+      const mediaEl = sourceCanvas.querySelector('svg, img');
+      if (!mediaEl) {
+        alert('Item is rendering. Please try again in a moment.');
+        return;
+      }
+
+      modalTitle.textContent = titleText || 'Preview';
+      modalCanvas.innerHTML = '';
+
+      const clonedMedia = mediaEl.cloneNode(true);
+      clonedMedia.style.display = 'block';
+      clonedMedia.style.maxWidth = '85vw';
+      clonedMedia.style.maxHeight = '72vh';
+      clonedMedia.style.width = 'auto';
+      clonedMedia.style.height = 'auto';
+      clonedMedia.style.objectFit = 'contain';
+      
+      modalCanvas.appendChild(clonedMedia);
+
+      modalScale = 1.0;
+      modalPanX = 0;
+      modalPanY = 0;
+      updateModalTransform();
+
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDiagramModal() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      modalCanvas.innerHTML = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function updateModalTransform() {
+      modalCanvas.style.transform = `translate(${modalPanX}px, ${modalPanY}px) scale(${modalScale})`;
+      modalZoomDisplay.textContent = `${Math.round(modalScale * 100)}%`;
+    }
+
+    function stepModalZoom(delta) {
+      modalScale = Math.min(Math.max(0.25, modalScale + delta), 5.0);
+      updateModalTransform();
+    }
+
+    function resetModalZoom() {
+      modalScale = 1.0;
+      modalPanX = 0;
+      modalPanY = 0;
+      updateModalTransform();
+    }
+
+    function toggleNativeFullscreen() {
+      if (!document.fullscreenElement) {
+        modal.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Modal Mouse Drag Panning
+    modalStage.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.preview-header') || e.target.closest('.preview-controls')) return;
+      isModalDragging = true;
+      dragStartX = e.clientX - modalPanX;
+      dragStartY = e.clientY - modalPanY;
+      modalStage.classList.add('active-drag');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isModalDragging) return;
+      modalPanX = e.clientX - dragStartX;
+      modalPanY = e.clientY - dragStartY;
+      updateModalTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isModalDragging = false;
+      modalStage.classList.remove('active-drag');
+    });
+
+    // Mouse Wheel Zooming
+    modalStage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      modalScale = Math.min(Math.max(0.25, modalScale * zoomFactor), 5.0);
+      updateModalTransform();
+    }, { passive: false });
+
+    // Double-click to toggle zoom
+    modalStage.addEventListener('dblclick', () => {
+      if (modalScale > 1.2) {
+        resetModalZoom();
+      } else {
+        stepModalZoom(0.6);
+      }
+    });
+
+    // Global keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (modal.style.display === 'flex') {
+        if (e.key === 'Escape') {
+          closeDiagramModal();
+        } else if (e.key === '+' || e.key === '=') {
+          stepModalZoom(0.25);
+        } else if (e.key === '-' || e.key === '_') {
+          stepModalZoom(-0.25);
+        } else if (e.key === '0') {
+          resetModalZoom();
+        }
+      }
+    });
+
+    // Sidebar active link indicator
+    function setActiveLink(clickedEl) {
+      document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+      clickedEl.classList.add('active');
+    }
+
+    // Scroll spy for sidebar links
+    window.addEventListener('scroll', () => {
+      const sections = ['problem', 'gap', 'how-it-works', 'workflows', 'control-audit', 'deployment'];
+      const scrollPos = window.scrollY + 100;
+
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+              link.classList.toggle('active', link.getAttribute('href') === `#${sectionId}`);
+            });
+            break;
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
