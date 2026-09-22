@@ -182,14 +182,16 @@ async function streamChatWithWorkspace(
     });
   });
 
+  const { HybridSearch } = require("../retrieval/hybridSearch");
   const vectorSearchResults =
     embeddingsCount !== 0
-      ? await VectorDb.performSimilaritySearch({
-          namespace: workspace.slug,
-          input: updatedMessage,
+      ? await HybridSearch.searchWorkspace({
+          workspace,
+          query: updatedMessage,
+          user,
           LLMConnector,
-          similarityThreshold: workspace?.similarityThreshold,
-          topN: workspace?.topN,
+          similarityThreshold: workspace?.similarityThreshold ?? 0.20,
+          topN: workspace?.topN ?? 4,
           filterIdentifiers: pinnedDocIdentifiers,
           rerank: workspace?.vectorSearchMode === "rerank",
         })
@@ -200,7 +202,7 @@ async function streamChatWithWorkspace(
         };
 
   // Failed similarity search if it was run at all and failed.
-  if (!!vectorSearchResults.message) {
+  if (!!vectorSearchResults.message && vectorSearchResults.sources.length === 0) {
     writeResponseChunk(response, {
       id: uuid,
       type: "abort",

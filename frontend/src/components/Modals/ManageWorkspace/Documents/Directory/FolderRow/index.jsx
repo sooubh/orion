@@ -43,6 +43,7 @@ export default function FolderRow({
   onLoadMore,
   acceptsDrops = false,
   onDropFiles,
+  onDeleteFile,
 }) {
   const { t } = useTranslation();
   const [isDropTarget, setIsDropTarget] = useState(false);
@@ -173,6 +174,7 @@ export default function FolderRow({
             selected={isFileSelected(file.id)}
             folderName={item.name}
             toggleSelection={onToggleFile}
+            onDelete={onDeleteFile}
           />
         ))}
       {expanded && hasMore && (

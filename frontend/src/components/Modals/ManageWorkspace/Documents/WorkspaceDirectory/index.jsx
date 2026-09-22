@@ -22,6 +22,8 @@ import { safeJsonParse } from "@/utils/request";
 import { useTranslation } from "react-i18next";
 import { middleTruncate } from "@/utils/directories";
 import { useEmbeddingProgress } from "@/EmbeddingProgressContext";
+import useUser from "@/hooks/useUser";
+import showToast from "@/utils/toast";
 
 function WorkspaceDirectory({
   workspace,
@@ -96,6 +98,66 @@ function WorkspaceDirectory({
 
     setLoadingMessage("");
     setLoading(false);
+  };
+
+  const { user } = useUser();
+  const canDelete = user?.role !== "default";
+
+  const deleteSelectedItems = async () => {
+    if (
+      !window.confirm(
+        "Delete this document? This will also remove its indexed content."
+      )
+    ) {
+      return;
+    }
+
+    setLoading(true);
+    setLoadingMessage("Deleting selected documents and indexed content...");
+
+    const itemsToDelete = Object.keys(selectedItems).map((itemId) => {
+      const folder = files.items.find((f) =>
+        f.items.some((i) => i.id === itemId)
+      );
+      const item = folder?.items?.find((i) => i.id === itemId);
+      return folder && item ? `${folder.name}/${item.name}` : null;
+    }).filter(Boolean);
+
+    try {
+      let failCount = 0;
+      for (const docLocation of itemsToDelete) {
+        const { success } = await Workspace.deleteAndUnembedFile(
+          workspace.slug,
+          docLocation
+        );
+        if (!success) failCount++;
+      }
+
+      if (failCount === 0) {
+        showToast(
+          "Selected documents and indexed content deleted successfully",
+          "success",
+          { clear: true }
+        );
+      } else {
+        showToast(
+          `Deleted with ${failCount} failure(s).`,
+          "warning",
+          { clear: true }
+        );
+      }
+
+      await fetchKeys(true);
+      setSelectedItems({});
+    } catch (error) {
+      console.error("Failed to delete documents:", error);
+      showToast(`Error deleting documents: ${error.message}`, "error", {
+        clear: true,
+      });
+    } finally {
+      setLoadingMessage("");
+      setLoading(false);
+    }
   };
 
   const handleSaveChanges = (e) => {
@@ -281,6 +343,14 @@ function WorkspaceDirectory({
                     >
                       {t("connectors.directory.remove_selected")}
                     </button>
+                    {canDelete && (
+                      <button
+                        onClick={deleteSelectedItems}
+                        className="border-none text-sm font-semibold bg-white light:bg-[#FEE2E2] h-[30px] px-2.5 rounded-lg hover:bg-red-600 hover:text-white text-red-500 light:text-[#DC2626] light:hover:bg-[#DC2626] light:hover:text-white transition-colors"
+                      >
+                        Delete selected
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

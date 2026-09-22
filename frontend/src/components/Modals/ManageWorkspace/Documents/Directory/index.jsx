@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import Document from "@/models/document";
 import showToast from "@/utils/toast";
+import useUser from "@/hooks/useUser";
 import FolderSelectionPopup from "./FolderSelectionPopup";
 import MoveToFolderIcon from "./MoveToFolderIcon";
 import { useModal } from "@/hooks/useModal";
@@ -34,6 +35,8 @@ export default function Directory({
   moveToWorkspace,
 }) {
   const { t } = useTranslation();
+  const { user } = useUser();
+  const canDelete = user?.role !== "default";
   const [showFolderSelection, setShowFolderSelection] = useState(false);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -149,8 +152,12 @@ export default function Directory({
   /* -------------------------------- mutations ------------------------------ */
 
   const deleteFiles = async (event) => {
-    event.stopPropagation();
-    if (!window.confirm(t("connectors.directory.delete-confirmation"))) return;
+    event?.stopPropagation?.();
+    if (!canDelete) {
+      showToast("You are not authorized to delete documents", "error");
+      return;
+    }
+    if (!window.confirm("Delete this document? This will also remove its indexed content.")) return;
 
     const selected = await resolveSelection();
     const toRemove = selected.map((file) => `${file.folderName}/${file.name}`);
@@ -171,8 +178,36 @@ export default function Directory({
       removeFiles(selected.map((file) => file.id));
       clearSelection();
       await refresh();
+      showToast("Documents deleted successfully", "success");
     } catch (error) {
       console.error("Failed to delete files and folders:", error);
+      showToast(`Failed to delete: ${error.message}`, "error");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const deleteSingleFile = async (file, folderName) => {
+    if (!canDelete) {
+      showToast("You are not authorized to delete documents", "error");
+      return;
+    }
+    if (
+      !window.confirm(
+        "Delete this document? This will also remove its indexed content."
+      )
+    )
+      return;
+
+    const target = `${folderName}/${file.name}`;
+    setBusy(`Removing ${file.title || file.name}...`);
+    try {
+      await System.deleteDocuments([target]);
+      removeFiles([file.id]);
+      await refresh();
+      showToast("Document deleted successfully", "success");
+    } catch (error) {
+      console.error("Failed to delete file:", error);
       showToast(`Failed to delete: ${error.message}`, "error");
     } finally {
       setBusy(null);
@@ -352,6 +387,7 @@ export default function Directory({
                     onLoadMore={loadMore}
                     acceptsDrops={uploadQueue.ready}
                     onDropFiles={handleFolderDrop}
+                    onDeleteFile={deleteSingleFile}
                   />
                 ))
               ) : (
@@ -402,12 +438,15 @@ export default function Directory({
                         />
                       )}
                     </div>
-                    <button
-                      onClick={deleteFiles}
-                      className="border-none text-sm font-semibold bg-white light:bg-[#E0F2FE] h-[32px] w-[32px] rounded-lg text-dark-text hover:bg-neutral-800/80 hover:text-white light:text-[#026AA2] light:hover:bg-[#026AA2] light:hover:text-white flex justify-center items-center"
-                    >
-                      <Trash size={18} weight="bold" />
-                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={deleteFiles}
+                        className="border-none text-sm font-semibold bg-white light:bg-[#E0F2FE] h-[32px] w-[32px] rounded-lg text-dark-text hover:bg-neutral-800/80 hover:text-white light:text-[#026AA2] light:hover:bg-[#026AA2] light:hover:text-white flex justify-center items-center"
+                        title="Delete selected documents"
+                      >
+                        <Trash size={18} weight="bold" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ const {
   resolveProviderConnector,
 } = require("../../../helpers");
 const { Deduplicator } = require("../utils/dedupe");
+const { HybridSearch } = require("../../../retrieval/hybridSearch");
 
 const memory = {
   name: "rag-memory",
@@ -19,20 +20,27 @@ const memory = {
           tracker: new Deduplicator(),
           name: this.name,
           description:
-            "Search your local documents and workspace files for relevant information, or store information to long-term memory. Use search to find answers in uploaded documents, embedded files, or previously stored memories. Use store only when explicitly asked to remember or save something.",
+            "Search uploaded documents by content, semantic meaning, keywords and metadata. Use filename lookup only when the user explicitly identifies a filename. Search across all workspace files for facts, measurements, equipment readings, procedures, and findings. Use store only when explicitly asked to remember or save something.",
           examples: [
             {
-              prompt: "Check my files for information about the project",
+              prompt: "Analyze the C-204 inspection report findings and measurements",
               call: JSON.stringify({
                 action: "search",
-                content: "<project information to search for>",
+                content: "C-204 inspection report findings measurements follow-up actions",
               }),
             },
             {
-              prompt: "What do you know about Plato's motives?",
+              prompt: "What does the maintenance procedure say about vibration above 7.0 mm/s?",
               call: JSON.stringify({
                 action: "search",
-                content: "What are the facts about Plato's motives?",
+                content: "maintenance SOP vibration above 7.0 mm/s threshold",
+              }),
+            },
+            {
+              prompt: "Which document contains the 7.8 mm/s vibration reading?",
+              call: JSON.stringify({
+                action: "search",
+                content: "7.8 mm/s vibration reading",
               }),
             },
             {
@@ -56,7 +64,7 @@ const memory = {
               content: {
                 type: "string",
                 description:
-                  "The plain text to search our local documents with or to store in our vector database.",
+                  "The plain text query to search our local documents with by content, meaning, keywords, or entities, or to store in our vector database.",
               },
             },
             additionalProperties: false,
@@ -89,37 +97,42 @@ const memory = {
                   workspace,
                   prompt: query,
                 });
-              const vectorDB = getVectorDbClass();
-              const { contextTexts = [], sources = [] } =
-                await vectorDB.performSimilaritySearch({
-                  namespace: workspace.slug,
-                  input: query,
-                  LLMConnector,
-                  topN: workspace?.topN ?? 4,
-                  rerank: workspace?.vectorSearchMode === "rerank",
-                });
 
-              if (contextTexts.length === 0) {
+              const user = this.super.handlerProps.invocation.user_id
+                ? { id: this.super.handlerProps.invocation.user_id }
+                : null;
+
+              const searchResult = await HybridSearch.searchWorkspace({
+                workspace,
+                query,
+                user,
+                LLMConnector,
+                topN: workspace?.topN ?? 6,
+                similarityThreshold: workspace?.similarityThreshold ?? 0.20,
+                rerank: workspace?.vectorSearchMode === "rerank",
+              });
+
+              if (!searchResult.sources || searchResult.sources.length === 0) {
                 this.super.introspect(
-                  `${this.caller}: I didn't find anything locally that would help answer this question.`
+                  `${this.caller}: No relevant documents found in workspace for query "${query}".`
                 );
-                return "There was no additional context found for that query. We should search the web for this information.";
+                return (
+                  searchResult.message ||
+                  "No relevant document was found in the current workspace."
+                );
               }
 
               this.super.introspect(
-                `${this.caller}: Found ${contextTexts.length} additional piece of context to help answer this question.`
+                `${this.caller}: Found ${searchResult.sources.length} relevant document source(s) to answer this question.`
               );
 
-              this.super.addCitation?.(sources);
-
-              let combinedText = "Additional context for query:\n";
-              for (const text of contextTexts) combinedText += text + "\n\n";
-              return combinedText;
+              this.super.addCitation?.(searchResult.sources);
+              return searchResult.combinedContext;
             } catch (error) {
               this.super.handlerProps.log(
                 `memory.search raised an error. ${error.message}`
               );
-              return `An error was raised while searching the vector database. ${error.message}`;
+              return `An error was raised while searching the workspace documents. ${error.message}`;
             }
           },
           store: async function (content = "") {

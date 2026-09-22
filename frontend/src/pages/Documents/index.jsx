@@ -20,6 +20,7 @@ import {
   Eye,
   Shield,
   ShieldCheck,
+  Trash,
 } from "@phosphor-icons/react";
 import System from "@/models/system";
 import Workspace from "@/models/workspace";
@@ -27,6 +28,7 @@ import Security from "@/models/security";
 import showToast from "@/utils/toast";
 import { humanFileSize } from "@/utils/numbers";
 import Modal, { ModalHeader, ModalBody, ModalFooter } from "@/components/lib/Modal";
+import useUser from "@/hooks/useUser";
 
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState([]);
@@ -43,6 +45,9 @@ export default function DocumentsPage() {
   const [reviewReason, setReviewReason] = useState("");
   const [updatingClassification, setUpdatingClassification] = useState(false);
   const [embeddingDocId, setEmbeddingDocId] = useState(null);
+  const [deletingDocId, setDeletingDocId] = useState(null);
+  const { user } = useUser();
+  const canDelete = user?.role !== "default";
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -165,6 +170,37 @@ export default function DocumentsPage() {
       showToast("Embedding failed", "error");
     } finally {
       setEmbeddingDocId(null);
+    }
+  }
+
+  async function handleDeleteDocument(doc) {
+    if (!canDelete) {
+      showToast("You are not authorized to delete documents", "error");
+      return;
+    }
+    if (
+      !window.confirm(
+        "Delete this document? This will also remove its indexed content."
+      )
+    ) {
+      return;
+    }
+
+    setDeletingDocId(doc.id);
+    try {
+      const target = `${doc.folderName}/${doc.name}`;
+      const success = await System.deleteDocuments([target]);
+      if (success) {
+        showToast(`Deleted "${doc.title || doc.name}"`, "success");
+        await loadData();
+      } else {
+        showToast("Failed to delete document", "error");
+      }
+    } catch (err) {
+      console.error("Delete document error:", err);
+      showToast(`Delete failed: ${err.message}`, "error");
+    } finally {
+      setDeletingDocId(null);
     }
   }
 
@@ -535,6 +571,22 @@ export default function DocumentsPage() {
                             )}
                             <span>Embed</span>
                           </button>
+                          {canDelete && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDocument(doc)}
+                              disabled={deletingDocId === doc.id}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                              title="Delete document and remove indexed content"
+                            >
+                              {deletingDocId === doc.id ? (
+                                <CircleNotch size={13} className="animate-spin" />
+                              ) : (
+                                <Trash size={13} />
+                              )}
+                              <span>Delete</span>
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -611,6 +663,20 @@ export default function DocumentsPage() {
               </p>
             </div>
             <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const doc = selectedDocForPreview;
+                    setSelectedDocForPreview(null);
+                    handleDeleteDocument(doc);
+                  }}
+                  className="px-3 py-2 bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer mr-auto"
+                >
+                  <Trash size={14} />
+                  <span>Delete Document</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {

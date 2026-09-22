@@ -879,7 +879,6 @@ function workspaceEndpoints(app) {
     [
       validatedRequest,
       flexUserRoleValid([ROLES.admin, ROLES.manager]),
-      handleFileUpload,
     ],
     async function (request, response) {
       try {
@@ -890,15 +889,47 @@ function workspaceEndpoints(app) {
           ? await Workspace.getWithUser(user, { slug })
           : await Workspace.get({ slug });
 
-        if (!currWorkspace || !body.documentLocation)
-          return response.sendStatus(400).end();
+        const target =
+          body.documentLocation ||
+          body.filename ||
+          body.docpath ||
+          body.name ||
+          body.docId;
 
-        // Will delete the document from the entire system + wil unembed it.
-        await purgeDocument(body.documentLocation);
-        response.status(200).end();
+        if (!currWorkspace || !target) {
+          return response.status(400).json({
+            success: false,
+            error: "Workspace and document identifier are required.",
+          });
+        }
+
+        // Resolve document in workspace if docId or bare name was sent
+        const doc =
+          (await Document.get({ docId: target, workspaceId: currWorkspace.id })) ||
+          (await Document.get({ docpath: target, workspaceId: currWorkspace.id })) ||
+          (await Document.get({ filename: target, workspaceId: currWorkspace.id }));
+
+        const docLocation = doc?.docpath || target;
+
+        // Will delete the document from the entire system + will unembed it.
+        await purgeDocument(docLocation);
+
+        await EventLogs.logEvent(
+          "document_removed_from_workspace",
+          {
+            workspaceName: currWorkspace.name,
+            documentLocation: docLocation,
+          },
+          user?.id
+        );
+
+        return response.status(200).json({ success: true, message: null });
       } catch (e) {
-        console.error(e.message, e);
-        response.sendStatus(500).end();
+        console.error("[remove-and-unembed] Error:", e.message, e);
+        return response.status(500).json({
+          success: false,
+          error: `Failed to remove document: ${e.message}`,
+        });
       }
     }
   );

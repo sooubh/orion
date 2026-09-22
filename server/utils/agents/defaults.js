@@ -83,6 +83,15 @@ const WORKSPACE_AGENT = {
       role +=
         "\n\nWhen you need information from the user (URLs, file paths, preferences, choices, etc.), you MUST use the request-user-input tool. Do not ask questions in your text response - the user cannot reply to text. Only the tool can collect user input.";
 
+    // Document retrieval guidelines to prevent filename guessing and ensure content/semantic search
+    role +=
+      "\n\nDocument Retrieval Guidelines:\n" +
+      "- When answering questions about uploaded documents, ALWAYS search document content using rag-memory based on the user's intent, concepts, measurements, and keywords.\n" +
+      "- NEVER invent, fabricate, or guess document filenames from natural-language requests. Filename lookup should only be used if the user explicitly provided an exact filename (e.g. 'Open report.pdf').\n" +
+      "- When the user asks to analyze, compare, or summarize findings, equipment data, or procedures, search for relevant content across all documents in the workspace using rag-memory.\n" +
+      "- Ground your answers strictly in the retrieved evidence from authorized documents and cite the source document name (e.g. [03_CONFIDENTIAL_Inspection_Report.pdf]).\n" +
+      "- If no relevant document is found after searching content, state that no relevant document was found in the workspace. Never claim a document does not exist merely because a guessed filename was not found.";
+
     return {
       role,
       functions: [

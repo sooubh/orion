@@ -4,9 +4,12 @@ import {
   getFileExtension,
   middleTruncate,
 } from "@/utils/directories";
-import { File } from "@phosphor-icons/react";
+import { File, Trash } from "@phosphor-icons/react";
+import useUser from "@/hooks/useUser";
 
-function FileRow({ item, selected, folderName, toggleSelection }) {
+function FileRow({ item, selected, folderName, toggleSelection, onDelete }) {
+  const { user } = useUser();
+  const canDelete = user?.role !== "default";
   const tooltipContent = useMemo(
     () =>
       JSON.stringify({
@@ -47,11 +50,24 @@ function FileRow({ item, selected, folderName, toggleSelection }) {
           {middleTruncate(item.title, 55)}
         </p>
       </div>
-      <div className="col-span-2 flex justify-end items-center">
+      <div className="col-span-2 flex justify-end items-center gap-x-2">
         {item?.cached && (
           <div className="bg-theme-settings-input-active rounded-3xl">
             <p className="text-xs px-2 py-0.5">Cached</p>
           </div>
+        )}
+        {canDelete && onDelete && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item, folderName);
+            }}
+            className="border-none text-theme-text-secondary hover:text-red-500 transition-colors p-1 rounded cursor-pointer"
+            title="Delete document"
+          >
+            <Trash size={16} />
+          </button>
         )}
       </div>
     </tr>
@@ -59,5 +75,9 @@ function FileRow({ item, selected, folderName, toggleSelection }) {
 }
 
 export default memo(FileRow, (prev, next) => {
-  return prev.item.id === next.item.id && prev.selected === next.selected;
+  return (
+    prev.item.id === next.item.id &&
+    prev.selected === next.selected &&
+    prev.onDelete === next.onDelete
+  );
 });

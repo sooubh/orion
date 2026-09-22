@@ -281,7 +281,7 @@ class LanceDb extends VectorDatabase {
     return true;
   }
 
-  async deleteDocumentFromNamespace(namespace, docId) {
+  async deleteDocumentFromNamespace(namespace, docId, additionalFilter = null) {
     const { client } = await this.connect();
     const exists = await this.namespaceExists(client, namespace);
     if (!exists) {
@@ -297,8 +297,16 @@ class LanceDb extends VectorDatabase {
       (record) => record.vectorId
     );
 
-    if (vectorIds.length === 0) return;
-    await table.delete(`id IN (${vectorIds.map((v) => `'${v}'`).join(",")})`);
+    if (vectorIds.length > 0) {
+      await table
+        .delete(`id IN (${vectorIds.map((v) => `'${v}'`).join(",")})`)
+        .catch((e) => this.logger("table.delete error:", e.message));
+    }
+    if (additionalFilter) {
+      await table
+        .delete(additionalFilter)
+        .catch((e) => this.logger("table.delete additionalFilter error:", e.message));
+    }
     return true;
   }
 

@@ -33,7 +33,7 @@ const POLICY_VERSION = "1.0.0";
 const PATTERNS = {
   RESTRICTED: [
     {
-      regex: /\b(TOP\s*SECRET|ITAR(\s+CONTROLLED)?|EXPORT\s*CONTROLLED|SOVEREIGN\s*CLEARANCE|RESTRICTED\s*DISTRIBUTION|DEFENSE\s*CONFIDENTIAL|NATIONAL\s*SECURITY|CLASSIFIED\s*ORDNANCE|TACTICAL\s*GRID|NUCLEAR\s*REACTOR\s*CORE)\b/i,
+      regex: /(?:\b|_)(RESTRICTED(\s*DISTRIBUTION|\s*NOTE|\s*TECHNICAL)?|TOP\s*SECRET|ITAR(\s+CONTROLLED)?|EXPORT\s*CONTROLLED|SOVEREIGN\s*CLEARANCE|DEFENSE\s*CONFIDENTIAL|NATIONAL\s*SECURITY|CLASSIFIED\s*ORDNANCE|TACTICAL\s*GRID|NUCLEAR\s*REACTOR\s*CORE)(?:\b|_)|_RESTRICTED_/i,
       reason: "High-grade security or defense restriction marking detected",
       weight: 3,
     },
@@ -55,7 +55,7 @@ const PATTERNS = {
   ],
   CONFIDENTIAL: [
     {
-      regex: /\b(CONFIDENTIAL|PROPRIETARY|STRICTLY\s*CONFIDENTIAL|COMPANY\s*CONFIDENTIAL|COMMERCIALLY\s*SENSITIVE|TRADE\s*SECRET|PRIVILEGED\s*(&|AND)\s*CONFIDENTIAL|NON-DISCLOSURE\s*AGREEMENT|NDA\s*PROTECTED)\b/i,
+      regex: /(?:\b|_)(CONFIDENTIAL|PROPRIETARY|STRICTLY\s*CONFIDENTIAL|COMPANY\s*CONFIDENTIAL|COMMERCIALLY\s*SENSITIVE|TRADE\s*SECRET|PRIVILEGED\s*(&|AND)\s*CONFIDENTIAL|NON-DISCLOSURE\s*AGREEMENT|NDA\s*PROTECTED)(?:\b|_)|_CONFIDENTIAL_/i,
       reason: "Confidentiality or proprietary disclosure marking detected",
       weight: 2,
     },
@@ -77,7 +77,7 @@ const PATTERNS = {
   ],
   INTERNAL: [
     {
-      regex: /\b(INTERNAL\s*USE\s*ONLY|INTERNAL\s*ONLY|FOR\s*INTERNAL\s*USE|INTERNAL\s*DOCUMENT|COMPANY\s*INTERNAL|OFFICIAL\s*USE)\b/i,
+      regex: /(?:\b|_)(INTERNAL\s*USE\s*ONLY|INTERNAL\s*ONLY|FOR\s*INTERNAL\s*USE|INTERNAL\s*DOCUMENT|COMPANY\s*INTERNAL|OFFICIAL\s*USE)(?:\b|_)|_INTERNAL_/i,
       reason: "Internal organizational use marking detected",
       weight: 1,
     },
@@ -89,7 +89,7 @@ const PATTERNS = {
   ],
   PUBLIC: [
     {
-      regex: /\b(PUBLIC\s*RELEASE|PUBLIC\s*DOMAIN|UNCLASSIFIED|FOR\s*PUBLIC\s*DISTRIBUTION|PRESS\s*RELEASE|MARKETING\s*BROCHURE|OPEN\s*SOURCE\s*LICENSE|OPEN\s*SOURCE|MIT\s*LICENSE|APACHE\s*LICENSE|CREATIVE\s*COMMONS|PUBLIC\s*DOCUMENTATION)\b/i,
+      regex: /(?:\b|_)(PUBLIC\s*RELEASE|PUBLIC\s*DOMAIN|UNCLASSIFIED|FOR\s*PUBLIC\s*DISTRIBUTION|PRESS\s*RELEASE|MARKETING\s*BROCHURE|OPEN\s*SOURCE\s*LICENSE|OPEN\s*SOURCE|MIT\s*LICENSE|APACHE\s*LICENSE|CREATIVE\s*COMMONS|PUBLIC\s*DOCUMENTATION)(?:\b|_)|_PUBLIC_/i,
       reason: "Explicit public release or open-source marking detected",
       weight: 0,
     },
@@ -117,7 +117,8 @@ class ClassificationService {
     userId = "system",
   }) {
     const rawContent = content || text || "";
-    const combinedText = `${filename} ${(metadata?.title || "")} ${(metadata?.description || "")} ${rawContent.slice(0, 100_000)}`;
+    const normalizedFilename = filename.replace(/[_]/g, " ");
+    const combinedText = `${filename} ${normalizedFilename} ${(metadata?.title || "")} ${(metadata?.description || "")} ${rawContent.slice(0, 100_000)}`;
 
     const detectedReasons = [];
     let highestWeight = -1;

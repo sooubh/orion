@@ -4,10 +4,11 @@ import {
   getFileExtension,
   middleTruncate,
 } from "@/utils/directories";
-import { ArrowUUpLeft, File, PushPin } from "@phosphor-icons/react";
+import { ArrowUUpLeft, File, PushPin, Trash } from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 import showToast from "@/utils/toast";
 import System from "@/models/system";
+import useUser from "@/hooks/useUser";
 
 export default function WorkspaceFileRow({
   item,
@@ -23,6 +24,54 @@ export default function WorkspaceFileRow({
   disableSelection,
   setSelectedItems,
 }) {
+  const { user } = useUser();
+  const canDelete = user?.role !== "default";
+
+  const onDeleteClick = async (e) => {
+    e.stopPropagation();
+    if (
+      !window.confirm(
+        "Delete this document? This will also remove its indexed content."
+      )
+    ) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      setLoadingMessage("Deleting document and indexed content...");
+      const docLocation = `${folderName}/${item.name}`;
+      const { success, error } = await Workspace.deleteAndUnembedFile(
+        workspace.slug,
+        docLocation
+      );
+
+      if (success) {
+        showToast(
+          "Document and indexed content deleted successfully",
+          "success",
+          { clear: true }
+        );
+        await fetchKeys(true);
+      } else {
+        showToast(
+          `Failed to delete document: ${error || "Unknown error"}`,
+          "error",
+          { clear: true }
+        );
+      }
+    } catch (error) {
+      console.error("Failed to delete document:", error);
+      showToast(`Error deleting document: ${error.message}`, "error", {
+        clear: true,
+      });
+    } finally {
+      setSelectedItems({});
+      setLoadingMessage("");
+      setLoading(false);
+    }
+  };
+
   const onRemoveClick = async (e) => {
     e.stopPropagation();
     setLoading(true);
@@ -108,6 +157,9 @@ export default function WorkspaceFileRow({
               item={item}
             />
             <RemoveItemFromWorkspace item={item} onClick={onRemoveClick} />
+            {canDelete && (
+              <DeleteItemFromWorkspace item={item} onClick={onDeleteClick} />
+            )}
           </div>
         )}
       </div>
@@ -189,6 +241,19 @@ const RemoveItemFromWorkspace = ({ item: _item, onClick }) => {
         data-tooltip-content="Remove document from workspace"
         onClick={onClick}
         className="text-base font-bold w-4 h-4 ml-2 flex-shrink-0 cursor-pointer"
+      />
+    </div>
+  );
+};
+
+const DeleteItemFromWorkspace = ({ item: _item, onClick }) => {
+  return (
+    <div>
+      <Trash
+        data-tooltip-id="delete-document"
+        data-tooltip-content="Delete this document and remove indexed content"
+        onClick={onClick}
+        className="text-base font-bold w-4 h-4 ml-2 flex-shrink-0 cursor-pointer text-theme-text-primary hover:text-red-500 transition-colors"
       />
     </div>
   );

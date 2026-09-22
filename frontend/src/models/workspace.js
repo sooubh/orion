@@ -484,15 +484,24 @@ const Workspace = {
    * @returns {Promise<boolean>}
    */
   deleteAndUnembedFile: async function (slug, documentLocation) {
-    const response = await fetch(
-      `${API_BASE}/workspace/${slug}/remove-and-unembed`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({ documentLocation }),
-        headers: baseHeaders(),
-      }
-    );
-    return response.ok;
+    try {
+      const response = await fetch(
+        `${API_BASE}/workspace/${slug}/remove-and-unembed`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({ documentLocation }),
+          headers: baseHeaders(),
+        }
+      );
+      const data = await response.json().catch(() => ({}));
+      return {
+        success: response.ok,
+        error: data?.error || (response.ok ? null : "Failed to delete document."),
+      };
+    } catch (e) {
+      console.error(e);
+      return { success: false, error: e.message };
+    }
   },
 
   /**

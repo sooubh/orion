@@ -2,6 +2,8 @@ const { Document } = require("../../../../models/documents");
 const { safeJsonParse } = require("../../../http");
 const { summarizeContent } = require("../utils/summarize");
 const Provider = require("../providers/ai-provider");
+const { HybridSearch } = require("../../../retrieval/hybridSearch");
+const { resolveProviderConnector } = require("../../../helpers");
 
 const docSummarizer = {
   name: "document-summarizer",
@@ -16,24 +18,24 @@ const docSummarizer = {
           super: aibitat,
           name: this.name,
           description:
-            "List all documents in the workspace or summarize a specific document. See what files are available, get a summary of a document's contents, or read and condense a file into key points.",
+            "List all documents in the workspace or summarize an explicitly specified document. To search document content by topic, concept, question, or measurements, use rag-memory instead. Only use summarize when a specific document is identified.",
           examples: [
             {
               prompt: "List my files",
               call: JSON.stringify({ action: "list", document_filename: null }),
             },
             {
-              prompt: "Summarize the readme file",
+              prompt: "Open 03_CONFIDENTIAL_Inspection_Report.pdf",
               call: JSON.stringify({
                 action: "summarize",
-                document_filename: "readme.md",
+                document_filename: "03_CONFIDENTIAL_Inspection_Report.pdf",
               }),
             },
             {
-              prompt: "Give me a summary of example.txt",
+              prompt: "Summarize 04_CONFIDENTIAL_Maintenance_SOP.docx",
               call: JSON.stringify({
                 action: "summarize",
-                document_filename: "example.txt",
+                document_filename: "04_CONFIDENTIAL_Maintenance_SOP.docx",
               }),
             },
           ],
@@ -45,13 +47,13 @@ const docSummarizer = {
                 type: "string",
                 enum: ["list", "summarize"],
                 description:
-                  "The action to take. 'list' will return all files available with their filename and descriptions. 'summarize' will open and summarize the file by the a document name.",
+                  "The action to take. 'list' will return all files available with their filename and descriptions. 'summarize' will open and summarize the file by name or best-matching document content.",
               },
               document_filename: {
                 type: "string",
                 "x-nullable": true,
                 description:
-                  "The file name of the document you want to get the full content of.",
+                  "The exact file name of the document you want to get the full content of. If you do not know the exact filename, use rag-memory to search by content.",
               },
             },
             additionalProperties: false,
@@ -85,8 +87,9 @@ const docSummarizer = {
                 const metadata = safeJsonParse(doc.metadata, {});
                 return {
                   document_id: doc.docId,
-                  filename: metadata?.title ?? "unknown.txt",
+                  filename: metadata?.title ?? doc.filename ?? "unknown.txt",
                   description: metadata?.description ?? "no description",
+                  classification: metadata?.classification ?? "INTERNAL",
                 };
               });
 
@@ -99,77 +102,79 @@ const docSummarizer = {
             }
           },
 
-          summarizeDoc: async function (filename) {
+          summarizeDoc: async function (filenameOrQuery) {
             try {
-              const availableDocs = safeJsonParse(
-                await this.listDocuments(),
-                []
-              );
-              if (!availableDocs.length) {
+              const workspace = this.super.handlerProps.invocation.workspace;
+              const user = this.super.handlerProps.invocation.user_id
+                ? { id: this.super.handlerProps.invocation.user_id }
+                : null;
+
+              const { connector: LLMConnector } =
+                await resolveProviderConnector({
+                  workspace,
+                  prompt: String(filenameOrQuery || ""),
+                });
+
+              // Use HybridSearch to locate the document by exact filename, fuzzy name, or content concepts
+              const matchedResult = await HybridSearch.findBestMatchingDocument({
+                workspace,
+                filenameOrQuery,
+                user,
+                LLMConnector,
+              });
+
+              if (matchedResult.error) {
                 this.super.handlerProps.log(
-                  `${this.caller}: No available documents to summarize.`
+                  `${this.caller}: ${matchedResult.error}`
                 );
-                return "No documents were found.";
+                return matchedResult.error;
               }
 
-              const docInfo = availableDocs.find(
-                (info) => info.filename === filename
-              );
-              if (!docInfo) {
-                this.super.handlerProps.log(
-                  `${this.caller}: No available document by the name "${filename}".`
-                );
-                return `No available document by the name "${filename}".`;
-              }
+              const resolvedFilename = matchedResult.filename;
+              const content = matchedResult.content;
 
-              const document = await Document.content(docInfo.document_id);
-              this.super.introspect(
-                `${this.caller}: Grabbing all content for ${
-                  filename ?? "a discovered file."
-                }`
-              );
-
-              if (!document.content || document.content.length === 0) {
+              if (!content || content.length === 0) {
                 throw new Error(
-                  "This document has no readable content that could be found."
+                  `Document "${resolvedFilename}" has no readable content.`
                 );
               }
+
+              this.super.introspect(
+                `${this.caller}: Retrieved content for "${resolvedFilename}" (via ${matchedResult.matchMethod}).`
+              );
 
               // Report citation for the document being summarized
               this.super.addCitation?.({
-                id: docInfo.document_id,
-                title: document.title || filename,
-                text: document.content,
+                id: matchedResult.documentId,
+                title: resolvedFilename,
+                text: content,
                 chunkSource: null,
                 score: null,
               });
 
               const { TokenManager } = require("../../../helpers/tiktoken");
               if (
-                new TokenManager(this.super.model).countFromString(
-                  document.content
-                ) < Provider.contextLimit(this.super.provider, this.super.model)
+                new TokenManager(this.super.model).countFromString(content) <
+                Provider.contextLimit(this.super.provider, this.super.model)
               ) {
-                return document.content;
+                return content;
               }
 
               this.super.introspect(
-                `${this.caller}: Summarizing ${filename ?? ""}...`
+                `${this.caller}: Summarizing "${resolvedFilename}"...`
               );
 
-              // Aborting is handled by the session abort signal that
-              // `summarizeContent` reads off the aibitat instance.
               return await summarizeContent({
                 provider: this.super.provider,
                 model: this.super.model,
-                content: document.content,
+                content,
                 aibitat: this.super,
               });
             } catch (error) {
               this.super.handlerProps.log(
                 `document-summarizer.summarizeDoc raised an error. ${error.message}`
               );
-              return `Let the user know this action was not successful. An error was raised while summarizing the file. ${error.message}`;
+              return `Let the user know this action was not successful. An error was raised while summarizing the file: ${error.message}`;
             }
           },
         });

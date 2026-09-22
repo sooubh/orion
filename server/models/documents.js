@@ -205,20 +205,65 @@ const Document = {
     const VectorDb = getVectorDbClass();
     if (removals.length === 0) return;
 
-    for (const path of removals) {
-      const document = await this.get({
+    for (const rawPath of removals) {
+      if (!rawPath) continue;
+      const path = String(rawPath).replace(/\\/g, "/");
+      let document = await this.get({
         docpath: path,
         workspaceId: workspace.id,
       });
+      if (!document) {
+        document = await this.get({
+          filename: path,
+          workspaceId: workspace.id,
+        });
+      }
+      if (!document && !path.includes("/")) {
+        document = await this.get({
+          docpath: `custom-documents/${path}`,
+          workspaceId: workspace.id,
+        });
+      }
+      if (!document && path.includes("/")) {
+        const justFile = path.split("/").pop();
+        document = await this.get({
+          filename: justFile,
+          workspaceId: workspace.id,
+        });
+      }
+      if (!document) {
+        document = await this.get({
+          docId: path,
+          workspaceId: workspace.id,
+        });
+      }
+
       if (!document) continue;
-      await VectorDb.deleteDocumentFromNamespace(
-        workspace.slug,
-        document.docId
-      );
+
+      const meta = safeJsonParse(document.metadata, {});
+      const docTitle = meta?.title || document.filename;
+      const cleanTitle = (docTitle || "").replace(/'/g, "''");
+
+      try {
+        if (VectorDb.name === "LanceDb") {
+          await VectorDb.deleteDocumentFromNamespace(
+            workspace.slug,
+            document.docId,
+            cleanTitle ? `title = '${cleanTitle}'` : null
+          );
+        } else {
+          await VectorDb.deleteDocumentFromNamespace(
+            workspace.slug,
+            document.docId
+          );
+        }
+      } catch (err) {
+        console.warn("[Document.removeDocuments] Vector delete error:", err.message);
+      }
 
       try {
         await prisma.workspace_documents.delete({
-          where: { id: document.id, workspaceId: workspace.id },
+          where: { id: Number(document.id) },
         });
         await prisma.document_vectors.deleteMany({
           where: { docId: document.docId },

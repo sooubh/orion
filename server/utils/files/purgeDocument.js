@@ -11,13 +11,39 @@ const { Document } = require("../../models/documents");
 const { Workspace } = require("../../models/workspace");
 
 async function purgeDocument(filename = null) {
-  if (!filename || !normalizePath(filename)) return;
+  if (!filename) return;
 
-  await purgeVectorCache(filename);
-  await purgeSourceDocument(filename);
+  const normalized = normalizePath(filename);
+  if (!normalized) return;
+
+  const forwardNormalized = normalized.replace(/\\/g, "/");
+  const bareFilename = forwardNormalized.split("/").pop();
+
+  // Resolve full location under documentsPath
+  let resolvedLocation = forwardNormalized;
+  const directPath = path.resolve(documentsPath, normalized);
+
+  if (!fs.existsSync(directPath)) {
+    // If filename did not include a folder, check inside custom-documents
+    const inCustom = path.resolve(documentsPath, "custom-documents", normalized);
+    if (fs.existsSync(inCustom)) {
+      resolvedLocation = `custom-documents/${bareFilename}`;
+    }
+  }
+
+  await purgeVectorCache(resolvedLocation);
+  await purgeVectorCache(forwardNormalized);
+  await purgeVectorCache(normalized);
+  await purgeVectorCache(bareFilename);
+  await purgeSourceDocument(resolvedLocation);
+
   const workspaces = await Workspace.where();
   for (const workspace of workspaces) {
-    await Document.removeDocuments(workspace, [filename]);
+    await Document.removeDocuments(workspace, [
+      resolvedLocation,
+      forwardNormalized,
+      bareFilename,
+    ]);
   }
   return;
 }
