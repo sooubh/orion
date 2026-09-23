@@ -43,11 +43,16 @@ class ContextWindowFinder {
     if (!fs.existsSync(this.cacheLocation))
       fs.mkdirSync(this.cacheLocation, { recursive: true });
 
-    // If the cache is stale or not found at all, pull the model map from remote
+    // If the cache is stale or not found at all, pull the model map from remote if not offline
     if (this.isCacheStale || !fs.existsSync(this.cacheFilePath)) {
-      this.#pullRemoteModelMap().catch((err) =>
-        this.log("Background model map pull failed:", err)
-      );
+      if (
+        process.env.AIRGAP_MODE !== "true" &&
+        process.env.OFFLINE_MODE !== "true"
+      ) {
+        this.#pullRemoteModelMap().catch((err) =>
+          this.log("Background model map pull failed:", err?.message || err)
+        );
+      }
     }
   }
 
@@ -75,14 +80,7 @@ class ContextWindowFinder {
    */
   get cachedModelMap() {
     if (!fs.existsSync(this.cacheFilePath)) {
-      this.log(`\x1b[33m
---------------------------------
-[WARNING] Model map cache is not found!
-Invalid context windows will be returned leading to inaccurate model responses
-or smaller context windows than expected.
-You can fix this by restarting AnythingLLM so the model map is re-pulled.
---------------------------------\x1b[0m`);
-      return null;
+      return LEGACY_MODEL_MAP;
     }
 
     if (this.isCacheStale && !this.seenStaleCacheWarning) {
@@ -92,9 +90,13 @@ You can fix this by restarting AnythingLLM so the model map is re-pulled.
       this.seenStaleCacheWarning = true;
     }
 
-    return JSON.parse(
-      fs.readFileSync(this.cacheFilePath, { encoding: "utf8" })
-    );
+    try {
+      return JSON.parse(
+        fs.readFileSync(this.cacheFilePath, { encoding: "utf8" })
+      );
+    } catch {
+      return LEGACY_MODEL_MAP;
+    }
   }
 
   /**
@@ -104,7 +106,9 @@ You can fix this by restarting AnythingLLM so the model map is re-pulled.
   async #pullRemoteModelMap() {
     try {
       this.log("Pulling remote model map...");
-      const response = await fetch(ContextWindowFinder.remoteUrl);
+      const response = await fetch(ContextWindowFinder.remoteUrl, {
+        signal: AbortSignal.timeout(5000),
+      });
       if (response.status !== 200) {
         throw new Error(
           "Failed to fetch remote model map - non 200 status code"
@@ -194,11 +198,14 @@ You can fix this by restarting AnythingLLM so the model map is re-pulled.
    * @returns {number|null} - The context window for the given provider and model
    */
   get(provider = null, model = null) {
-    if (!provider || !this.cachedModelMap || !this.cachedModelMap[provider])
-      return null;
-    if (!model) return this.cachedModelMap[provider];
+    const map = this.cachedModelMap || LEGACY_MODEL_MAP;
+    if (!provider) return null;
+    const providerMap = map[provider] || LEGACY_MODEL_MAP[provider];
+    if (!providerMap) return null;
+    if (!model) return providerMap;
 
-    const modelContextWindow = this.cachedModelMap[provider][model];
+    const modelContextWindow =
+      providerMap[model] || LEGACY_MODEL_MAP[provider]?.[model];
     if (!modelContextWindow) {
       this.log("Invalid access to model context window - not found in cache", {
         provider,

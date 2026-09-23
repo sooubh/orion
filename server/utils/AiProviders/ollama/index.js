@@ -231,14 +231,21 @@ class OllamaAILLM {
    * @param {Error} e
    */
   #errorHandler(e) {
-    switch (e.message) {
-      case "fetch failed":
-        throw new Error(
-          "Your Ollama instance could not be reached or is not responding. Please make sure it is running the API server and your connection information is correct in Orion."
-        );
-      default:
-        return e;
+    const msg = e?.message || "";
+    if (
+      msg === "fetch failed" ||
+      msg.includes("fetch failed") ||
+      msg.includes("ECONNREFUSED") ||
+      msg.includes("ETIMEDOUT") ||
+      msg.includes("ENOTFOUND") ||
+      e?.code === "ECONNREFUSED" ||
+      e?.cause?.code === "ECONNREFUSED"
+    ) {
+      throw new Error(
+        "Local model unavailable. Please start Ollama or verify the local model configuration."
+      );
     }
+    return e;
   }
 
   /**

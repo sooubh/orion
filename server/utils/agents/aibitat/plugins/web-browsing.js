@@ -49,10 +49,25 @@ const webBrowsing = {
             additionalProperties: false,
           },
           handler: async function ({ query }) {
+            if (
+              process.env.AIRGAP_MODE === "true" ||
+              process.env.OFFLINE_MODE === "true"
+            ) {
+              return "Web search is unavailable in offline / air-gapped mode. Relying on local knowledge base and documents.";
+            }
             try {
               if (query) return await this.search(query);
               return "There is nothing we can do. This function call returns no information.";
             } catch (error) {
+              const msg = error?.message || "";
+              if (
+                msg.includes("fetch failed") ||
+                msg.includes("ENOTFOUND") ||
+                msg.includes("ECONNREFUSED") ||
+                msg.includes("ETIMEDOUT")
+              ) {
+                return "Web search is unavailable due to no internet connection. Relying on local knowledge base and documents.";
+              }
               return `There was an error while calling the function. No data or response was found. Let the user know this was the error: ${error.message}`;
             }
           },

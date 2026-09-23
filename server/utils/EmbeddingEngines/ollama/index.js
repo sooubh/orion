@@ -7,14 +7,14 @@ const { OllamaAILLM } = require("../../AiProviders/ollama");
 
 class OllamaEmbedder {
   constructor() {
-    if (!process.env.EMBEDDING_BASE_PATH)
-      throw new Error("No embedding base path was set.");
-    if (!process.env.EMBEDDING_MODEL_PREF)
-      throw new Error("No embedding model was set.");
-
     this.className = "OllamaEmbedder";
-    this.basePath = process.env.EMBEDDING_BASE_PATH;
-    this.model = process.env.EMBEDDING_MODEL_PREF;
+    this.basePath =
+      process.env.EMBEDDING_BASE_PATH ||
+      process.env.OLLAMA_BASE_PATH ||
+      "http://127.0.0.1:11434";
+    const envPref = process.env.OLLAMA_EMBED_MODEL_PREF || process.env.EMBEDDING_MODEL_PREF;
+    const isHFModel = envPref && (envPref.includes("/") || envPref.startsWith("Xenova/") || envPref.startsWith("MintplexLabs/"));
+    this.model = (!envPref || isHFModel) ? "nomic-embed-text:latest" : envPref;
     this.maxConcurrentChunks = process.env.OLLAMA_EMBEDDING_BATCH_SIZE
       ? Number(process.env.OLLAMA_EMBEDDING_BATCH_SIZE)
       : 1;

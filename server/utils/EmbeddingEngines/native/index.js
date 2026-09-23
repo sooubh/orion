@@ -137,15 +137,30 @@ class NativeEmbedder {
 
   async #fetchWithHost(hostOverride = null) {
     try {
+      if (
+        !this.modelDownloaded &&
+        (process.env.AIRGAP_MODE === "true" || process.env.OFFLINE_MODE === "true")
+      ) {
+        throw new Error(
+          `Embedding model ${this.model} is not cached locally in offline/airgap mode.`
+        );
+      }
+
       // Convert ESM to CommonJS via import so we can load this library.
       const pipeline = (...args) =>
         import("@xenova/transformers").then(({ pipeline, env }) => {
-          if (!this.modelDownloaded) {
-            // if model is not downloaded, we will log where we are fetching from.
-            if (hostOverride) {
-              env.remoteHost = hostOverride;
-              env.remotePathTemplate = "{model}/"; // Our S3 fallback url does not support revision File structure.
-            }
+          if (
+            this.modelDownloaded ||
+            process.env.AIRGAP_MODE === "true" ||
+            process.env.OFFLINE_MODE === "true"
+          ) {
+            env.localFilesOnly = true;
+            env.allowRemoteModels = false;
+          } else if (hostOverride) {
+            env.remoteHost = hostOverride;
+            env.remotePathTemplate = "{model}/"; // Our S3 fallback url does not support revision File structure.
+            this.log(`Downloading ${this.model} from ${env.remoteHost}`);
+          } else {
             this.log(`Downloading ${this.model} from ${env.remoteHost}`);
           }
           return pipeline(...args);
@@ -153,6 +168,7 @@ class NativeEmbedder {
       return {
         pipeline: await pipeline("feature-extraction", this.model, {
           cache_dir: this.cacheDir,
+          local_files_only: this.modelDownloaded,
           ...(!this.modelDownloaded
             ? {
                 // Show download progress if we need to download any files
@@ -171,6 +187,17 @@ class NativeEmbedder {
         error: null,
       };
     } catch (error) {
+      if (
+        this.modelDownloaded ||
+        process.env.AIRGAP_MODE === "true" ||
+        process.env.OFFLINE_MODE === "true"
+      ) {
+        return {
+          pipeline: null,
+          retry: false,
+          error,
+        };
+      }
       return {
         pipeline: null,
         retry: hostOverride === null ? this.#fallbackHost : false,

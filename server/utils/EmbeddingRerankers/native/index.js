@@ -97,6 +97,14 @@ class NativeEmbeddingReranker {
         const { AutoModelForSequenceClassification, AutoTokenizer, env } =
           await import("@xenova/transformers");
         this.log(`Loading reranker suite...`);
+        if (
+          this.modelDownloaded ||
+          process.env.AIRGAP_MODE === "true" ||
+          process.env.OFFLINE_MODE === "true"
+        ) {
+          env.localFilesOnly = true;
+          env.allowRemoteModels = false;
+        }
         NativeEmbeddingReranker.#transformers = {
           AutoModelForSequenceClassification,
           AutoTokenizer,
@@ -128,11 +136,19 @@ class NativeEmbeddingReranker {
       return NativeEmbeddingReranker.#model;
     }
 
+    if (
+      !this.modelDownloaded &&
+      (process.env.AIRGAP_MODE === "true" || process.env.OFFLINE_MODE === "true")
+    ) {
+      throw new Error(`Reranker model ${this.model} is not cached locally in offline/airgap mode.`);
+    }
+
     try {
       const model =
         await NativeEmbeddingReranker.#transformers.AutoModelForSequenceClassification.from_pretrained(
           this.model,
           {
+            local_files_only: this.modelDownloaded,
             progress_callback: (p) => {
               if (!this.modelDownloaded && p.status === "progress") {
                 this.log(
@@ -149,14 +165,16 @@ class NativeEmbeddingReranker {
     } catch (e) {
       this.log(
         `Failed to load model ${this.model} from ${this.host}.`,
-        e.message,
-        e.stack
+        e.message
       );
       if (
         NativeEmbeddingReranker.#transformers.env.remoteHost ===
-        this.#fallbackHost
+        this.#fallbackHost ||
+        this.modelDownloaded ||
+        process.env.AIRGAP_MODE === "true" ||
+        process.env.OFFLINE_MODE === "true"
       ) {
-        this.log(`Failed to load model ${this.model} from fallback host.`);
+        this.log(`Failed to load model ${this.model}.`);
         throw e;
       }
 
@@ -179,11 +197,19 @@ class NativeEmbeddingReranker {
       return NativeEmbeddingReranker.#tokenizer;
     }
 
+    if (
+      !this.modelDownloaded &&
+      (process.env.AIRGAP_MODE === "true" || process.env.OFFLINE_MODE === "true")
+    ) {
+      throw new Error(`Reranker tokenizer ${this.model} is not cached locally in offline/airgap mode.`);
+    }
+
     try {
       const tokenizer =
         await NativeEmbeddingReranker.#transformers.AutoTokenizer.from_pretrained(
           this.model,
           {
+            local_files_only: this.modelDownloaded,
             progress_callback: (p) => {
               if (!this.modelDownloaded && p.status === "progress") {
                 this.log(
@@ -200,14 +226,16 @@ class NativeEmbeddingReranker {
     } catch (e) {
       this.log(
         `Failed to load tokenizer ${this.model} from ${this.host}.`,
-        e.message,
-        e.stack
+        e.message
       );
       if (
         NativeEmbeddingReranker.#transformers.env.remoteHost ===
-        this.#fallbackHost
+        this.#fallbackHost ||
+        this.modelDownloaded ||
+        process.env.AIRGAP_MODE === "true" ||
+        process.env.OFFLINE_MODE === "true"
       ) {
-        this.log(`Failed to load tokenizer ${this.model} from fallback host.`);
+        this.log(`Failed to load tokenizer ${this.model}.`);
         throw e;
       }
 

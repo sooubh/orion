@@ -148,7 +148,9 @@ class ModelPricing {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
     this.#loadFromDisk();
-    if (this.#isCacheStale() || !this.#pricing) {
+    const isOffline =
+      process.env.AIRGAP_MODE === "true" || process.env.OFFLINE_MODE === "true";
+    if (!isOffline && (this.#isCacheStale() || !this.#pricing)) {
       this.#refresh()
         .then(() => {
           if (this.#pricing)

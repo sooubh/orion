@@ -9,19 +9,21 @@
   <!-- Mermaid.js for Minimal Monochrome Architectural & Flow Diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'base',
-      themeVariables: {
-        primaryColor: '#ffffff',
-        primaryBorderColor: '#111111',
-        primaryTextColor: '#111111',
-        lineColor: '#111111',
-        secondaryColor: '#f4f4f5',
-        tertiaryColor: '#ffffff',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-      }
-    });
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#ffffff',
+          primaryBorderColor: '#111111',
+          primaryTextColor: '#111111',
+          lineColor: '#111111',
+          secondaryColor: '#f4f4f5',
+          tertiaryColor: '#ffffff',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }
+      });
+    }
   </script>
   <style>
     /* ==========================================================================

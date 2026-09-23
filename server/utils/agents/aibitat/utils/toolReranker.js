@@ -62,6 +62,12 @@ class ToolReranker {
   async #getReranker() {
     if (!this.reranker) {
       this.reranker = new NativeEmbeddingReranker();
+      if (
+        !this.reranker.modelDownloaded &&
+        (process.env.AIRGAP_MODE === "true" || process.env.OFFLINE_MODE === "true")
+      ) {
+        return null;
+      }
       await this.reranker.initClient();
     }
     return this.reranker;
@@ -147,6 +153,10 @@ class ToolReranker {
       }));
 
       const reranker = await this.#getReranker();
+      if (!reranker || !reranker.modelDownloaded) {
+        this.log("Reranker model not cached locally, using full tool set");
+        return tools;
+      }
       const reranked = await reranker.rerank(
         this.#truncateText(userPrompt),
         rerankDocs,

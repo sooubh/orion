@@ -44,11 +44,25 @@ const webScraping = {
             additionalProperties: false,
           },
           handler: async function ({ url }) {
+            if (
+              process.env.AIRGAP_MODE === "true" ||
+              process.env.OFFLINE_MODE === "true"
+            ) {
+              return "Web scraping is unavailable in offline / air-gapped mode. Relying on local documents.";
+            }
             try {
               if (url) return await this.scrape(url);
               return "There is nothing we can do. This function call returns no information.";
             } catch (error) {
               const errorMessage = error?.message ?? JSON.stringify(error);
+              if (
+                errorMessage.includes("fetch failed") ||
+                errorMessage.includes("ENOTFOUND") ||
+                errorMessage.includes("ECONNREFUSED") ||
+                errorMessage.includes("ETIMEDOUT")
+              ) {
+                return `External URL cannot be accessed in offline mode: ${url}. Relying on local knowledge base and documents.`;
+              }
               this.super.handlerProps.log(
                 `Web Scraping Error: ${errorMessage}`
               );

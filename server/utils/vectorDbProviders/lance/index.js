@@ -130,9 +130,10 @@ class LanceDb extends VectorDatabase {
       .limit(searchLimit)
       .toArray();
 
-    await reranker
-      .rerank(query, vectorSearchResults, { topK: topN })
-      .then((rerankResults) => {
+    let rerankSuccess = false;
+    if (reranker.modelDownloaded) {
+      try {
+        const rerankResults = await reranker.rerank(query, vectorSearchResults, { topK: topN });
         rerankResults.forEach((item) => {
           if (this.distanceToSimilarity(item._distance) < similarityThreshold)
             return;
@@ -153,11 +154,40 @@ class LanceDb extends VectorDatabase {
           });
           result.scores.push(score);
         });
-      })
-      .catch((e) => {
+        rerankSuccess = true;
+      } catch (e) {
         this.logger(e);
         this.logger("rerankedSimilarityResponse", e.message);
+      }
+    }
+
+    // Fallback: If reranking was skipped (model not downloaded offline) or failed,
+    // preserve vector search results using cosine similarity rather than losing context.
+    if (!rerankSuccess || result.contextTexts.length === 0) {
+      result.contextTexts = [];
+      result.sourceDocuments = [];
+      result.scores = [];
+      const fallbackResults = vectorSearchResults.slice(0, topN);
+      fallbackResults.forEach((item) => {
+        if (this.distanceToSimilarity(item._distance) < similarityThreshold)
+          return;
+        const { vector: _, ...rest } = item;
+        if (filterIdentifiers.includes(sourceIdentifier(rest))) {
+          this.logger(
+            "A source was filtered from context as it's parent document is pinned."
+          );
+          return;
+        }
+
+        const score = this.distanceToSimilarity(item._distance);
+        result.contextTexts.push(rest.text);
+        result.sourceDocuments.push({
+          ...rest,
+          score,
+        });
+        result.scores.push(score);
       });
+    }
 
     return result;
   }
