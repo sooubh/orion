@@ -631,6 +631,8 @@
     </div>
     <div class="header-actions">
       <a href="index.html" class="btn-outline">&larr; Return to Website</a>
+      <a href="https://app.sooubh.me/orion/index.html" target="_blank" class="btn-outline">Live Website &nearr;</a>
+      <a href="https://app.sooubh.me/orion/architecture.html" target="_blank" class="btn-primary">Live Spec &nearr;</a>
     </div>
   </header>
 
@@ -908,7 +910,7 @@ graph TB
         PARSERS["Format Parsers (PDF, DOCX, XLSX, ...)"]
         OCR["Tesseract.js OCR Engine"]
         WHISPER["Whisper Audio Transcription"]
-        SCRAPE["Puppeteer Web Scraper"]
+        SCRAPE["Intranet Doc Scraper<br/>(Policy-Gated Loopback)"]
         COLL --> PARSERS & OCR & WHISPER & SCRAPE
     end
 
@@ -1093,7 +1095,7 @@ sequenceDiagram
 
       <h3 class="subsection-heading" id="server-agents">3.2 AIbitat Multi-Agent System &amp; MCP Skills</h3>
       <p>
-        Autonomous workflows use the <strong>AIbitat</strong> framework coupled with Anthropic's <strong>Model Context Protocol (MCP)</strong>:
+        Autonomous workflows use the <strong>AIbitat</strong> framework coupled with the open <strong>Model Context Protocol (MCP)</strong> standard:
       </p>
       <ul>
         <li><code>create-files/</code>: Generates formatted <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code>, and <code>.pdf</code> deliverable documents.</li>
@@ -1479,7 +1481,7 @@ sequenceDiagram
         Tools capable of executing arbitrary code or querying production systems operate inside decoupled boundaries:
       </p>
       <ul>
-        <li><strong>Model Context Protocol (MCP) Standard:</strong> All external skills adhere to Anthropic's open standard, formalizing JSON-RPC tool schemas, input validations, and error boundaries.</li>
+        <li><strong>Model Context Protocol (MCP) Standard:</strong> All external skills adhere to the open standard, formalizing JSON-RPC tool schemas, input validations, and error boundaries.</li>
         <li><strong>Isolated Container Execution:</strong> Python execution tools run in ephemeral, restricted containers without network access, with restricted CPU/memory quotas, and read-only filesystem mounts.</li>
         <li><strong>Human-in-the-Loop Sign-Off:</strong> Actions categorized as high-impact (database mutations, file deletions, email dispatch) trigger an explicit interactive confirmation modal before execution proceeds.</li>
       </ul>
@@ -1665,31 +1667,39 @@ erDiagram
         </table>
       </div>
 
-      <!-- SECTION 9: APPENDIX (LEAST IMPORTANT) -->
-      <h2 class="section-heading" id="appendix-compatibility">9. Technical Appendix: Compatibility Matrix</h2>
+      <!-- SECTION 9: APPENDIX -->
+      <h2 class="section-heading" id="appendix-compatibility">9. Technical Appendix: Sovereign Local Compatibility Matrix</h2>
+      <p>
+        To ensure strict zero-egress and air-gap integrity, Orion eliminates remote third-party cloud APIs and executes strictly with verified local runtimes and self-hosted storage engines:
+      </p>
       <table class="outline-table">
         <thead>
           <tr>
             <th>Component Class</th>
             <th>Default Choice</th>
-            <th>Full Compatibility List</th>
+            <th>Verified Sovereign Local Runtimes</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>LLM Inference (39+)</strong></td>
+            <td><strong>Local LLM Inference</strong></td>
             <td>Ollama / LM Studio (Local)</td>
-            <td>Ollama, LM Studio, LocalAI, KoboldCPP, NVIDIA NIM, Lemonade, oMLX, OpenAI, Anthropic, Gemini, Azure, Groq, Mistral, DeepSeek, Bedrock.</td>
+            <td>Ollama, LM Studio, LocalAI, KoboldCPP, NVIDIA NIM (Local), Lemonade, oMLX (Apple Silicon), Generic OpenAI (vLLM / TGI Local), Microsoft Foundry Local, Privatemode, Docker Model Runner, TextGenWebUI.</td>
           </tr>
           <tr>
-            <td><strong>Embedding Engines (14)</strong></td>
+            <td><strong>Local Embedding Engines</strong></td>
             <td>Native ONNX (<code>all-MiniLM-L6-v2</code>)</td>
-            <td>Native, OpenAI, Azure OpenAI, Ollama, LM Studio, LocalAI, Cohere, VoyageAI, LiteLLM, Gemini, Mistral.</td>
+            <td>Native ONNX (via <code>@xenova/transformers</code>), Ollama Local Embeddings, LM Studio Local, LocalAI, Lemonade Local, Generic OpenAI (Local Endpoint).</td>
           </tr>
           <tr>
-            <td><strong>Vector Databases (10)</strong></td>
-            <td>LanceDB (Embedded)</td>
-            <td>LanceDB, Chroma, Pinecone, Qdrant, Weaviate, Milvus, Zilliz Cloud, PGVector, Astra DB, Chroma Cloud.</td>
+            <td><strong>On-Premise Vector DBs</strong></td>
+            <td>LanceDB (Embedded Serverless)</td>
+            <td>LanceDB (Embedded disk-backed), PGVector (Local PostgreSQL), Chroma (Self-Hosted), Qdrant (Self-Hosted), Weaviate (Self-Hosted), Milvus (Self-Hosted).</td>
+          </tr>
+          <tr>
+            <td><strong>Audio &amp; Vision Ingestion</strong></td>
+            <td>Local Xenova Whisper &amp; Tesseract OCR</td>
+            <td>Local Whisper (ONNX CPU/GPU), Tesseract.js Multilingual OCR, Native PDF/DOCX/XLSX/PPTX format parsers.</td>
           </tr>
         </tbody>
       </table>

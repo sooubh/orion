@@ -106,40 +106,6 @@ export const getConfigurableSkills = (
   },
 });
 
-export const getAppIntegrationSkills = (t) => ({
-  "gmail-agent": {
-    title: t("agent.skill.gmail.title"),
-    description: t("agent.skill.gmail.description"),
-    component: GMailSkillPanel,
-    skill: "gmail-agent",
-    Icon: ({ size }) => (
-      <img src={GMailIcon} alt="GMail" width={size} height={size} />
-    ),
-    mode: ["singleUserOnly"],
-  },
-  "google-calendar-agent": {
-    title: t("agent.skill.googleCalendar.title"),
-    description: t("agent.skill.googleCalendar.description"),
-    component: GoogleCalendarSkillPanel,
-    skill: "google-calendar-agent",
-    Icon: ({ size }) => (
-      <img
-        src={GoogleCalendarIcon}
-        alt="Google Calendar"
-        width={size}
-        height={size}
-      />
-    ),
-    mode: ["singleUserOnly"],
-  },
-  "outlook-agent": {
-    title: t("agent.skill.outlook.title"),
-    description: t("agent.skill.outlook.description"),
-    component: OutlookSkillPanel,
-    skill: "outlook-agent",
-    Icon: ({ size }) => (
-      <img src={OutlookIcon} alt="Outlook" width={size} height={size} />
-    ),
-    mode: ["singleUserOnly"],
-  },
-});
+// Third-party cloud integration skills (Gmail, Outlook, Google Calendar)
+// are deactivated in Sovereign Air-Gap mode to guarantee Zero External Egress.
+export const getAppIntegrationSkills = (t) => ({});

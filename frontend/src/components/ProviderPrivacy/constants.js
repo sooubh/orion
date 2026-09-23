@@ -17,14 +17,7 @@ import DockerModelRunnerLogo from "@/media/llmprovider/docker-model-runner.png";
 import PrivateModeLogo from "@/media/llmprovider/privatemode.png";
 import LemonadeLogo from "@/media/llmprovider/lemonade.png";
 import OMLXLogo from "@/media/llmprovider/omlx.png";
-import OpenAiLogo from "@/media/llmprovider/openai.png";
-import AzureOpenAiLogo from "@/media/llmprovider/azure.png";
-import OpenRouterLogo from "@/media/llmprovider/openrouter.jpeg";
-import CohereLogo from "@/media/llmprovider/cohere.png";
-import VoyageAiLogo from "@/media/llmprovider/generic-openai.png";
-import MistralLogo from "@/media/llmprovider/mistral.jpeg";
-import LiteLLMLogo from "@/media/llmprovider/litellm.png";
-import GeminiLogo from "@/media/llmprovider/gemini.png";
+
 
 const LLM_PROVIDER_PRIVACY_MAP = {
   ollama: {
@@ -132,12 +125,16 @@ const VECTOR_DB_PROVIDER_PRIVACY_MAP = {
   },
   qdrant: {
     name: "Qdrant",
-    policyUrl: "https://qdrant.tech/legal/privacy-policy/",
+    description: [
+      "Your vectors and document text are stored on your local Qdrant instance.",
+    ],
     logo: QDrantLogo,
   },
   weaviate: {
     name: "Weaviate",
-    policyUrl: "https://weaviate.io/privacy",
+    description: [
+      "Your vectors and document text are stored on your local Weaviate instance.",
+    ],
     logo: WeaviateLogo,
   },
   milvus: {
@@ -164,16 +161,6 @@ const EMBEDDING_ENGINE_PROVIDER_PRIVACY_MAP = {
     ],
     logo: OrionIcon,
   },
-  openai: {
-    name: "OpenAI",
-    policyUrl: "https://openai.com/policies/privacy-policy/",
-    logo: OpenAiLogo,
-  },
-  azure: {
-    name: "Azure OpenAI",
-    policyUrl: "https://privacy.microsoft.com/privacystatement",
-    logo: AzureOpenAiLogo,
-  },
   localai: {
     name: "LocalAI",
     description: [
@@ -195,44 +182,12 @@ const EMBEDDING_ENGINE_PROVIDER_PRIVACY_MAP = {
     ],
     logo: LMStudioLogo,
   },
-  openrouter: {
-    name: "OpenRouter",
-    policyUrl: "https://openrouter.ai/privacy",
-    logo: OpenRouterLogo,
-  },
-  cohere: {
-    name: "Cohere",
-    policyUrl: "https://cohere.com/privacy",
-    logo: CohereLogo,
-  },
-  voyageai: {
-    name: "Voyage AI",
-    policyUrl: "https://www.voyageai.com/privacy",
-    logo: VoyageAiLogo,
-  },
-  mistral: {
-    name: "Mistral AI",
-    policyUrl: "https://legal.mistral.ai/terms/privacy-policy",
-    logo: MistralLogo,
-  },
-  litellm: {
-    name: "LiteLLM",
-    description: [
-      "Your document text is only accessible on the server running LiteLLM and to the providers you configured in LiteLLM.",
-    ],
-    logo: LiteLLMLogo,
-  },
   "generic-openai": {
-    name: "Generic OpenAI compatible service",
+    name: "Generic OpenAI compatible service (Local)",
     description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      "Data is stored and processed locally on your self-hosted endpoint.",
     ],
     logo: GenericOpenAiLogo,
-  },
-  gemini: {
-    name: "Google Gemini",
-    policyUrl: "https://policies.google.com/privacy",
-    logo: GeminiLogo,
   },
   lemonade: {
     name: "Lemonade",

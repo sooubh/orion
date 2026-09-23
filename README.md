@@ -6,8 +6,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A518.12.1-black.svg)](https://nodejs.org)
 [![Air--Gap](https://img.shields.io/badge/Perimeter-Zero--Egress%20Air--Gap-black.svg)](#security--zero-egress-guarantees)
-[![Architecture](https://img.shields.io/badge/Architecture-Specification%20v2.0-black.svg)](architecture.html)
-[![SIH](https://img.shields.io/badge/Specification-SIH26117-black.svg)](index.html)
+[![Live Website](https://img.shields.io/badge/Live-Website%20Demo-black.svg)](https://app.sooubh.me/orion/index.html)
+[![Live Architecture](https://img.shields.io/badge/Live-Architecture%20Spec-black.svg)](https://app.sooubh.me/orion/architecture.html)
+[![SIH](https://img.shields.io/badge/Specification-SIH26117-black.svg)](https://app.sooubh.me/orion/index.html)
+
+> 🌐 **Live Demonstrations & Technical Specifications:**  
+> - **Platform Overview & Operational Workflow:** [https://app.sooubh.me/orion/index.html](https://app.sooubh.me/orion/index.html)  
+> - **Technical Architecture & System Specification v2.0:** [https://app.sooubh.me/orion/architecture.html](https://app.sooubh.me/orion/architecture.html)
 
 ---
 
@@ -73,7 +78,7 @@ Hosting an open-weight model (e.g., via Ollama or LM Studio) addresses *where in
 | **Dynamic Model Routing** | Isolated engine (`server/utils/modelRouting/`) with runtime model discovery, capability auto-inference, and hardware telemetry (CPU, RAM, GPU VRAM). | Dynamically selects the optimal eligible model without static hardcoded model names. |
 | **4-Tier Data Classification** | Standard classification service (`server/utils/classification/`) enforcing `PUBLIC`, `INTERNAL`, `CONFIDENTIAL`, and `RESTRICTED` tiers. | Data sensitivity binds immutably to document chunks and runtime context tokens. |
 | **Centralized Policy Engine** | Pre-execution governance gate (`server/utils/policy/`) evaluating `User + Data + Model + Tool + Scope -> Allow / Deny / Require Approval`. | Technical capability never supersedes organizational authorization. |
-| **Sandboxed Agent Execution** | AIbitat multi-agent core with Anthropic Model Context Protocol (MCP) skills and isolated ephemeral code execution. | Mathematical operations run in deterministic sandboxes; state changes require human sign-off. |
+| **Sandboxed Agent Execution** | AIbitat multi-agent core with open Model Context Protocol (MCP) skills and isolated ephemeral code execution. | Mathematical operations run in deterministic sandboxes; state changes require human sign-off. |
 | **Deterministic Verification** | Verification manager (`server/utils/verification/`) with math calculation verifiers, structured schema verifiers, RAG citation grounding, and deliverable integrity checks. | Delivers verifiable work products (`.docx`, `.xlsx`, `.pptx`, `.pdf`) with verifiable source backlinks. |
 | **Cryptographic Audit Trail** | Structured SQLite event logs recording session actors, accessed files, model checkpoints, tool calls, policy decisions, and verification results. | Complete forensic traceability for regulatory compliance and safety audits. |
 
@@ -238,7 +243,7 @@ $$\text{EvaluatePolicy}(\text{User}, \text{Classification}, \text{Model}, \text{
 
 ## AIbitat Multi-Agent Engine & Ephemeral Sandboxing
 
-ORION incorporates the **AIbitat** multi-agent framework, extended with Anthropic's **Model Context Protocol (MCP)**:
+ORION incorporates the **AIbitat** multi-agent framework, extended with the open **Model Context Protocol (MCP)** standard:
 
 - **Mathematical Integrity via Sandboxed Python:** When an agent encounters numerical computations (equipment efficiency curves, tolerance limits, financial sums), it writes a Python script and executes it within a sandboxed child process. The verified numerical output is inserted back into the response, preventing token-generation hallucinations.
 - **MCP-Standardized Skill Tooling:** External skills adhere to the open MCP protocol, providing typed JSON-RPC schemas, strict parameter validation, and explicit capability boundaries.
@@ -564,7 +569,7 @@ To maintain truth in engineering and operational integrity, ORION adheres to tra
 1. **Deterministic Security over Absolute Claims:** ORION eliminates external data exposure through local computation, strict network policies, signed inter-service IPC, and dynamic tool gating. Air-gap integrity requires corresponding host OS firewall and socket-level enforcement in accordance with facility policies.
 2. **Local Hardware Headroom:** Local open-weight models require sufficient physical RAM and GPU VRAM. Running multi-billion parameter models on hardware without appropriate memory will result in slow CPU quantization fallback or process termination. Consult the [Hardware Sizing Profiles](#hardware-sizing--deployment-profiles) for target allocations.
 3. **Database Concurrency:** ORION ships with embedded **SQLite via Prisma ORM** by default, ideal for single-node air-gapped workstations and department servers. For high-concurrency enterprise deployments with hundreds of simultaneous operators, the Prisma schema can be mapped to an internal on-premise PostgreSQL cluster.
-4. **Hybrid Flexibility:** While ORION is architected for 100% on-premise air-gapped sovereignty, organizations operating in unclassified or hybrid environments may optionally enable external cloud endpoints (such as Azure OpenAI or Anthropic) for specific non-sensitive workspaces using the Centralized Policy Engine.
+4. **Strict Sovereign Local Extensibility:** ORION is engineered for 100% on-premise air-gapped sovereignty. For organizations running custom internal LLMs, ORION connects seamlessly to any self-hosted, OpenAI-compatible local runtime (vLLM, TGI, Ollama, LM Studio, or LocalAI) within the internal network perimeter without requiring external cloud access or data egress.
 
 ---
 
