@@ -22,7 +22,7 @@ import NewWorkspaceModal, {
   useNewWorkspaceModal,
 } from "../Modals/NewWorkspace";
 import ActiveWorkspaces from "./ActiveWorkspaces";
-import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
+import { useSidebarToggle, ToggleSidebarButton, SIDEBAR_TOGGLE_EVENT } from "./SidebarToggle";
 import OrionBrand from "@/components/OrionBrand";
 
 export default function Sidebar() {
@@ -253,7 +253,6 @@ export default function Sidebar() {
 }
 
 export function SidebarMobileHeader() {
-  const [showSidebar, setShowSidebar] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -261,7 +260,11 @@ export function SidebarMobileHeader() {
     <header className="md:hidden h-14 bg-[#090a0b] border-b border-[#1f2328] px-4 flex items-center justify-between z-40 fixed top-0 left-0 right-0 font-sans">
       <button
         type="button"
-        onClick={() => setShowSidebar(true)}
+        onClick={() => {
+          window.dispatchEvent(
+            new CustomEvent(SIDEBAR_TOGGLE_EVENT, { detail: { open: true } })
+          );
+        }}
         className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900"
       >
         <List size={22} />

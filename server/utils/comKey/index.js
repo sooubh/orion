@@ -63,12 +63,32 @@ class CommunicationKey {
     );
   }
 
-  // This instance of ComKey on server is intended for generation of Priv/Pub key for signing and decoding.
   // this resource is shared with /collector/ via a class of the same name in /utils which does decoding/verification only
   // while this server class only does signing with the private key.
   sign(textData = "") {
+    let data = textData;
+    const sortKeys = (obj) => {
+      if (obj === null || typeof obj !== "object") return obj;
+      if (Array.isArray(obj)) return obj.map(sortKeys);
+      const sortedKeys = Object.keys(obj).sort();
+      const result = {};
+      for (const key of sortedKeys) {
+        result[key] = sortKeys(obj[key]);
+      }
+      return result;
+    };
+
+    if (typeof data !== "string") {
+      data = JSON.stringify(sortKeys(data));
+    } else {
+      try {
+        const parsed = JSON.parse(data);
+        data = JSON.stringify(sortKeys(parsed));
+      } catch (e) {}
+    }
+
     return crypto
-      .sign("RSA-SHA256", Buffer.from(textData), this.#readPrivateKey())
+      .sign("RSA-SHA256", Buffer.from(data), this.#readPrivateKey())
       .toString("hex");
   }
 

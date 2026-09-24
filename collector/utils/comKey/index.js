@@ -30,7 +30,26 @@ class CommunicationKey {
   verify(signature = "", textData = "") {
     try {
       let data = textData;
-      if (typeof textData !== "string") data = JSON.stringify(data);
+      const sortKeys = (obj) => {
+        if (obj === null || typeof obj !== "object") return obj;
+        if (Array.isArray(obj)) return obj.map(sortKeys);
+        const sortedKeys = Object.keys(obj).sort();
+        const result = {};
+        for (const key of sortedKeys) {
+          result[key] = sortKeys(obj[key]);
+        }
+        return result;
+      };
+
+      if (typeof data !== "string") {
+        data = JSON.stringify(sortKeys(data));
+      } else {
+        try {
+          const parsed = JSON.parse(data);
+          data = JSON.stringify(sortKeys(parsed));
+        } catch (e) {}
+      }
+
       return crypto.verify(
         "RSA-SHA256",
         Buffer.from(data),

@@ -215,9 +215,7 @@
   --theme-button-delete-hover-bg: #feecee;
 }
 
-[data-theme="light"] .text-white {
-  color: var(--theme-text-primary);
-}
+
 
 [data-theme="light"] .text-description,
 [data-theme="light"] .text-white\/60 {

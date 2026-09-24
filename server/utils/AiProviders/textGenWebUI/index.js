@@ -8,7 +8,7 @@ const {
 } = require("../../helpers/chat/LLMPerformanceMonitor");
 
 class TextGenWebUILLM {
-  constructor(embedder = null) {
+  constructor(embedder = null, modelPreference = null) {
     const { OpenAI: OpenAIApi } = require("openai");
     if (!process.env.TEXT_GEN_WEB_UI_BASE_PATH)
       throw new Error(
@@ -21,7 +21,7 @@ class TextGenWebUILLM {
       baseURL: this.basePath,
       apiKey: process.env.TEXT_GEN_WEB_UI_API_KEY ?? null,
     });
-    this.model = null;
+    this.model = modelPreference ?? process.env.TEXT_GEN_WEB_UI_MODEL_PREF ?? null;
     this.limits = {
       history: this.promptWindowLimit() * 0.15,
       system: this.promptWindowLimit() * 0.15,

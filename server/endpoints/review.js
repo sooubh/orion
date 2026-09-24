@@ -9,6 +9,8 @@ const { v4: uuidv4 } = require("uuid");
 
 // In-memory persistent storage for reviews in current session
 const reviewsStore = new Map();
+// Clear cache periodically to prevent memory leaks
+setInterval(() => reviewsStore.clear(), 30 * 60 * 1000).unref();
 
 /**
  * Endpoints for Sovereign AI Specialist Review Engine

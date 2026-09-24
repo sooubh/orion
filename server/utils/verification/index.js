@@ -38,6 +38,7 @@ class VerificationManager {
    */
   static async verifyStep({ step, output, context = {}, socket = null }) {
     const stepId = step?.stepId || `step_${Date.now()}`;
+    if (step && !step.stepId) step.stepId = stepId;
     const stepType = step?.type || StepType.TEXT_RESPONSE;
 
     // Notify UI that verification has begun

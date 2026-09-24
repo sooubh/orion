@@ -24,7 +24,7 @@ class RepairEngine {
     // Strip previous self-repair instructions from string inputs to prevent accumulation
     const cleanInput = (input) => {
       if (typeof input !== "string") return input || "";
-      return input.replace(/\n*\[SELF-REPAIR (?:INSTRUCTION|ESCALATION)[^\]]*\]:[^\n]*(?:\n(?!\[SELF-REPAIR).)*/g, "").trim();
+      return input.replace(/\n*\[SELF-REPAIR[^\]]*\]:[\s\S]*?(?=\n*\[SELF-REPAIR|$)/gi, "").trim();
     };
 
     switch (strategy) {

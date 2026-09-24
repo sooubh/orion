@@ -195,8 +195,7 @@ class RecursiveSplitter {
 
   async _splitText(documentText) {
     if (!this.chunkHeader) return this.engine.splitText(documentText);
-    const strings = await this.engine.splitText(documentText);
-    const documents = await this.engine.createDocuments(strings, [], {
+    const documents = await this.engine.createDocuments([documentText], [], {
       chunkHeader: this.chunkHeader,
     });
     return documents

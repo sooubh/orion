@@ -40,6 +40,8 @@ const {
 function workspaceEndpoints(app) {
   if (!app) return;
   const responseCache = new Map();
+  // Clear cache periodically to prevent memory leaks
+  setInterval(() => responseCache.clear(), 30 * 60 * 1000).unref();
 
   app.post(
     "/workspace/new",

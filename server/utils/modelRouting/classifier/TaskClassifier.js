@@ -25,7 +25,18 @@ class TaskClassifier {
     const promptStr = typeof prompt === "string" ? prompt : "";
     const promptLower = promptStr.toLowerCase();
 
-    // 1. Modality detection (Vision)
+    // 1. Task Type categorization: Match functional intent patterns first before modality overrides
+    let detectedType = null;
+
+    for (const rule of TASK_PATTERNS) {
+      if (rule.type === TASK_TYPES.MULTIMODAL_ANALYSIS) continue;
+      if (rule.pattern.test(promptStr)) {
+        detectedType = rule.type;
+        break;
+      }
+    }
+
+    // 2. Modality detection (Vision)
     const hasImageAttachment = attachments.some(
       (a) =>
         a?.mime?.startsWith("image/") ||
@@ -38,30 +49,11 @@ class TaskClassifier {
       /\b(inspect|read|interpret|analyze|view|describe)\s+(?:the\s+|this\s+)?chart\b/i.test(
         promptLower,
       );
+    // Don't let mentions of "chart" override a text-based functional intent like DOCUMENT_SUMMARY unless there's an actual image
     const requiresVision =
-      requiresVisionOverride ?? (hasImageAttachment || mentionsVision);
+      requiresVisionOverride ?? (hasImageAttachment || (mentionsVision && !detectedType));
 
-    // 2. Code detection
-    const hasCodeIndicator = CODE_INDICATORS.some((pattern) =>
-      pattern.test(promptStr),
-    );
-    const mentionsCode =
-      /\b(code|function|method|script|sql|python|javascript|typescript|c\+\+|rust|golang|bug|debug|refactor)\b/i.test(
-        promptLower,
-      );
-    const requiresCode =
-      requiresCodeOverride ?? (hasCodeIndicator || mentionsCode);
-
-    // 3. Task Type categorization: Match functional intent patterns first before modality overrides
-    let detectedType = null;
-
-    for (const rule of TASK_PATTERNS) {
-      if (rule.type === TASK_TYPES.MULTIMODAL_ANALYSIS) continue;
-      if (rule.pattern.test(promptStr)) {
-        detectedType = rule.type;
-        break;
-      }
-    }
+    // 3. Code detection
 
     if (!detectedType) {
       if (requiresVision) {

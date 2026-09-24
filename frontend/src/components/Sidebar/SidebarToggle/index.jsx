@@ -52,11 +52,20 @@ export function useSidebarToggle() {
         });
       }
     }
+    
+    function handleCustomToggle(e) {
+      if (e.detail && e.detail.hasOwnProperty('open')) {
+        setShowSidebar(e.detail.open);
+      }
+    }
+
     window.addEventListener("keydown", toggleSidebar);
+    window.addEventListener(SIDEBAR_TOGGLE_EVENT, handleCustomToggle);
     return () => {
       window.removeEventListener("keydown", toggleSidebar);
+      window.removeEventListener(SIDEBAR_TOGGLE_EVENT, handleCustomToggle);
     };
-  }, []);
+  }, [canToggleSidebar]);
 
   useEffect(() => {
     window.localStorage.setItem(

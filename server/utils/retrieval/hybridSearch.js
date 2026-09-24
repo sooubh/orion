@@ -61,7 +61,7 @@ class HybridSearch {
 
     // 2. Extract equipment codes, tags, identifiers, and uppercase acronyms
     const entityMatches =
-      normalizedText.match(/\b(?:[A-Z]{1,4}-\d{1,4}|TK-\d{2,4}|XV-\d{2,4}|SYN-[A-Z0-9\-]+|[a-zA-Z0-9]+-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*|[A-Z]{2,}\b)\b/g) || [];
+      normalizedText.match(/\b(?:[A-Z]{1,4}-\d{1,4}|[a-zA-Z0-9]+-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*|[A-Z]{2,}\b)\b/g) || [];
     const entities = Array.from(
       new Set(
         entityMatches
