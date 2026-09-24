@@ -59,14 +59,20 @@ class HybridSearch {
     // Normalize text for entity and keyword extraction (replace underscores with spaces)
     const normalizedText = trimmed.replace(/[_]/g, " ");
 
-    // 2. Extract equipment codes and tags (e.g. C-204, P-101, P-204, TK-01, XV-101, XV-102)
+    // 2. Extract equipment codes, tags, identifiers, and uppercase acronyms
     const entityMatches =
-      normalizedText.match(/\b(?:[A-Z]{1,3}-\d{2,4}|TK-\d{2}|XV-\d{3}|SYN-[A-Z0-9\-]+)\b/gi) || [];
-    const entities = Array.from(new Set(entityMatches.map((e) => e.toUpperCase())));
+      normalizedText.match(/\b(?:[A-Z]{1,4}-\d{1,4}|TK-\d{2,4}|XV-\d{2,4}|SYN-[A-Z0-9\-]+|[a-zA-Z0-9]+-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*|[A-Z]{2,}\b)\b/g) || [];
+    const entities = Array.from(
+      new Set(
+        entityMatches
+          .map((e) => e.toUpperCase())
+          .filter((e) => !STOP_WORDS.has(e.toLowerCase()))
+      )
+    );
 
-    // 3. Extract measurements and units (e.g. "7.8 mm/s", "42.5 A", "71 C", "> 7.0 mm/s")
+    // 3. Extract measurements and units (e.g. "7.8 mm/s", "42.5 A", "71 C", "> 7.0 mm/s", general units)
     const measurementMatches =
-      trimmed.match(/(?:>|<|>=|<=)?\s*\d+(?:\.\d+)?\s*(?:mm\/s|bar|A|C|%|°C)/gi) || [];
+      trimmed.match(/(?:>|<|>=|<=)?\s*\d+(?:\.\d+)?\s*(?:mm\/s|bar|psi|rpm|hz|khz|mhz|ghz|kb|mb|gb|tb|ms|s|sec|min|hr|h|km|m|cm|mm|kg|g|mg|l|ml|v|w|kw|mw|a|ma|c|°c|°f|%)\b/gi) || [];
     const measurements = Array.from(new Set(measurementMatches.map((m) => m.trim().toLowerCase())));
 
     // 4. Extract domain keywords (ignoring standard conversational stop words and file extensions)
@@ -246,15 +252,15 @@ class HybridSearch {
       });
     });
 
-    // 3. RETRIEVE ALL WORKSPACE DOCUMENT CHUNKS FOR LEXICAL / ENTITY MATCHING
-    // Query LanceDB directly for table rows to ensure exact keyword/entity hits are never missed
-    if (hasVectorized && VectorDb.name === "LanceDb") {
+    // 3. RETRIEVE WORKSPACE DOCUMENT CHUNKS FOR LEXICAL / ENTITY MATCHING
+    // Avoid loading entire tables into memory if vector search already yielded candidates; safeguard with bounded query limit(100)
+    if (hasVectorized && VectorDb.name === "LanceDb" && candidateMap.size === 0) {
       try {
         const { client } = await VectorDb.connect();
         const exists = await VectorDb.namespaceExists(client, namespace);
         if (exists) {
           const table = await client.openTable(namespace);
-          const allRows = await table.query().toArray();
+          const allRows = await table.query().limit(100).toArray();
 
           for (const row of allRows) {
             const id = row.id;
@@ -378,7 +384,25 @@ class HybridSearch {
         analysis.keywords.length > 0 ? Math.min(1, keywordMatches / (totalPossibleKeywords * 1.5)) : 0;
 
       // Composite lexical score
-      item.lexicalScore = entityScore * 0.45 + measurementScore * 0.35 + keywordScore * 0.20;
+      const hasEntities = analysis.entities.length > 0;
+      const hasMeasurements = analysis.measurements.length > 0;
+      const hasKeywords = analysis.keywords.length > 0;
+
+      let lexicalScore = 0;
+      if (hasEntities && hasMeasurements && hasKeywords) {
+        lexicalScore = entityScore * 0.40 + measurementScore * 0.30 + keywordScore * 0.30;
+      } else if (hasEntities && hasKeywords) {
+        lexicalScore = entityScore * 0.50 + keywordScore * 0.50;
+      } else if (hasMeasurements && hasKeywords) {
+        lexicalScore = measurementScore * 0.50 + keywordScore * 0.50;
+      } else if (hasEntities) {
+        lexicalScore = entityScore;
+      } else if (hasMeasurements) {
+        lexicalScore = measurementScore;
+      } else {
+        lexicalScore = keywordScore;
+      }
+      item.lexicalScore = Math.min(1.0, lexicalScore);
 
       // Title token overlap score
       const titleTokens = cleanTitle
@@ -441,7 +465,7 @@ class HybridSearch {
         contextTexts: [],
         sources: [],
         combinedContext: "",
-        message: "No relevant document was found in the current workspace.",
+        message: null,
       };
     }
 

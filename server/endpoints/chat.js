@@ -30,8 +30,10 @@ function chatEndpoints(app) {
         const workspace = response.locals.workspace;
 
         if (typeof message !== "string" || message.trim().length === 0) {
+          const uuid = uuidv4();
           response.status(400).json({
-            id: uuidv4(),
+            id: uuid,
+            uuid: uuid,
             type: "abort",
             textResponse: null,
             sources: [],
@@ -48,14 +50,17 @@ function chatEndpoints(app) {
         response.flushHeaders();
 
         if (multiUserMode(response) && !(await User.canSendChat(user))) {
+          const uuid = uuidv4();
           writeResponseChunk(response, {
-            id: uuidv4(),
+            id: uuid,
+            uuid: uuid,
             type: "abort",
             textResponse: null,
             sources: [],
             close: true,
             error: `You have met your maximum 24 hour chat quota of ${user.dailyMessageLimit} chats. Try again later.`,
           });
+          response.end();
           return;
         }
 
@@ -89,8 +94,10 @@ function chatEndpoints(app) {
         response.end();
       } catch (e) {
         console.error(e);
+        const uuid = uuidv4();
         writeResponseChunk(response, {
-          id: uuidv4(),
+          id: uuid,
+          uuid: uuid,
           type: "abort",
           textResponse: null,
           sources: [],
@@ -117,8 +124,10 @@ function chatEndpoints(app) {
         const thread = response.locals.thread;
 
         if (typeof message !== "string" || message.trim().length === 0) {
+          const uuid = uuidv4();
           response.status(400).json({
-            id: uuidv4(),
+            id: uuid,
+            uuid: uuid,
             type: "abort",
             textResponse: null,
             sources: [],
@@ -135,14 +144,17 @@ function chatEndpoints(app) {
         response.flushHeaders();
 
         if (multiUserMode(response) && !(await User.canSendChat(user))) {
+          const uuid = uuidv4();
           writeResponseChunk(response, {
-            id: uuidv4(),
+            id: uuid,
+            uuid: uuid,
             type: "abort",
             textResponse: null,
             sources: [],
             close: true,
             error: `You have met your maximum 24 hour chat quota of ${user.dailyMessageLimit} chats. Try again later.`,
           });
+          response.end();
           return;
         }
 
@@ -195,8 +207,10 @@ function chatEndpoints(app) {
         response.end();
       } catch (e) {
         console.error(e);
+        const uuid = uuidv4();
         writeResponseChunk(response, {
-          id: uuidv4(),
+          id: uuid,
+          uuid: uuid,
           type: "abort",
           textResponse: null,
           sources: [],

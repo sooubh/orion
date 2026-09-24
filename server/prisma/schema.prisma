@@ -36,6 +36,7 @@ model workspace_documents {
   createdAt            DateTime              @default(now())
   lastUpdatedAt        DateTime              @default(now())
   workspace            workspaces            @relation(fields: [workspaceId], references: [id])
+  document_sync_queues document_sync_queues?
 }
 
 model invites {
@@ -69,6 +70,7 @@ model users {
   lastUpdatedAt                DateTime                      @default(now())
   dailyMessageLimit            Int?
   bio                          String?                       @default("")
+  web_push_subscription_config String?
   workspace_chats              workspace_chats[]
   workspace_users              workspace_users[]
   embed_configs                embed_configs[]
@@ -84,6 +86,7 @@ model users {
   prompt_history               prompt_history[]
   workspace_parsed_files       workspace_parsed_files[]
   memories                     memories[]
+  desktop_mobile_devices       desktop_mobile_devices[]
 }
 
 model recovery_codes {
@@ -411,4 +414,74 @@ model model_router_rules {
   @@unique([router_id, title])
   @@index([router_id])
   @@index([router_id, enabled, priority])
+}
+
+model document_sync_queues {
+  id                       Int                        @id @default(autoincrement())
+  staleAfterMs             Int                        @default(604800000)
+  nextSyncAt               DateTime
+  createdAt                DateTime                   @default(now())
+  lastSyncedAt             DateTime                   @default(now())
+  workspaceDocId           Int                        @unique
+  workspace_document       workspace_documents        @relation(fields: [workspaceDocId], references: [id], onDelete: Cascade)
+  document_sync_executions document_sync_executions[]
+}
+
+model document_sync_executions {
+  id                   Int                  @id @default(autoincrement())
+  queueId              Int
+  status               String               @default("unknown")
+  result               String?
+  createdAt            DateTime             @default(now())
+  document_sync_queues document_sync_queues @relation(fields: [queueId], references: [id], onDelete: Cascade)
+}
+
+model desktop_mobile_devices {
+  id         Int      @id @default(autoincrement())
+  deviceOs   String
+  deviceName String
+  token      String   @unique
+  approved   Boolean  @default(false)
+  userId     Int?
+  createdAt  DateTime @default(now())
+  user       users?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model external_communication_connectors {
+  id            Int      @id @default(autoincrement())
+  type          String   @unique
+  config        String   @default("{}")
+  active        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+}
+
+model scheduled_jobs {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  prompt             String
+  tools              String?
+  schedule           String
+  enabled            Boolean              @default(true)
+  lastRunAt          DateTime?
+  nextRunAt          DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  scheduled_job_runs scheduled_job_runs[]
+}
+
+model scheduled_job_runs {
+  id             Int            @id @default(autoincrement())
+  jobId          Int
+  status         String         @default("queued")
+  result         String?
+  error          String?
+  startedAt      DateTime       @default(now())
+  completedAt    DateTime?
+  readAt         DateTime?
+  scheduled_jobs scheduled_jobs @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
 }

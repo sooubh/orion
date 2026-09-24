@@ -198,15 +198,16 @@ class QDrant extends VectorDatabase {
             // The id property must be defined or else it will be unable to be managed by ALLM.
             chunk.forEach((chunk) => {
               const id = uuidv4();
-              if (chunk?.payload?.hasOwnProperty("id")) {
-                const { id: _id, ...payload } = chunk.payload;
+              if (chunk.id || chunk.payload?.id || chunk.metadata?.id) {
+                const rawPayload = chunk.payload || chunk.metadata || {};
+                const { id: _id, ...payload } = rawPayload;
                 documentVectors.push({ docId, vectorId: id });
                 submission.ids.push(id);
-                submission.vectors.push(chunk.vector);
+                submission.vectors.push(chunk.vector || chunk.values);
                 submission.payloads.push(payload);
               } else {
                 console.error(
-                  "The 'id' property is not defined in chunk.payload - it will be omitted from being inserted in QDrant collection."
+                  "The 'id' property is not defined in chunk - it will be omitted from being inserted in QDrant collection."
                 );
               }
             });

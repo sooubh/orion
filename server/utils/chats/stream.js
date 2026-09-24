@@ -71,6 +71,7 @@ async function streamChatWithWorkspace(
   if (routerError) {
     return writeResponseChunk(response, {
       id: uuid,
+      uuid: uuid,
       type: "abort",
       textResponse: null,
       sources: [],
@@ -85,6 +86,7 @@ async function streamChatWithWorkspace(
 
   if (routingMetadata?.routedTo?.shouldNotify) {
     writeResponseChunk(response, {
+      id: `${uuid}:route`,
       uuid: `${uuid}:route`,
       type: "modelRouteNotification",
       routedTo: routingMetadata.routedTo,
@@ -105,6 +107,7 @@ async function streamChatWithWorkspace(
       "There is no relevant information in this workspace to answer your query.";
     writeResponseChunk(response, {
       id: uuid,
+      uuid: uuid,
       type: "textResponse",
       textResponse,
       sources: [],
@@ -205,6 +208,7 @@ async function streamChatWithWorkspace(
   if (!!vectorSearchResults.message && vectorSearchResults.sources.length === 0) {
     writeResponseChunk(response, {
       id: uuid,
+      uuid: uuid,
       type: "abort",
       textResponse: null,
       sources: [],
@@ -278,6 +282,7 @@ async function streamChatWithWorkspace(
       "There is no relevant information in this workspace to answer your query.";
     writeResponseChunk(response, {
       id: uuid,
+      uuid: uuid,
       type: "textResponse",
       textResponse,
       sources: [],
@@ -340,6 +345,7 @@ async function streamChatWithWorkspace(
       connector: LLMConnector,
     });
     writeResponseChunk(response, {
+      id: uuid,
       uuid,
       sources,
       type: "textResponseChunk",
@@ -407,6 +413,7 @@ async function streamChatWithWorkspace(
     });
 
     writeResponseChunk(response, {
+      id: uuid,
       uuid,
       type: "finalizeResponseStream",
       close: true,
@@ -420,6 +427,7 @@ async function streamChatWithWorkspace(
   }
 
   writeResponseChunk(response, {
+    id: uuid,
     uuid,
     type: "finalizeResponseStream",
     close: true,

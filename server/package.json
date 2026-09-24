@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Orion Server - Private Intelligence Platform",
   "main": "index.js",
-  "author": "Timothy Carambat (Mintplex Labs)",
+  "author": "Orion",
   "license": "MIT",
   "private": false,
   "engines": {
@@ -14,6 +14,7 @@
     "start": "cross-env NODE_ENV=production node index.js",
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
+    "test": "node --test __tests__/*.test.js",
     "test:router": "node --test __tests__/adaptiveRouting.test.js",
     "swagger": "node ./swagger/init.js"
   },

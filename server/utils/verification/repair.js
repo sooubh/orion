@@ -21,6 +21,12 @@ class RepairEngine {
     let toolOverride = null;
     let feedbackPrompt = "";
 
+    // Strip previous self-repair instructions from string inputs to prevent accumulation
+    const cleanInput = (input) => {
+      if (typeof input !== "string") return input || "";
+      return input.replace(/\n*\[SELF-REPAIR (?:INSTRUCTION|ESCALATION)[^\]]*\]:[^\n]*(?:\n(?!\[SELF-REPAIR).)*/g, "").trim();
+    };
+
     switch (strategy) {
       case RepairStrategy.RECALCULATION: {
         const correctVal = suggestedFix.correctValue;
@@ -39,7 +45,7 @@ class RepairEngine {
             repairConstraint: `Must match verified value ${correctVal}`,
           };
         } else {
-          modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+          modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         }
         break;
       }
@@ -59,7 +65,7 @@ class RepairEngine {
             requiredKeys: suggestedFix.missingKeys || [],
           };
         } else {
-          modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+          modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         }
         break;
       }
@@ -78,7 +84,7 @@ class RepairEngine {
             requiredSections: suggestedFix.missingSections || [],
           };
         } else {
-          modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+          modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         }
         break;
       }
@@ -91,7 +97,7 @@ class RepairEngine {
           `Previous response contained claims not grounded in retrieved documents: [${(suggestedFix.ungroundedEntities || []).slice(0, 5).join(", ")}]. ` +
           `Do not extrapolate or speculate. Answer ONLY using facts explicitly present in the source context.`;
 
-        modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+        modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         break;
       }
 
@@ -118,7 +124,7 @@ class RepairEngine {
         feedbackPrompt =
           `[SELF-REPAIR ESCALATION]: Escalating reasoning to higher-tier sovereign model ` +
           `(${modelOverride}) due to repeated step verification difficulty.`;
-        modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+        modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         break;
       }
 
@@ -136,7 +142,7 @@ class RepairEngine {
             _errorFeedback: suggestedFix.error,
           };
         } else {
-          modifiedInput = `${step?.input || ""}\n\n${feedbackPrompt}`;
+          modifiedInput = `${cleanInput(step?.input)}\n\n${feedbackPrompt}`;
         }
         break;
       }

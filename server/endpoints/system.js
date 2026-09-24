@@ -11,7 +11,7 @@ const {
 } = require("../utils/files");
 const { purgeDocument, purgeFolder } = require("../utils/files/purgeDocument");
 const { getVectorDbClass } = require("../utils/helpers");
-const { updateENV, dumpENV } = require("../utils/helpers/updateENV");
+const { updateENV } = require("../utils/helpers/updateENV");
 const {
   reqBody,
   makeJWT,
@@ -83,13 +83,6 @@ function systemEndpoints(app) {
 
   app.get("/migrate", async (_, response) => {
     response.sendStatus(200);
-  });
-
-  app.get("/env-dump", async (_, response) => {
-    if (process.env.NODE_ENV !== "production")
-      return response.sendStatus(200).end();
-    dumpENV();
-    response.sendStatus(200).end();
   });
 
   app.get("/onboarding", async (_, response) => {
@@ -228,7 +221,7 @@ function systemEndpoints(app) {
             user: null,
             valid: false,
             token: null,
-            message: "[001] Invalid login credentials.",
+            message: "Invalid login credentials.",
           });
           return;
         }
@@ -246,7 +239,7 @@ function systemEndpoints(app) {
             user: null,
             valid: false,
             token: null,
-            message: "[002] Invalid login credentials.",
+            message: "Invalid login credentials.",
           });
           return;
         }

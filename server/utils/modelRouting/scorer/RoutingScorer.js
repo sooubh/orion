@@ -1,4 +1,5 @@
 const { DEFAULT_ROUTING_WEIGHTS } = require("./weights");
+const { SENSITIVITY_LEVELS } = require("../contracts/types");
 
 class RoutingScorer {
   /**
@@ -50,10 +51,15 @@ class RoutingScorer {
 
       // 3. Sensitivity Fit (20%)
       // Exact tier match gets full 1.0; over-clearance gets 0.85 to preserve higher-tier models
-      const exactTierMatch = Array.isArray(model.sensitivityAccess)
-        ? model.sensitivityAccess.includes(data.sensitivity)
-        : false;
-      const sensitivityFit = exactTierMatch ? 1.0 : 0.85;
+      const targetSensitivity = String(data.sensitivity || "INTERNAL").toUpperCase().trim();
+      const targetLevel = SENSITIVITY_LEVELS[targetSensitivity] ?? SENSITIVITY_LEVELS.INTERNAL;
+
+      const modelLevels = (model.sensitivityAccess || []).map(
+        (s) => SENSITIVITY_LEVELS[String(s).toUpperCase().trim()] ?? 0,
+      );
+      const modelMaxLevel = modelLevels.length > 0 ? Math.max(...modelLevels) : 0;
+
+      const sensitivityFit = modelMaxLevel === targetLevel ? 1.0 : 0.85;
 
       // 4. Hardware Fit (15%)
       let hardwareFit = 1.0;

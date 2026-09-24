@@ -52,10 +52,8 @@ class CommunicationKey {
 
     if (!fs.existsSync(this.#storageLoc))
       fs.mkdirSync(this.#storageLoc, { recursive: true });
-    fs.writeFileSync(
-      `${path.resolve(this.#storageLoc, this.#privKeyName)}`,
-      keyPair.privateKey
-    );
+    const privKeyPath = path.resolve(this.#storageLoc, this.#privKeyName);
+    fs.writeFileSync(privKeyPath, keyPair.privateKey, { mode: 0o600 });
     fs.writeFileSync(
       `${path.resolve(this.#storageLoc, this.#pubKeyName)}`,
       keyPair.publicKey

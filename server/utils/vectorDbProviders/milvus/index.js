@@ -27,7 +27,7 @@ class Milvus extends VectorDatabase {
   // If the first char of the collection is not an underscore or letter the collection name will be invalid.
   normalize(inputString) {
     let normalized = inputString.replace(/[^a-zA-Z0-9_]/g, "_");
-    if (new RegExp(/^[a-zA-Z_]/).test(normalized.slice(0, 1)))
+    if (!/^[a-zA-Z_]/.test(normalized.slice(0, 1)))
       normalized = `orion_${normalized}`;
     return normalized;
   }

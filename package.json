@@ -8,7 +8,15 @@
   "engines": {
     "node": ">=18"
   },
+  "workspaces": [
+    "frontend",
+    "server",
+    "collector"
+  ],
   "scripts": {
+    "test": "npm run test:server",
+    "test:server": "cd server && npm test",
+    "lint": "cd server && npm run lint",
     "dev:server": "cd server && npm run dev",
     "dev:collector": "cd collector && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

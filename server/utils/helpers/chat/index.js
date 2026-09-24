@@ -129,7 +129,7 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
     const eligibleHistoryItems = [];
     var historyTokenCount = 0;
 
-    for (const [i, history] of rawHistory.reverse().entries()) {
+    for (const [i, history] of [...rawHistory].reverse().entries()) {
       const [user, assistant] = convertToPromptHistory([history]);
       const [userTokens, assistantTokens] = [
         tokenManager.countFromString(user.content),
@@ -146,13 +146,8 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
       }
 
       // If we reach here the overhead of adding this history item will
-      // be too much of the limit. So now, we are prioritizing
-      // the most recent 3 message pairs - if we are already past those - exit loop and stop
-      // trying to make history work.
-      if (i > 2) break;
-
-      // We are over the limit and we are within the first 3 most recent chats.
-      // so now we cannonball them to make them fit into the window.
+      // be too much of the limit.
+      // Cannonball them to make them fit into the window.
       // max size = llm.limit.history; Each component of the message, can at most
       // be 50% of the history. We cannonball whichever is the problem.
       // The math isnt perfect for tokens, so we have to add a fudge factor for safety.
@@ -243,7 +238,7 @@ async function messageStringCompressor(llm, promptArgs = {}, rawHistory = []) {
     const eligibleHistoryItems = [];
     var historyTokenCount = 0;
 
-    for (const [i, history] of rawHistory.reverse().entries()) {
+    for (const [i, history] of [...rawHistory].reverse().entries()) {
       const [user, assistant] = convertToPromptHistory([history]);
       const [userTokens, assistantTokens] = [
         tokenManager.countFromString(user.content),
@@ -260,13 +255,8 @@ async function messageStringCompressor(llm, promptArgs = {}, rawHistory = []) {
       }
 
       // If we reach here the overhead of adding this history item will
-      // be too much of the limit. So now, we are prioritizing
-      // the most recent 3 message pairs - if we are already past those - exit loop and stop
-      // trying to make history work.
-      if (i > 2) break;
-
-      // We are over the limit and we are within the first 3 most recent chats.
-      // so now we cannonball them to make them fit into the window.
+      // be too much of the limit.
+      // Cannonball them to make them fit into the window.
       // max size = llm.limit.history; Each component of the message, can at most
       // be 50% of the history. We cannonball whichever is the problem.
       // The math isnt perfect for tokens, so we have to add a fudge factor for safety.
@@ -407,7 +397,7 @@ function fillSourceWindow({
   // Looking at this function by itself you may think that this loop could be extreme for long history chats,
   // but this was already handled where `history` we derived. This comes from `recentChatHistory` which
   // includes a limit for history (default: 20). So this loop does not look as extreme as on first glance.
-  for (const chat of history.reverse()) {
+  for (const chat of [...history].reverse()) {
     if (sources.length >= nDocs) {
       log(
         `Citations backfilled to ${nDocs} references from ${searchResults.length} original citations.`

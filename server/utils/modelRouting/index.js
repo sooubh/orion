@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require("uuid");
+const { randomUUID: uuidv4 } = require("crypto");
 const { ModelRegistry } = require("./registry/ModelRegistry");
 const { HardwareProfiler } = require("./profiler/HardwareProfiler");
 const { CandidateFilter } = require("./filter/CandidateFilter");

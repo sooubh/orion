@@ -181,8 +181,10 @@ class RecursiveSplitter {
       chunkHeader: chunkHeader ? `${chunkHeader?.slice(0, 50)}...` : null,
     });
     this.chunkHeader = chunkHeader;
+    const headerLength = chunkHeader ? chunkHeader.length : 0;
+    const effectiveChunkSize = Math.max(100, chunkSize - headerLength);
     this.engine = new RecursiveCharacterTextSplitter({
-      chunkSize,
+      chunkSize: effectiveChunkSize,
       chunkOverlap,
     });
   }

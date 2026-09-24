@@ -32,8 +32,15 @@ class PDFLoader {
       const textItems = [];
       for (const item of content.items) {
         if ("str" in item) {
-          if (lastY === item.transform[5] || !lastY) {
+          if (lastY === undefined) {
             textItems.push(item.str);
+          } else if (lastY === item.transform[5]) {
+            const prev = textItems[textItems.length - 1] || "";
+            if (prev.endsWith(" ") || item.str.startsWith(" ") || !item.str) {
+              textItems.push(item.str);
+            } else {
+              textItems.push(` ${item.str}`);
+            }
           } else {
             textItems.push(`\n${item.str}`);
           }

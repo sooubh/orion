@@ -80,6 +80,13 @@ class CheckpointValidator {
             reason: `Source document ${inputRefs.sourceFilePath} has changed since checkpoint creation. Checkpoint is stale.`,
           };
         }
+      } else {
+        return {
+          valid: false,
+          stale: true,
+          securityCleared: false,
+          reason: `Source document ${inputRefs.sourceFilePath} no longer exists. Checkpoint is stale.`,
+        };
       }
     }
 

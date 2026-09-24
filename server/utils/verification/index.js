@@ -178,6 +178,7 @@ class VerificationManager {
     socket = null,
   }) {
     const stepId = step?.stepId || `step_${Date.now()}`;
+    if (step && !step.stepId) step.stepId = stepId;
     const currentAttempts = (this.attempts.get(stepId) || 0) + 1;
     this.attempts.set(stepId, currentAttempts);
 

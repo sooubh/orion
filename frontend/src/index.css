@@ -224,10 +224,6 @@
   color: var(--theme-text-secondary);
 }
 
-[data-theme="light"] .bg-theme-bg-secondary {
-  border: 1px solid var(--theme-sidebar-border);
-}
-
 [data-theme="light"] .border-white\/10 {
   border-color: var(--theme-sidebar-border);
 }
@@ -286,12 +282,6 @@ a {
 
 .g327 {
   border-color: #302f30;
-}
-
-@font-face {
-  font-family: "plus-jakarta-sans";
-  src: url("../public/fonts/PlusJakartaSans.ttf");
-  font-display: swap;
 }
 
 .grr {
@@ -1294,9 +1284,7 @@ textarea {
 
 /* Industrial Solid Buttons (Dark Default) */
 button.bg-sky-500,
-a.bg-sky-500,
-button.bg-amber-500,
-a.bg-amber-500 {
+a.bg-sky-500 {
   background-color: #3b6998 !important;
   color: #ffffff !important;
   border: 1px solid #4a759f !important;
@@ -1304,9 +1292,7 @@ a.bg-amber-500 {
 }
 
 button.bg-sky-500:hover,
-a.bg-sky-500:hover,
-button.bg-amber-500:hover,
-a.bg-amber-500:hover {
+a.bg-sky-500:hover {
   background-color: #4b7cae !important;
 }
 
@@ -1447,11 +1433,6 @@ body.light .text-\[\#f4f4f5\],
   color: #181b1f !important;
 }
 
-body.light .text-white,
-[data-theme="light"] .text-white {
-  color: #181b1f !important;
-}
-
 body.light .text-zinc-100,
 [data-theme="light"] .text-zinc-100 {
   color: #181b1f !important;
@@ -1541,11 +1522,7 @@ body.light .border-amber-500\/30,
 body.light button.bg-sky-500,
 [data-theme="light"] button.bg-sky-500,
 body.light a.bg-sky-500,
-[data-theme="light"] a.bg-sky-500,
-body.light button.bg-amber-500,
-[data-theme="light"] button.bg-amber-500,
-body.light a.bg-amber-500,
-[data-theme="light"] a.bg-amber-500 {
+[data-theme="light"] a.bg-sky-500 {
   background-color: #2c527a !important;
   color: #ffffff !important;
   border: 1px solid #1e3c5c !important;
@@ -1555,11 +1532,7 @@ body.light a.bg-amber-500,
 body.light button.bg-sky-500:hover,
 [data-theme="light"] button.bg-sky-500:hover,
 body.light a.bg-sky-500:hover,
-[data-theme="light"] a.bg-sky-500:hover,
-body.light button.bg-amber-500:hover,
-[data-theme="light"] button.bg-amber-500:hover,
-body.light a.bg-amber-500:hover,
-[data-theme="light"] a.bg-amber-500:hover {
+[data-theme="light"] a.bg-sky-500:hover {
   background-color: #1e3c5c !important;
 }
 

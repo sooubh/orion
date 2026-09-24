@@ -21,17 +21,17 @@ export default function HumanReviewCard({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-semibold text-amber-300">
+                <h4 className="text-sm font-semibold text-amber-300 light:text-amber-900">
                   Verification Boundary — Human Review Required
                 </h4>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 light:text-amber-900">
                   Fail-Closed
                 </span>
               </div>
               <p className="text-xs text-theme-text-secondary mt-1">
-                Step <span className="font-mono text-amber-200">{stepName || stepId}</span> failed independent verification after {attempts} automated self-repair attempts.
+                Step <span className="font-mono text-amber-200 light:text-amber-900">{stepName || stepId}</span> failed independent verification after {attempts} automated self-repair attempts.
               </p>
-              <p className="text-xs text-rose-300 mt-1.5 font-mono bg-black/20 p-2 rounded border border-rose-500/20">
+              <p className="text-xs text-rose-300 light:text-rose-800 mt-1.5 font-mono bg-black/20 p-2 rounded border border-rose-500/20">
                 {reason}
               </p>
             </div>

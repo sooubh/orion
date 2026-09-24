@@ -32,7 +32,10 @@ class TaskClassifier {
         /\.(png|jpe?g|webp|gif|bmp|tiff)$/i.test(a?.name || ""),
     );
     const mentionsVision =
-      /\b(image|picture|photo|screenshot|diagram|drawing|chart|scanned|scan|ocr|visual)\b/i.test(
+      /\b(image|picture|photo|screenshot|diagram|drawing|scanned|scan|ocr|visual)\b/i.test(
+        promptLower,
+      ) ||
+      /\b(inspect|read|interpret|analyze|view|describe)\s+(?:the\s+|this\s+)?chart\b/i.test(
         promptLower,
       );
     const requiresVision =
@@ -43,28 +46,40 @@ class TaskClassifier {
       pattern.test(promptStr),
     );
     const mentionsCode =
-      /\b(code|function|class|method|script|sql|python|javascript|typescript|c\+\+|rust|golang|bug|debug|refactor)\b/i.test(
+      /\b(code|function|method|script|sql|python|javascript|typescript|c\+\+|rust|golang|bug|debug|refactor)\b/i.test(
         promptLower,
       );
     const requiresCode =
       requiresCodeOverride ?? (hasCodeIndicator || mentionsCode);
 
-    // 3. Task Type categorization
-    let detectedType = TASK_TYPES.TEXT_QA;
+    // 3. Task Type categorization: Match functional intent patterns first before modality overrides
+    let detectedType = null;
 
-    if (requiresVision) {
-      detectedType = TASK_TYPES.MULTIMODAL_ANALYSIS;
-    } else if (requiresCode) {
-      detectedType = /\b(review|audit|lint|analyze|inspect)\b/i.test(
-        promptLower,
-      )
-        ? TASK_TYPES.CODE_REVIEW
-        : TASK_TYPES.CODE_GENERATION;
-    } else {
-      for (const rule of TASK_PATTERNS) {
-        if (rule.pattern.test(promptStr)) {
-          detectedType = rule.type;
-          break;
+    for (const rule of TASK_PATTERNS) {
+      if (rule.type === TASK_TYPES.MULTIMODAL_ANALYSIS) continue;
+      if (rule.pattern.test(promptStr)) {
+        detectedType = rule.type;
+        break;
+      }
+    }
+
+    if (!detectedType) {
+      if (requiresVision) {
+        detectedType = TASK_TYPES.MULTIMODAL_ANALYSIS;
+      } else if (requiresCode) {
+        detectedType = /\b(review|audit|lint|analyze|inspect)\b/i.test(
+          promptLower,
+        )
+          ? TASK_TYPES.CODE_REVIEW
+          : TASK_TYPES.CODE_GENERATION;
+      } else {
+        const multimodalRule = TASK_PATTERNS.find(
+          (r) => r.type === TASK_TYPES.MULTIMODAL_ANALYSIS,
+        );
+        if (multimodalRule && multimodalRule.pattern.test(promptStr)) {
+          detectedType = TASK_TYPES.MULTIMODAL_ANALYSIS;
+        } else {
+          detectedType = TASK_TYPES.TEXT_QA;
         }
       }
     }

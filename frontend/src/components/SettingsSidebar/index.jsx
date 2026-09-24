@@ -234,7 +234,7 @@ function SupportEmail() {
   return (
     <a
       href={supportEmail}
-      className="text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary text-xs leading-[18px] transition-colors"
+      className="text-theme-text-secondary hover:text-white light:hover:text-theme-text-primary text-xs leading-[18px] transition-colors"
     >
       {t("settings.contact")}
     </a>

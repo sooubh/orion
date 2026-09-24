@@ -2,7 +2,7 @@ const { getEncoding } = require("js-tiktoken");
 
 class TikTokenTokenizer {
   static MAX_KB_ESTIMATE = 10;
-  static DIVISOR = 8;
+  static DIVISOR = 3.8;
 
   constructor() {
     if (TikTokenTokenizer.instance) {
@@ -44,15 +44,25 @@ class TikTokenTokenizer {
     try {
       if (this.#isTooLong(input)) {
         this.log("Input will take too long to encode - estimating");
-        return Math.ceil(input.length / TikTokenTokenizer.DIVISOR);
+        return Math.ceil(input.length / 3.8);
       }
 
       return this.encoder.encode(input).length;
     } catch (e) {
       this.log("Could not tokenize string! Estimating...", e.message, e.stack);
-      return Math.ceil(input?.length / TikTokenTokenizer.DIVISOR) || 0;
+      return Math.ceil(input?.length / 3.8) || 0;
     }
   }
+}
+
+/**
+ * Approximate token count for a string using standard character-to-token ratio (3.8).
+ * @param {string} input
+ * @returns {number}
+ */
+function approxTokenCount(input = "") {
+  if (!input || input.length === 0) return 0;
+  return Math.ceil(input.length / 3.8);
 }
 
 const tokenizer = new TikTokenTokenizer();
@@ -63,4 +73,5 @@ module.exports = {
    * @returns {number}
    */
   tokenizeString: (input) => tokenizer.tokenizeString(input),
+  approxTokenCount,
 };

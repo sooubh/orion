@@ -31,7 +31,9 @@ export default function CheckpointRecoveryNotification({
           <div className="flex items-center gap-2">
             <span
               className={`font-semibold ${
-                isRollback ? "text-cyan-300" : "text-emerald-300"
+                isRollback
+                  ? "text-cyan-300 light:text-cyan-900"
+                  : "text-emerald-300 light:text-emerald-900"
               }`}
             >
               {isRollback ? "Workflow Rolled Back" : "Workflow Resumed"}

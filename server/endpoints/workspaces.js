@@ -911,8 +911,8 @@ function workspaceEndpoints(app) {
 
         const docLocation = doc?.docpath || target;
 
-        // Will delete the document from the entire system + will unembed it.
-        await purgeDocument(docLocation);
+        // Only remove document and unembed from current workspace, do not purge globally
+        await Document.removeDocuments(currWorkspace, [docLocation]);
 
         await EventLogs.logEvent(
           "document_removed_from_workspace",

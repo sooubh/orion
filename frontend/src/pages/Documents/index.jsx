@@ -601,8 +601,7 @@ export default function DocumentsPage() {
       {/* Document Preview Modal */}
       {selectedDocForPreview && (
         <Modal isOpen={!!selectedDocForPreview} onClose={() => setSelectedDocForPreview(null)} size="md">
-          <div className="p-6 space-y-4 bg-zinc-900 rounded-2xl border border-zinc-800 text-white">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div className="flex items-center gap-2.5">
                 {getFileIcon(selectedDocForPreview.name)}
                 <h3 className="text-sm font-bold truncate max-w-sm">
@@ -704,15 +703,13 @@ export default function DocumentsPage() {
                 <span>Embed into {selectedWorkspace?.name || "Workspace"}</span>
               </button>
             </div>
-          </div>
         </Modal>
       )}
 
       {/* Classification Review & Policy Override Modal */}
       {selectedDocForReview && (
         <Modal isOpen={!!selectedDocForReview} onClose={() => setSelectedDocForReview(null)} size="md">
-          <div className="p-6 space-y-4 bg-zinc-900 rounded-2xl border border-zinc-800 text-white">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div className="flex items-center gap-2.5">
                 <ShieldCheck size={22} className="text-amber-400" weight="duotone" />
                 <h3 className="text-sm font-bold truncate max-w-sm">
@@ -827,7 +824,6 @@ export default function DocumentsPage() {
                 <span>Save & Apply Policy</span>
               </button>
             </div>
-          </div>
         </Modal>
       )}
     </div>

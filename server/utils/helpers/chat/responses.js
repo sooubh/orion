@@ -1,5 +1,4 @@
-const { v4: uuidv4 } = require("uuid");
-const moment = require("moment");
+const { randomUUID: uuidv4 } = require("crypto");
 const { isAbortError } = require("../abortSignals");
 
 /**
@@ -218,7 +217,7 @@ function convertToChatHistory(history = []) {
       {
         role: "user",
         content: prompt,
-        sentAt: moment(createdAt).unix(),
+        sentAt: Math.floor(new Date(createdAt).getTime() / 1000),
         attachments: data?.attachments ?? [],
         chatId: id,
       },
@@ -228,7 +227,7 @@ function convertToChatHistory(history = []) {
         content: data.text,
         sources: data.sources || [],
         chatId: id,
-        sentAt: moment(createdAt).unix(),
+        sentAt: Math.floor(new Date(createdAt).getTime() / 1000),
         feedbackScore,
         metrics: data?.metrics || {},
         ...(data?.outputs?.length > 0 ? { outputs: data.outputs } : {}),

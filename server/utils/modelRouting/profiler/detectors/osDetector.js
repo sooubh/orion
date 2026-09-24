@@ -5,8 +5,19 @@ const os = require("os");
  * Execution is synchronous and virtually instantaneous (< 0.1ms).
  */
 function detectOsResources() {
-  const cpuCores = os.cpus()?.length || 1;
-  const cpuModel = os.cpus()?.[0]?.model || "Generic CPU";
+  let cpuCores = 1;
+  let cpuModel = "Generic CPU";
+  try {
+    const cpus = os.cpus();
+    if (cpus && cpus.length > 0) {
+      cpuCores = cpus.length;
+      cpuModel = cpus[0]?.model || "Generic CPU";
+    } else {
+      cpuCores = os.availableParallelism?.() || 1;
+    }
+  } catch (_e) {
+    cpuCores = os.availableParallelism?.() || 1;
+  }
   const totalMemBytes = os.totalmem() || 0;
   const freeMemBytes = os.freemem() || 0;
 

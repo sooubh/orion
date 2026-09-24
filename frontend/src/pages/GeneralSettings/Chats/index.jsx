@@ -133,7 +133,7 @@ export default function WorkspaceChats() {
                   <button
                     ref={openMenuButton}
                     onClick={toggleMenu}
-                    className="flex items-center gap-x-2 px-4 py-1 rounded-lg bg-primary-button hover:light:bg-theme-bg-primary hover:text-theme-text-primary text-xs font-semibold hover:bg-secondary shadow-[0_4px_14px_rgba(0,0,0,0.25)] h-[34px] w-fit"
+                    className="flex items-center gap-x-2 px-4 py-1 rounded-lg bg-primary-button light:hover:bg-theme-bg-primary hover:text-theme-text-primary text-xs font-semibold hover:bg-secondary shadow-[0_4px_14px_rgba(0,0,0,0.25)] h-[34px] w-fit"
                   >
                     <Download size={18} weight="bold" />
                     {t("recorded.export")}
@@ -164,7 +164,7 @@ export default function WorkspaceChats() {
                 {chats.length > 0 && (
                   <button
                     onClick={handleClearAllChats}
-                    className="flex items-center gap-x-2 px-4 py-1 border hover:border-transparent light:border-theme-sidebar-border border-white/40 text-white/40 light:text-theme-text-secondary rounded-lg bg-transparent hover:light:text-theme-bg-primary hover:text-theme-text-primary text-xs font-semibold hover:bg-red-500 shadow-[0_4px_14px_rgba(0,0,0,0.25)] h-[34px] w-fit"
+                    className="flex items-center gap-x-2 px-4 py-1 border hover:border-transparent light:border-theme-sidebar-border border-white/40 text-white/40 light:text-theme-text-secondary rounded-lg bg-transparent light:hover:text-theme-bg-primary hover:text-theme-text-primary text-xs font-semibold hover:bg-red-500 shadow-[0_4px_14px_rgba(0,0,0,0.25)] h-[34px] w-fit"
                   >
                     <Trash size={18} weight="bold" />
                     Clear Chats

@@ -240,16 +240,12 @@ const Document = {
 
       if (!document) continue;
 
-      const meta = safeJsonParse(document.metadata, {});
-      const docTitle = meta?.title || document.filename;
-      const cleanTitle = (docTitle || "").replace(/'/g, "''");
-
       try {
         if (VectorDb.name === "LanceDb") {
           await VectorDb.deleteDocumentFromNamespace(
             workspace.slug,
             document.docId,
-            cleanTitle ? `title = '${cleanTitle}'` : null
+            `id = '${document.docId}'`
           );
         } else {
           await VectorDb.deleteDocumentFromNamespace(

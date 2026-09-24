@@ -35,8 +35,8 @@ class GenericOpenAiLLM {
     this.model =
       modelPreference ?? process.env.GENERIC_OPEN_AI_MODEL_PREF ?? null;
     this.maxTokens = process.env.GENERIC_OPEN_AI_MAX_TOKENS
-      ? toValidNumber(process.env.GENERIC_OPEN_AI_MAX_TOKENS, 1024)
-      : 1024;
+      ? toValidNumber(process.env.GENERIC_OPEN_AI_MAX_TOKENS, 4096)
+      : 4096;
     if (!this.model)
       throw new Error("GenericOpenAI must have a valid model set.");
     this.limits = {

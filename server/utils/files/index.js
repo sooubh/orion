@@ -256,8 +256,10 @@ async function getDocumentsByFolder(folderName = "", pagination = {}) {
 async function cachedVectorInformation(filename = null, checkOnly = false) {
   if (!filename) return checkOnly ? false : { exists: false, chunks: [] };
 
-  const digest = uuidv5(filename, uuidv5.URL);
-  const file = path.resolve(vectorCachePath, `${digest}.json`);
+  const engine = process.env.EMBEDDING_ENGINE || "native";
+  const model = process.env.EMBEDDING_MODEL_PREF || "default";
+  const cacheFilename = `${uuidv5(`${filename}:${engine}:${model}`, uuidv5.URL)}.json`;
+  const file = path.resolve(vectorCachePath, cacheFilename);
   const exists = fs.existsSync(file);
 
   if (checkOnly) return exists;
@@ -279,8 +281,10 @@ async function storeVectorResult(vectorData = [], filename = null) {
   );
   if (!fs.existsSync(vectorCachePath)) fs.mkdirSync(vectorCachePath);
 
-  const digest = uuidv5(filename, uuidv5.URL);
-  const writeTo = path.resolve(vectorCachePath, `${digest}.json`);
+  const engine = process.env.EMBEDDING_ENGINE || "native";
+  const model = process.env.EMBEDDING_MODEL_PREF || "default";
+  const cacheFilename = `${uuidv5(`${filename}:${engine}:${model}`, uuidv5.URL)}.json`;
+  const writeTo = path.resolve(vectorCachePath, cacheFilename);
   fs.writeFileSync(writeTo, JSON.stringify(vectorData), "utf8");
   return;
 }
@@ -305,12 +309,18 @@ async function purgeSourceDocument(filename = null) {
 // Purges a vector-cache file from the vector-cache/ folder.
 async function purgeVectorCache(filename = null) {
   if (!filename) return;
-  const digest = uuidv5(filename, uuidv5.URL);
-  const filePath = path.resolve(vectorCachePath, `${digest}.json`);
+  const engine = process.env.EMBEDDING_ENGINE || "native";
+  const model = process.env.EMBEDDING_MODEL_PREF || "default";
+  const keyedFilename = `${uuidv5(`${filename}:${engine}:${model}`, uuidv5.URL)}.json`;
+  const legacyFilename = `${uuidv5(filename, uuidv5.URL)}.json`;
 
-  if (!fs.existsSync(filePath) || !fs.lstatSync(filePath).isFile()) return;
-  console.log(`Purging vector-cache of ${filename}.`);
-  fs.rmSync(filePath);
+  for (const f of [keyedFilename, legacyFilename]) {
+    const filePath = path.resolve(vectorCachePath, f);
+    if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+      console.log(`Purging vector-cache of ${filename}.`);
+      fs.rmSync(filePath);
+    }
+  }
   return;
 }
 

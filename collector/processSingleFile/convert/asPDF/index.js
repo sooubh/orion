@@ -52,19 +52,16 @@ async function asPdf({
     };
   }
 
-  const content = pageContent.join("");
+  const content = pageContent.join("\n\n");
   const data = {
     id: v4(),
     url: "file://" + fullFilePath,
-    title: metadata.title || filename,
+    title: metadata.title || docs[0]?.metadata?.pdf?.info?.Title || filename,
     docAuthor:
       metadata.docAuthor ||
       docs[0]?.metadata?.pdf?.info?.Creator ||
       "no author found",
-    description:
-      metadata.description ||
-      docs[0]?.metadata?.pdf?.info?.Title ||
-      "No description found.",
+    description: metadata.description || "No description found.",
     docSource: metadata.docSource || "pdf file uploaded by the user.",
     chunkSource: metadata.chunkSource || "",
     published: createdDate(fullFilePath),

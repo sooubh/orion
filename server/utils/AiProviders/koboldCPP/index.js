@@ -204,43 +204,67 @@ class KoboldCPPLLM {
       response.on("close", handleAbort);
 
       for await (const chunk of stream) {
-        const message = chunk?.choices?.[0];
-        const token = message?.delta?.content;
+        try {
+          const message = chunk?.choices?.[0];
+          if (!message) continue;
+          const token = message?.delta?.content;
 
-        if (token) {
-          fullText += token;
-          writeResponseChunk(response, {
-            uuid,
-            sources: [],
-            type: "textResponseChunk",
-            textResponse: token,
-            close: false,
-            error: false,
-          });
-        }
+          if (token) {
+            fullText += token;
+            writeResponseChunk(response, {
+              uuid,
+              sources: [],
+              type: "textResponseChunk",
+              textResponse: token,
+              close: false,
+              error: false,
+            });
+          }
 
-        // KoboldCPP finishes with "length" or "stop"
-        if (
-          message.finish_reason !== "null" &&
-          (message.finish_reason === "length" ||
-            message.finish_reason === "stop")
-        ) {
-          writeResponseChunk(response, {
-            uuid,
-            sources,
-            type: "textResponseChunk",
-            textResponse: "",
-            close: true,
-            error: false,
-          });
-          response.removeListener("close", handleAbort);
-          usage.completion_tokens = LLMPerformanceMonitor.countTokens([
-            { content: fullText },
-          ]);
-          stream?.endMeasurement(usage);
-          resolve(fullText);
+          // KoboldCPP finishes with "length" or "stop"
+          if (
+            message.finish_reason &&
+            message.finish_reason !== "null" &&
+            (message.finish_reason === "length" ||
+              message.finish_reason === "stop")
+          ) {
+            writeResponseChunk(response, {
+              uuid,
+              sources,
+              type: "textResponseChunk",
+              textResponse: "",
+              close: true,
+              error: false,
+            });
+            response.removeListener("close", handleAbort);
+            usage.completion_tokens = LLMPerformanceMonitor.countTokens([
+              { content: fullText },
+            ]);
+            stream?.endMeasurement(usage);
+            resolve(fullText);
+            return;
+          }
+        } catch (parseError) {
+          console.error(`KoboldCPP stream chunk parse error:`, parseError.message);
+          continue;
         }
       }
+
+      // If stream ended without a finish_reason, resolve with what we have
+      writeResponseChunk(response, {
+        uuid,
+        sources,
+        type: "textResponseChunk",
+        textResponse: "",
+        close: true,
+        error: false,
+      });
+      response.removeListener("close", handleAbort);
+      usage.completion_tokens = LLMPerformanceMonitor.countTokens([
+        { content: fullText },
+      ]);
+      stream?.endMeasurement(usage);
+      resolve(fullText);
     });
   }
 

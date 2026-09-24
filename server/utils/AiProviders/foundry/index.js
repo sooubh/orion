@@ -376,7 +376,7 @@ class FoundryLLM {
    * @returns {number}
    */
   get timeout() {
-    return 500;
+    return 30000;
   }
 
   /**
@@ -438,7 +438,7 @@ class FoundryLLM {
           });
           resolve(fullText);
         }
-      }, 500);
+      }, timeoutThresholdMs);
 
       try {
         for await (const chunk of stream) {

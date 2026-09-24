@@ -335,7 +335,7 @@ class PolicyEngine {
   static #evaluateKnowledgePolicy(chunkClassification, source, user, model) {
     const chunkWeight = CLASSIFICATION_WEIGHTS[chunkClassification] ?? 1;
     const provider = typeof model === "object" ? model?.provider : String(model || "");
-    const isCloud = CLOUD_PROVIDERS.includes(String(provider).toLowerCase());
+    const isCloud = CLOUD_PROVIDERS.some((cp) => String(provider).toLowerCase().includes(cp));
 
     // Prevent cloud model from seeing confidential or restricted chunks
     if (isCloud && chunkWeight >= CLASSIFICATION_WEIGHTS.CONFIDENTIAL) {

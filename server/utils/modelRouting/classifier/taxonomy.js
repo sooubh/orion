@@ -6,12 +6,6 @@ const { TASK_TYPES } = require("../contracts/types");
  */
 const TASK_PATTERNS = [
   {
-    type: TASK_TYPES.MULTIMODAL_ANALYSIS,
-    pattern:
-      /\b(image|picture|photo|screenshot|diagram|drawing|chart|scanned|scan|ocr|visual|inspect image)\b/i,
-    priority: 100,
-  },
-  {
     type: TASK_TYPES.CODE_REVIEW,
     pattern:
       /\b(review code|code review|audit code|lint|find bug|security vulnerability in|refactor code|inspect function)\b/i,
@@ -59,11 +53,17 @@ const TASK_PATTERNS = [
       /\b(think step by step|chain of thought|deduce|hypothesize|evaluate pros and cons|logical deduction|counterfactual)\b/i,
     priority: 50,
   },
+  {
+    type: TASK_TYPES.MULTIMODAL_ANALYSIS,
+    pattern:
+      /\b(inspect image|image analysis|visual inspection|describe image|transcribe image|ocr|scanned document)\b/i,
+    priority: 40,
+  },
 ];
 
 const CODE_INDICATORS = [
   /```[\s\S]*?```/,
-  /\b(function|def |class |const |let |var |import |export |async |await |SELECT |FROM |WHERE |git )\b/,
+  /\b(function\s*\w*\s*\(|def\s+\w+\s*\(|(?:const|let|var)\s+\w+\s*=|import\s+(?:\{[^}]+\}|\*\s+as\s+\w+|\w+)\s+from\s+['"][^'"]+['"]|import\s+['"][^'"]+['"]|from\s+\w+\s+import\s+|class\s+[A-Za-z0-9_]+\s*(?:extends\s+\w+\s*)?\{|class\s+[A-Za-z0-9_]+\s*(?:\([^)]*\))?\s*:|SELECT\s+[\s\S]+?\s+FROM|git\s+(commit|push|pull|checkout|branch|merge|status|clone|diff)\b)/i,
 ];
 
 module.exports = {

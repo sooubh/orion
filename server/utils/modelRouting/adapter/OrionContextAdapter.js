@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require("uuid");
+const { randomUUID: uuidv4 } = require("crypto");
 const { TaskClassifier } = require("../classifier/TaskClassifier");
 const { HardwareProfiler } = require("../profiler/HardwareProfiler");
 const { SENSITIVITY_LEVELS, SENSITIVITY_ORDER } = require("../contracts/types");
