@@ -14,6 +14,7 @@ export default function QuickActions({
   onCreateAgent,
   onEditWorkspace,
   onUploadDocument,
+  onManageDocuments,
 }) {
   const { t } = useTranslation();
   const { user } = useUser();
@@ -39,6 +40,13 @@ export default function QuickActions({
         // Any user can upload documents.
         show={true}
       />
+      {onManageDocuments && (
+        <QuickActionButton
+          label="Browse Documents"
+          onClick={onManageDocuments}
+          show={true}
+        />
+      )}
     </div>
   );
 }

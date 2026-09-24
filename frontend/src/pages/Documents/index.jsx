@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import paths from "@/utils/paths";
 import Sidebar, { SidebarMobileHeader } from "@/components/Sidebar";
 import { isMobile } from "react-device-detect";
 import {
@@ -21,6 +23,8 @@ import {
   Shield,
   ShieldCheck,
   Trash,
+  ChatCircleDots,
+  MinusCircle,
 } from "@phosphor-icons/react";
 import System from "@/models/system";
 import Workspace from "@/models/workspace";
@@ -34,6 +38,7 @@ export default function DocumentsPage() {
   const [documents, setDocuments] = useState([]);
   const [workspaces, setWorkspaces] = useState([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
+  const [selectedWorkspaceDetail, setSelectedWorkspaceDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,8 +86,12 @@ export default function DocumentsPage() {
 
       setDocuments(flatDocs);
       setWorkspaces(wsList || []);
-      if (wsList?.length > 0 && !selectedWorkspace) {
-        setSelectedWorkspace(wsList[0]);
+
+      const activeWs = selectedWorkspace || (wsList?.length > 0 ? wsList[0] : null);
+      if (activeWs) {
+        setSelectedWorkspace(activeWs);
+        const detail = await Workspace.bySlug(activeWs.slug);
+        setSelectedWorkspaceDetail(detail);
       }
     } catch (err) {
       console.error("Failed to load documents:", err);
@@ -105,6 +114,7 @@ export default function DocumentsPage() {
     setUploading(true);
     let successCount = 0;
     const errors = [];
+    const uploadedFileNames = [];
 
     try {
       for (const file of Array.from(files)) {
@@ -118,6 +128,7 @@ export default function DocumentsPage() {
 
         if (response?.ok && data?.success) {
           successCount++;
+          uploadedFileNames.push(file.name);
         } else {
           errors.push(data?.error || `Failed to upload ${file.name}`);
         }
@@ -125,9 +136,48 @@ export default function DocumentsPage() {
 
       if (successCount > 0) {
         showToast(
-          `Successfully uploaded and parsed ${successCount} file${successCount > 1 ? "s" : ""}`,
+          `Parsed ${successCount} file${successCount > 1 ? "s" : ""}. Embedding into workspace...`,
           "success"
         );
+
+        // Reload document list to discover the parsed document paths
+        const filesData = await System.localFiles();
+        const docPaths = [];
+        if (filesData?.items) {
+          for (const folder of filesData.items) {
+            const folderData = await System.localFiles(folder.name, 0, "all");
+            if (folderData?.documents) {
+              for (const doc of folderData.documents) {
+                // Match uploaded files by checking if the doc title/name contains any uploaded filename
+                const docBaseName = (doc.title || doc.name || "").replace(/\.[^.]+$/, "");
+                const matched = uploadedFileNames.some((fn) => {
+                  const uploadBase = fn.replace(/\.[^.]+$/, "");
+                  return docBaseName.toLowerCase().includes(uploadBase.toLowerCase());
+                });
+                if (matched) {
+                  docPaths.push(`${folder.name}/${doc.name}`);
+                }
+              }
+            }
+          }
+        }
+
+        // Auto-embed all newly uploaded docs into the selected workspace
+        if (docPaths.length > 0) {
+          const res = await Workspace.modifyEmbeddings(selectedWorkspace.slug, {
+            adds: docPaths,
+            deletes: [],
+          });
+          if (res?.workspace) {
+            showToast(
+              `Embedded ${docPaths.length} document${docPaths.length > 1 ? "s" : ""} into ${selectedWorkspace.name}`,
+              "success"
+            );
+          } else {
+            showToast("Documents parsed but embedding failed. You can embed manually.", "warning");
+          }
+        }
+
         await loadData();
       }
 
@@ -162,12 +212,38 @@ export default function DocumentsPage() {
 
       if (res?.workspace) {
         showToast(`Embedded "${doc.title || doc.name}" into ${selectedWorkspace.name}`, "success");
+        setSelectedWorkspaceDetail(res.workspace);
       } else {
         showToast("Failed to embed into workspace", "error");
       }
     } catch (err) {
       console.error("Embedding error:", err);
       showToast("Embedding failed", "error");
+    } finally {
+      setEmbeddingDocId(null);
+    }
+  }
+
+  async function handleUnembedFromWorkspace(doc) {
+    if (!selectedWorkspace) return;
+
+    setEmbeddingDocId(doc.id);
+    try {
+      const docPath = `${doc.folderName}/${doc.name}`;
+      const res = await Workspace.modifyEmbeddings(selectedWorkspace.slug, {
+        adds: [],
+        deletes: [docPath],
+      });
+
+      if (res?.workspace) {
+        showToast(`Unembedded "${doc.title || doc.name}" from ${selectedWorkspace.name}`, "success");
+        setSelectedWorkspaceDetail(res.workspace);
+      } else {
+        showToast("Failed to unembed from workspace", "error");
+      }
+    } catch (err) {
+      console.error("Unembedding error:", err);
+      showToast("Unembedding failed", "error");
     } finally {
       setEmbeddingDocId(null);
     }
@@ -455,9 +531,13 @@ export default function DocumentsPage() {
                 <span className="text-xs text-zinc-400 font-mono shrink-0">Embed Target:</span>
                 <select
                   value={selectedWorkspace?.slug || ""}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const ws = workspaces.find((w) => w.slug === e.target.value);
-                    if (ws) setSelectedWorkspace(ws);
+                    if (ws) {
+                      setSelectedWorkspace(ws);
+                      const detail = await Workspace.bySlug(ws.slug);
+                      setSelectedWorkspaceDetail(detail);
+                    }
                   }}
                   className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700/60 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
                 >
@@ -504,92 +584,143 @@ export default function DocumentsPage() {
                       <th className="py-3 px-4 font-semibold uppercase">Sensitivity</th>
                       <th className="py-3 px-4 font-semibold uppercase">Est. Chunks</th>
                       <th className="py-3 px-4 font-semibold uppercase">Size</th>
+                      <th className="py-3 px-4 font-semibold uppercase">Status</th>
                       <th className="py-3 px-5 font-semibold uppercase text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {filteredDocs.map((doc, idx) => (
-                      <tr key={idx} className="hover:bg-zinc-800/40 transition-colors group">
-                        <td className="py-3 px-5 font-medium text-white flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-700/60 shrink-0">
-                            {getFileIcon(doc.name)}
-                          </div>
-                          <div className="truncate max-w-xs md:max-w-md">
-                            <div className="truncate text-xs font-medium group-hover:text-indigo-300 transition-colors">
-                              {doc.title || doc.name}
+                    {filteredDocs.map((doc, idx) => {
+                      const isEmbedded = (selectedWorkspaceDetail?.documents || []).some(
+                        (d) =>
+                          d.docpath === `${doc.folderName}/${doc.name}` ||
+                          d.docpath === doc.name ||
+                          d.filename === doc.name
+                      );
+
+                      return (
+                        <tr key={idx} className="hover:bg-zinc-800/40 transition-colors group">
+                          <td className="py-3 px-5 font-medium text-white flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-700/60 shrink-0">
+                              {getFileIcon(doc.name)}
                             </div>
-                            <div className="text-[10px] text-zinc-500 font-mono truncate">{doc.id}</div>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-zinc-400 font-mono">
-                          <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300">
-                            {doc.folderName}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          {renderClassificationBadge(doc.classification, doc.classification_confidence, doc.classification_method)}
-                        </td>
-                        <td className="py-3 px-4 text-zinc-400 font-mono">
-                          {doc.token_count_estimate ? `${Math.ceil(doc.token_count_estimate / 250)} chunks` : "Parsed"}
-                        </td>
-                        <td className="py-3 px-4 text-zinc-400 font-mono">
-                          {humanFileSize(doc.cachedSize || 10240)}
-                        </td>
-                        <td className="py-3 px-5 text-right space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedDocForReview(doc);
-                              setReviewClassification(doc.classification || "CONFIDENTIAL");
-                              setReviewReason("");
-                            }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-500/30 text-xs font-medium transition-all cursor-pointer"
-                            title="Review or override sensitivity classification"
-                          >
-                            <Shield size={13} weight="duotone" />
-                            <span>Review</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedDocForPreview(doc)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60 text-xs font-medium transition-all cursor-pointer"
-                            title="Inspect metadata"
-                          >
-                            <Eye size={13} />
-                            <span>Preview</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleEmbedInWorkspace(doc)}
-                            disabled={embeddingDocId === doc.id}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
-                          >
-                            {embeddingDocId === doc.id ? (
-                              <CircleNotch size={13} className="animate-spin" />
+                            <div className="truncate max-w-xs md:max-w-md">
+                              <div className="truncate text-xs font-medium group-hover:text-indigo-300 transition-colors">
+                                {doc.title || doc.name}
+                              </div>
+                              <div className="text-[10px] text-zinc-500 font-mono truncate">{doc.id}</div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-zinc-400 font-mono">
+                            <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300">
+                              {doc.folderName}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {renderClassificationBadge(doc.classification, doc.classification_confidence, doc.classification_method)}
+                          </td>
+                          <td className="py-3 px-4 text-zinc-400 font-mono">
+                            {doc.token_count_estimate ? `${Math.ceil(doc.token_count_estimate / 250)} chunks` : "Parsed"}
+                          </td>
+                          <td className="py-3 px-4 text-zinc-400 font-mono">
+                            {humanFileSize(doc.cachedSize || 10240)}
+                          </td>
+                          <td className="py-3 px-4">
+                            {isEmbedded ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-medium whitespace-nowrap">
+                                <CheckCircle size={12} weight="fill" />
+                                <span>Embedded</span>
+                              </span>
                             ) : (
-                              <Lightning size={13} weight="fill" />
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-400 font-mono text-[11px] whitespace-nowrap">
+                                <CircleNotch size={12} />
+                                <span>Available</span>
+                              </span>
                             )}
-                            <span>Embed</span>
-                          </button>
-                          {canDelete && (
+                          </td>
+                          <td className="py-3 px-5 text-right space-x-2 whitespace-nowrap">
                             <button
                               type="button"
-                              onClick={() => handleDeleteDocument(doc)}
-                              disabled={deletingDocId === doc.id}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
-                              title="Delete document and remove indexed content"
+                              onClick={() => {
+                                setSelectedDocForReview(doc);
+                                setReviewClassification(doc.classification || "CONFIDENTIAL");
+                                setReviewReason("");
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-500/30 text-xs font-medium transition-all cursor-pointer"
+                              title="Review or override sensitivity classification"
                             >
-                              {deletingDocId === doc.id ? (
-                                <CircleNotch size={13} className="animate-spin" />
-                              ) : (
-                                <Trash size={13} />
-                              )}
-                              <span>Delete</span>
+                              <Shield size={13} weight="duotone" />
+                              <span>Review</span>
                             </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDocForPreview(doc)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60 text-xs font-medium transition-all cursor-pointer"
+                              title="Inspect metadata"
+                            >
+                              <Eye size={13} />
+                              <span>Preview</span>
+                            </button>
+                            {isEmbedded ? (
+                              <>
+                                <Link
+                                  to={paths.workspace.chat(selectedWorkspace?.slug || "primary")}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition-all cursor-pointer"
+                                  title="Ask questions about this document in workspace chat"
+                                >
+                                  <ChatCircleDots size={13} weight="fill" />
+                                  <span>Chat</span>
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUnembedFromWorkspace(doc)}
+                                  disabled={embeddingDocId === doc.id}
+                                  className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-700/60 text-xs font-medium transition-all disabled:opacity-50 cursor-pointer"
+                                  title={`Remove "${doc.title || doc.name}" from ${selectedWorkspace?.name || "workspace"}`}
+                                >
+                                  {embeddingDocId === doc.id ? (
+                                    <CircleNotch size={13} className="animate-spin" />
+                                  ) : (
+                                    <MinusCircle size={13} />
+                                  )}
+                                  <span>Unembed</span>
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleEmbedInWorkspace(doc)}
+                                disabled={embeddingDocId === doc.id}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                                title={`Embed into ${selectedWorkspace?.name || "workspace"} for AI RAG queries`}
+                              >
+                                {embeddingDocId === doc.id ? (
+                                  <CircleNotch size={13} className="animate-spin" />
+                                ) : (
+                                  <Lightning size={13} weight="fill" />
+                                )}
+                                <span>Embed</span>
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteDocument(doc)}
+                                disabled={deletingDocId === doc.id}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                                title="Delete document and remove indexed content"
+                              >
+                                {deletingDocId === doc.id ? (
+                                  <CircleNotch size={13} className="animate-spin" />
+                                ) : (
+                                  <Trash size={13} />
+                                )}
+                                <span>Delete</span>
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

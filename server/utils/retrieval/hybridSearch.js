@@ -87,9 +87,23 @@ class HybridSearch {
 
     const keywords = Array.from(new Set(words));
 
+    // 5. Detect explicit open/summarize document intent
+    const isOpenDocumentQuery =
+      /^(?:summarize|summary|overview|what(?:\s+is|\s+'s)?\s+in|explain|describe|tell\s+me\s+about|review)\s+(?:the\s+|all\s+|my\s+)?(?:document|documents|file|files|upload|workspace|data|content)\b/i.test(
+        trimmed
+      ) ||
+      /^(?:what\s+does\s+(?:the|this|my)\s+(?:document|file|report|data)\s+(?:say|contain|have|cover))/i.test(
+        trimmed
+      ) ||
+      /^(?:give\s+me\s+a\s+(?:summary|brief|overview|breakdown)\s+of\s+(?:the|this|all)\s+(?:document|documents|file|files))/i.test(
+        trimmed
+      ) ||
+      /^(?:summarize|summary|overview)\b/i.test(trimmed);
+
     return {
       isExplicitFilename,
       targetFilename,
+      isOpenDocumentQuery,
       entities,
       measurements,
       keywords,
@@ -436,23 +450,42 @@ class HybridSearch {
 
     // 5. HYBRID SCORING CALCULATION
     for (const item of candidates) {
-      // If exact filename was explicitly requested and matched strongly
-      if (analysis.isExplicitFilename && item.metadataScore >= 0.85) {
+      if (analysis.isOpenDocumentQuery) {
+        // Explicit request to summarize/review/overview workspace documents
+        // Prioritize intro/executive summary chunks + any vector correlation
+        const isIntroChunk =
+          item.id?.endsWith("_0") ||
+          item.id?.endsWith("-0") ||
+          item.id?.includes("_chunk_0") ||
+          item.metadata?.chunkIndex === 0;
+        const introBonus = isIntroChunk ? 0.35 : 0.15;
+        item.combinedScore = Math.min(1.0, 0.55 + 0.30 * (item.vectorScore || 0) + introBonus);
+      } else if (analysis.isExplicitFilename && item.metadataScore >= 0.85) {
+        // If exact filename was explicitly requested and matched strongly
         item.combinedScore = 0.50 * item.metadataScore + 0.30 * item.vectorScore + 0.20 * item.lexicalScore;
       } else {
-        // Natural language query: primary weight on semantic + entity/lexical + metadata overlap
+        // Natural language query: ensure vector similarity can surface chunks on its own
         const hasExactEntity = analysis.entities.length > 0 && item.lexicalScore > 0.2;
         const entityBonus = hasExactEntity ? 0.25 : 0;
+        const hasLexicalSignal = analysis.keywords.length > 0 || analysis.entities.length > 0 || analysis.measurements.length > 0;
 
-        item.combinedScore =
-          0.40 * item.vectorScore +
-          0.40 * item.lexicalScore +
-          0.20 * item.metadataScore +
-          entityBonus;
+        if (!hasLexicalSignal) {
+          // Pure semantic inquiry: vector similarity is primary
+          item.combinedScore = item.vectorScore;
+        } else {
+          // Blended search: dense vector + sparse lexical signals with floor
+          item.combinedScore = Math.max(
+            item.vectorScore * 0.85,
+            0.50 * item.vectorScore +
+            0.35 * item.lexicalScore +
+            0.15 * item.metadataScore +
+            entityBonus
+          );
+        }
       }
 
-      // Cap at 1.0
-      item.combinedScore = Math.min(1.0, item.combinedScore);
+      // Cap at 1.0 and floor at 0
+      item.combinedScore = Math.max(0.0, Math.min(1.0, item.combinedScore));
     }
 
     // 6. FILTER BY RELEVANCE THRESHOLD
