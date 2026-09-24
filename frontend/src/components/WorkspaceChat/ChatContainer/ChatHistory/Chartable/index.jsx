@@ -75,8 +75,8 @@ export function Chartable({ props }) {
     switch (chartType) {
       case "area":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             <AreaChart
@@ -92,8 +92,8 @@ export function Chartable({ props }) {
         );
       case "bar":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             <BarChart
@@ -111,8 +111,8 @@ export function Chartable({ props }) {
         );
       case "line":
         return (
-          <div className="bg-theme-bg-primary p-8 pb-12 rounded-xl text-white h-[500px] w-full light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 pb-12 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200 h-[500px] w-full">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             <LineChart
@@ -128,8 +128,8 @@ export function Chartable({ props }) {
         );
       case "composed":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-600 dark:text-zinc-400">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-2">
               {title}
             </h3>
             {showLegend && (
@@ -150,7 +150,7 @@ export function Chartable({ props }) {
                 tickLine={false}
                 axisLine={false}
                 interval="preserveStartEnd"
-                tick={{ transform: "translate(0, 6)", fill: "white" }}
+                tick={{ transform: "translate(0, 6)", fill: "currentColor" }}
                 style={{
                   fontSize: "12px",
                   fontFamily: "Inter; Helvetica",
@@ -161,7 +161,7 @@ export function Chartable({ props }) {
                 tickLine={false}
                 axisLine={false}
                 type="number"
-                tick={{ transform: "translate(-3, 0)", fill: "white" }}
+                tick={{ transform: "translate(-3, 0)", fill: "currentColor" }}
                 style={{
                   fontSize: "12px",
                   fontFamily: "Inter; Helvetica",
@@ -186,8 +186,8 @@ export function Chartable({ props }) {
         );
       case "scatter":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-600 dark:text-zinc-400">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-2">
               {title}
             </h3>
             {showLegend && (
@@ -210,7 +210,7 @@ export function Chartable({ props }) {
                 tickLine={false}
                 axisLine={false}
                 interval="preserveStartEnd"
-                tick={{ transform: "translate(0, 6)", fill: "white" }}
+                tick={{ transform: "translate(0, 6)", fill: "currentColor" }}
                 style={{
                   fontSize: "12px",
                   fontFamily: "Inter; Helvetica",
@@ -221,7 +221,7 @@ export function Chartable({ props }) {
                 tickLine={false}
                 axisLine={false}
                 type="number"
-                tick={{ transform: "translate(-3, 0)", fill: "white" }}
+                tick={{ transform: "translate(-3, 0)", fill: "currentColor" }}
                 style={{
                   fontSize: "12px",
                   fontFamily: "Inter; Helvetica",
@@ -234,8 +234,8 @@ export function Chartable({ props }) {
         );
       case "pie":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             <DonutChart
@@ -251,7 +251,6 @@ export function Chartable({ props }) {
                 "teal",
                 "fuchsia",
               ]}
-              // No actual legend for pie chart, but this will toggle the central text
               showLabel={showLegend}
               valueFormatter={dataFormatter}
               customTooltip={customTooltip}
@@ -260,8 +259,8 @@ export function Chartable({ props }) {
         );
       case "radar":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-600 dark:text-zinc-400">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-2">
               {title}
             </h3>
             {showLegend && (
@@ -282,8 +281,8 @@ export function Chartable({ props }) {
               data={data}
             >
               <PolarGrid />
-              <PolarAngleAxis dataKey="name" tick={{ fill: "white" }} />
-              <PolarRadiusAxis tick={{ fill: "white" }} />
+              <PolarAngleAxis dataKey="name" tick={{ fill: "currentColor" }} />
+              <PolarRadiusAxis tick={{ fill: "currentColor" }} />
               <Tooltip legendColor={getTremorColor(color || "blue")} />
               <Radar
                 dataKey="value"
@@ -296,8 +295,8 @@ export function Chartable({ props }) {
         );
       case "radialbar":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             {showLegend && (
@@ -333,8 +332,8 @@ export function Chartable({ props }) {
         );
       case "treemap":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             {showLegend && (
@@ -361,8 +360,8 @@ export function Chartable({ props }) {
         );
       case "funnel":
         return (
-          <div className="bg-theme-bg-primary p-8 rounded-xl text-white light:border light:border-theme-border-primary">
-            <h3 className="text-lg text-theme-text-primary font-medium">
+          <div className="bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#22262d] p-8 rounded-xl shadow-xs text-slate-800 dark:text-zinc-200">
+            <h3 className="text-lg text-slate-900 dark:text-white font-semibold mb-4">
               {title}
             </h3>
             {showLegend && (
@@ -393,7 +392,7 @@ export function Chartable({ props }) {
             <DownloadGraph onClick={handleDownload} />
             <div ref={ref}>{renderChart()}</div>
             <span
-              className="flex flex-col gap-y-1 mt-2"
+              className="flex flex-col gap-y-1 mt-2 text-xs text-slate-600 dark:text-zinc-400"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(renderMarkdown(content.caption)),
               }}
@@ -412,7 +411,7 @@ export function Chartable({ props }) {
           <div ref={ref}>{renderChart()}</div>
         </div>
         <span
-          className="flex flex-col gap-y-1 mt-2"
+          className="flex flex-col gap-y-1 mt-2 text-xs text-slate-600 dark:text-zinc-400"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(renderMarkdown(content.caption)),
           }}
@@ -428,17 +427,17 @@ const customTooltip = (props) => {
   const categoryPayload = payload?.[0];
   if (!categoryPayload) return null;
   return (
-    <div className="w-56 bg-theme-bg-primary rounded-lg border p-2 text-white">
+    <div className="w-56 bg-white dark:bg-[#111215] rounded-lg border border-slate-200 dark:border-[#22262d] p-2.5 shadow-lg text-slate-800 dark:text-zinc-200">
       <div className="flex flex-1 space-x-2.5">
         <div
           className={`flex w-1.5 flex-col bg-${categoryPayload?.color}-500 rounded`}
         />
         <div className="w-full">
           <div className="flex items-center justify-between space-x-8">
-            <p className="whitespace-nowrap text-right text-tremor-content">
+            <p className="whitespace-nowrap text-right text-xs text-slate-500 dark:text-zinc-400">
               {categoryPayload.name}
             </p>
-            <p className="whitespace-nowrap text-right font-medium text-tremor-content-emphasis">
+            <p className="whitespace-nowrap text-right font-semibold text-xs text-slate-900 dark:text-white">
               {categoryPayload.value}
             </p>
           </div>
@@ -462,13 +461,13 @@ function DownloadGraph({ onClick }) {
         <div className="p-1 rounded-full border-none">
           {loading ? (
             <CircleNotch
-              className="text-theme-text-primary w-5 h-5 animate-spin"
+              className="text-slate-600 dark:text-zinc-400 w-5 h-5 animate-spin"
               aria-label="Downloading image..."
             />
           ) : (
             <DownloadSimple
               weight="bold"
-              className="text-theme-text-primary w-5 h-5 hover:text-theme-text-primary"
+              className="text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white w-5 h-5 transition-colors"
               onClick={handleClick}
               aria-label="Download graph image"
             />

@@ -31,7 +31,7 @@ const PromptReply = ({ uuid, reply, pending, error, sources = [] }) => {
             {t("chat_window.generating_response")}
           </span>
           <div
-            className="mt-3 ml-1 dot-falling light:invert"
+            className="mt-3 ml-1 dot-falling invert dark:invert-0"
             aria-hidden="true"
           ></div>
         </div>
@@ -49,12 +49,12 @@ const PromptReply = ({ uuid, reply, pending, error, sources = [] }) => {
             changes to tell them the turn ended.
           */}
           <span
-            className="inline-block p-2 rounded-lg bg-red-50 text-red-500"
+            className="inline-block p-2.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 shadow-xs"
             role="alert"
           >
             <Warning className="h-4 w-4 mb-1 inline-block" />{" "}
             {t("chat_window.response_failed")}
-            <span className="text-xs">
+            <span className="text-xs ml-1">
               {t("chat_window.response_failed_reason", {
                 reason: error || "unknown",
               })}

@@ -326,6 +326,18 @@ export default function handleSocketResponse(socket, event, setChatHistory) {
           );
         }
 
+        if (type === "fullTextResponse") {
+          return prev.map((msg) =>
+            msg.uuid === uuid
+              ? {
+                  ...msg,
+                  type: "textResponse",
+                  content: content,
+                }
+              : msg
+          );
+        }
+
         if (type === "textResponseChunk") {
           return prev
             .map((msg) =>

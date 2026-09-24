@@ -303,7 +303,7 @@ const Workspace = {
       return this.get(clause);
 
     try {
-      const workspace = await prisma.workspaces.findFirst({
+      let workspace = await prisma.workspaces.findFirst({
         where: {
           ...clause,
           workspace_users: {
@@ -317,6 +317,43 @@ const Workspace = {
           documents: true,
         },
       });
+
+      if (!workspace && clause.slug && typeof clause.slug === "string") {
+        workspace = await prisma.workspaces.findFirst({
+          where: {
+            ...clause,
+            slug: clause.slug.toLowerCase(),
+            workspace_users: {
+              some: {
+                user_id: user?.id,
+              },
+            },
+          },
+          include: {
+            workspace_users: true,
+            documents: true,
+          },
+        });
+      }
+
+      if (!workspace && clause.slug && !isNaN(Number(clause.slug))) {
+        const { slug: _s, ...restClause } = clause;
+        workspace = await prisma.workspaces.findFirst({
+          where: {
+            ...restClause,
+            id: Number(clause.slug),
+            workspace_users: {
+              some: {
+                user_id: user?.id,
+              },
+            },
+          },
+          include: {
+            workspace_users: true,
+            documents: true,
+          },
+        });
+      }
 
       if (!workspace) return null;
 
@@ -372,16 +409,42 @@ const Workspace = {
 
   get: async function (clause = {}) {
     try {
-      const workspace = await prisma.workspaces.findFirst({
+      let workspace = await prisma.workspaces.findFirst({
         where: clause,
         include: {
           documents: true,
         },
       });
 
+      if (!workspace && clause.slug && typeof clause.slug === "string") {
+        workspace = await prisma.workspaces.findFirst({
+          where: {
+            ...clause,
+            slug: clause.slug.toLowerCase(),
+          },
+          include: {
+            documents: true,
+          },
+        });
+      }
+
+      if (!workspace && clause.slug && !isNaN(Number(clause.slug))) {
+        const { slug: _s, ...restClause } = clause;
+        workspace = await prisma.workspaces.findFirst({
+          where: {
+            ...restClause,
+            id: Number(clause.slug),
+          },
+          include: {
+            documents: true,
+          },
+        });
+      }
+
       if (!workspace) return null;
       return {
         ...workspace,
+        documents: await Document.forWorkspace(workspace.id),
         contextWindow: this._getContextWindow(workspace),
         currentContextTokenCount: await this._getCurrentContextTokenCount(
           workspace.id

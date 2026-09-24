@@ -46,9 +46,9 @@ export default function Tooltip({ legendColor, ...props }) {
       {...props}
       content={({ active, payload, label }) => {
         return active && payload ? (
-          <div className="bg-theme-bg-primary text-sm rounded-md border shadow-lg">
-            <div className="border-b py-2 px-4">
-              <p className="text-theme-bg-primary font-medium">{label}</p>
+          <div className="bg-white dark:bg-[#111215] text-sm rounded-md border border-slate-200 dark:border-[#22262d] shadow-lg">
+            <div className="border-b border-slate-200 dark:border-[#22262d] py-2 px-4">
+              <p className="text-slate-900 dark:text-white font-semibold">{label}</p>
             </div>
             <div className="space-y-1 py-2 px-4">
               {payload.map(({ value, name }, idx) => (
@@ -58,24 +58,14 @@ export default function Tooltip({ legendColor, ...props }) {
                 >
                   <div className="flex items-center space-x-2">
                     <span
-                      className="shrink-0 h-3 w-3 border-theme-bg-primary rounded-md rounded-full border-2 shadow-md"
+                      className="shrink-0 h-3 w-3 rounded-full border border-slate-200 dark:border-zinc-700 shadow-xs"
                       style={{ backgroundColor: legendColor }}
                     />
-                    <p
-                      style={{
-                        color: invertColor(legendColor, true),
-                      }}
-                      className="font-medium tabular-nums text-right whitespace-nowrap"
-                    >
+                    <p className="font-semibold tabular-nums text-slate-900 dark:text-white text-right whitespace-nowrap">
                       {value}
                     </p>
                   </div>
-                  <p
-                    style={{
-                      color: invertColor(legendColor, true),
-                    }}
-                    className="whitespace-nowrap font-normal"
-                  >
+                  <p className="whitespace-nowrap font-normal text-slate-600 dark:text-zinc-400">
                     {name}
                   </p>
                 </div>

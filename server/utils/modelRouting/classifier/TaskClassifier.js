@@ -54,6 +54,8 @@ class TaskClassifier {
       requiresVisionOverride ?? (hasImageAttachment || (mentionsVision && !detectedType));
 
     // 3. Code detection
+    const hasCodeIndicator = CODE_INDICATORS.some((pat) => pat.test(promptStr));
+    const requiresCode = requiresCodeOverride ?? hasCodeIndicator;
 
     if (!detectedType) {
       if (requiresVision) {

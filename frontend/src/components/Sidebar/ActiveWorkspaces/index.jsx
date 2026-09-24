@@ -122,9 +122,10 @@ export default function ActiveWorkspaces() {
                           aria-current={isActive ? "page" : ""}
                           className={`
                             transition-all duration-[200ms]
-                            flex flex-grow w-[75%] gap-x-2 py-[6px] pl-[4px] pr-[6px] rounded-[4px] text-white justify-start items-center
-                            bg-theme-sidebar-item-default
-                            ${isActive ? "light:bg-blue-200 font-bold" : "hover:bg-theme-sidebar-subitem-hover light:hover:bg-slate-300"}
+                            flex flex-grow w-[75%] gap-x-2 py-[6px] pl-[6px] pr-[6px] rounded-[6px] justify-start items-center
+                            ${isActive
+                              ? "bg-sky-50 dark:bg-sky-500/15 text-sky-950 dark:text-white font-bold border border-sky-200 dark:border-sky-500/30 shadow-sm"
+                              : "text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-theme-sidebar-subitem-hover"}
                           `}
                         >
                           <div className="flex flex-row justify-between w-full items-center">
@@ -133,8 +134,8 @@ export default function ActiveWorkspaces() {
                               className="cursor-grab mr-[3px]"
                             >
                               <DotsSixVertical
-                                size={20}
-                                className={`${isActive ? "text-white light:text-blue-800" : ""}`}
+                                size={18}
+                                className={`${isActive ? "text-sky-700 dark:text-sky-300" : "text-slate-400 dark:text-zinc-500"}`}
                                 weight="bold"
                               />
                             </div>
@@ -146,8 +147,8 @@ export default function ActiveWorkspaces() {
                               <div className="w-[130px] overflow-hidden">
                                 <p
                                   className={`
-                                  text-[14px] leading-loose whitespace-nowrap overflow-hidden
-                                  ${isActive ? "font-bold text-white light:text-blue-900" : "font-medium "} truncate
+                                  text-[13px] leading-snug whitespace-nowrap overflow-hidden
+                                  ${isActive ? "font-bold text-sky-950 dark:text-white" : "font-medium text-slate-700 dark:text-zinc-300"} truncate
                                   w-full group-hover:w-[130px] group-hover:duration-200
                                 `}
                                 >
@@ -168,10 +169,10 @@ export default function ActiveWorkspaces() {
                                   }}
                                   data-tooltip-id="upload-workspace"
                                   data-tooltip-content="Upload documents to this workspace for RAG indexing"
-                                  className={`group/upload border-none rounded-md flex items-center justify-center ml-auto p-[2px] ${isActive ? "hover:bg-zinc-500 light:hover:bg-sky-800/30" : "hover:bg-zinc-500 light:hover:bg-slate-400"}`}
+                                  className={`group/upload border-none rounded-md flex items-center justify-center ml-auto p-[2px] ${isActive ? "hover:bg-sky-100 dark:hover:bg-zinc-700 text-sky-700 dark:text-zinc-300" : "hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-500 dark:text-zinc-400"}`}
                                 >
                                   <UploadSimple
-                                    className={`h-[20px] w-[20px] ${isActive ? "text-zinc-400 hover:text-white light:text-blue-700 light:group-hover/upload:text-blue-900" : "text-zinc-400 hover:text-white light:text-slate-600 light:group-hover/upload:text-slate-950"}`}
+                                    className="h-[16px] w-[16px] hover:text-sky-900 dark:hover:text-white transition-colors"
                                   />
                                 </button>
                                 <button
@@ -186,7 +187,7 @@ export default function ActiveWorkspaces() {
                                           )
                                     );
                                   }}
-                                  className={`group/gear rounded-md flex items-center justify-center ml-auto p-[2px] ${isActive ? "hover:bg-zinc-500 light:hover:bg-sky-800/30" : "hover:bg-zinc-500 light:hover:bg-slate-400"}`}
+                                  className={`group/gear rounded-md flex items-center justify-center ml-auto p-[2px] ${isActive ? "hover:bg-sky-100 dark:hover:bg-zinc-700 text-sky-700 dark:text-zinc-300" : "hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-500 dark:text-zinc-400"}`}
                                   aria-label="General appearance settings"
                                   data-tooltip-id="gear-workspace"
                                   data-tooltip-content="General appearance settings"
@@ -195,10 +196,10 @@ export default function ActiveWorkspaces() {
                                     color={
                                       isInWorkspaceSettings &&
                                       workspace.slug === slug
-                                        ? "#46C8FF"
+                                        ? "#0284c7"
                                         : undefined
                                     }
-                                    className={`h-[20px] w-[20px] ${isActive ? "text-zinc-400 hover:text-white light:text-blue-700 light:group-hover/gear:text-blue-900" : "text-zinc-400 hover:text-white light:text-slate-600 light:group-hover/gear:text-slate-950"}`}
+                                    className="h-[16px] w-[16px] hover:text-sky-900 dark:hover:text-white transition-colors"
                                   />
                                 </button>
                               </div>

@@ -79,7 +79,7 @@ export default function DefaultChatContainer() {
           alt="Custom Logo"
           className=" w-[200px] h-fit mb-5 rounded-lg"
         />
-        <h1 className="text-white text-2xl font-semibold">
+        <h1 className="text-slate-900 dark:text-white text-2xl font-semibold">
           {t("home.welcome")}, {user.username}!
         </h1>
         <p className="text-theme-home-text-secondary text-base text-center whitespace-pre-line">
@@ -108,7 +108,7 @@ const Layout = ({ children }) => {
   return (
     <div
       style={{ height: isMobile ? "100%" : "calc(100% - 32px)" }}
-      className={`relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary light:border-[1px] light:border-theme-sidebar-border w-full h-full overflow-y-scroll ${showScrollbar ? "show-scrollbar" : "no-scroll"}`}
+      className={`relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary border border-slate-200 dark:border-theme-sidebar-border w-full h-full overflow-y-scroll ${showScrollbar ? "show-scrollbar" : "no-scroll"}`}
     >
       {children}
     </div>

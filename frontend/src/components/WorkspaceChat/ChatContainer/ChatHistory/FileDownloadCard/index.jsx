@@ -31,7 +31,7 @@ function FileDownloadCard({ props }) {
   return (
     <div className="flex justify-center w-full my-2">
       <div className="w-full max-w-[750px] mr-4">
-        <div className="flex items-center justify-between bg-zinc-800 light:bg-slate-100 light:border light:border-slate-200/50 rounded-xl px-2 py-1">
+        <div className="flex items-center justify-between bg-white dark:bg-[#16181d] border border-slate-200 dark:border-[#22262d] rounded-xl px-3 py-2 shadow-xs">
           <div className="flex items-center gap-x-3 min-w-0">
             <div
               className={`${badgeBg} ${badgeText} rounded-lg flex items-center justify-center flex-shrink-0 h-[48px] w-[48px] text-xs font-bold`}
@@ -39,10 +39,10 @@ function FileDownloadCard({ props }) {
               {badge}
             </div>
             <div className="flex flex-col min-w-0">
-              <p className="text-white light:text-slate-900 text-sm font-medium truncate leading-snug">
+              <p className="text-slate-900 dark:text-white text-sm font-semibold truncate leading-snug">
                 {filename || "Unknown file"}
               </p>
-              <p className="text-zinc-400 light:text-slate-500 text-xs leading-snug">
+              <p className="text-slate-600 dark:text-zinc-400 text-xs leading-snug">
                 {humanFileSize(fileSize, true, 1)}
                 {fileSize && fileType ? " · " : ""}
                 {fileType}
@@ -52,7 +52,7 @@ function FileDownloadCard({ props }) {
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="flex items-center gap-x-2 px-4 py-2 rounded-lg border border-zinc-600 light:border-theme-sidebar-border hover:bg-zinc-700 light:hover:bg-theme-bg-secondary transition-colors text-white light:text-theme-text-primary text-sm font-medium flex-shrink-0 ml-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-x-2 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-[#2a2e36] bg-slate-100 hover:bg-slate-200 dark:bg-[#1f2328] dark:hover:bg-[#252a30] transition-colors text-slate-800 dark:text-zinc-200 text-sm font-medium flex-shrink-0 ml-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {downloading ? (
               <CircleNotch size={16} weight="bold" className="animate-spin" />

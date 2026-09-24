@@ -24,32 +24,32 @@ export default function MemoryTabs() {
           onClick={() => setActiveTab("workspace")}
           data-tooltip-id="memories-workspace-pill"
           data-tooltip-content={workspaceName}
-          className={`flex items-center gap-0.5 h-6 px-3 rounded-full border-none cursor-pointer text-xs font-medium uppercase tracking-[1.2px] whitespace-nowrap transition-colors min-w-0 shrink ${
+          className={`flex items-center gap-0.5 h-6 px-3 rounded-full border-none cursor-pointer text-xs font-semibold uppercase tracking-[1.2px] whitespace-nowrap transition-colors min-w-0 shrink ${
             activeTab === "workspace"
-              ? "bg-zinc-800 light:bg-slate-300"
-              : "bg-transparent hover:bg-zinc-800/50 light:hover:bg-slate-200"
+              ? "bg-slate-200 dark:bg-zinc-800 text-slate-900 dark:text-white"
+              : "bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800/50 text-slate-600 dark:text-zinc-400"
           }`}
         >
-          <span className="text-zinc-200 light:text-slate-800 truncate max-w-[140px]">
+          <span className="truncate max-w-[140px]">
             {workspaceName}
           </span>
-          <span className="text-zinc-400 light:text-slate-600 font-normal">
+          <span className="text-slate-500 dark:text-zinc-500 font-normal">
             ({workspaceCount}/{LIMITS.workspace})
           </span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("global")}
-          className={`flex items-center gap-0.5 h-6 px-3 rounded-full border-none cursor-pointer text-xs font-medium uppercase tracking-[1.2px] whitespace-nowrap transition-colors shrink-0 ${
+          className={`flex items-center gap-0.5 h-6 px-3 rounded-full border-none cursor-pointer text-xs font-semibold uppercase tracking-[1.2px] whitespace-nowrap transition-colors shrink-0 ${
             activeTab === "global"
-              ? "bg-zinc-800 light:bg-slate-300"
-              : "bg-transparent hover:bg-zinc-800/50 light:hover:bg-slate-200"
+              ? "bg-slate-200 dark:bg-zinc-800 text-slate-900 dark:text-white"
+              : "bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800/50 text-slate-600 dark:text-zinc-400"
           }`}
         >
-          <span className="text-zinc-200 light:text-slate-800">
+          <span className="truncate max-w-[120px] inline-block">
             {t("chat_window.memories.tab_global")}
           </span>
-          <span className="text-zinc-400 light:text-slate-600 font-normal">
+          <span className="text-slate-500 dark:text-zinc-500 font-normal">
             ({globalCount}/{LIMITS.global})
           </span>
         </button>
@@ -58,7 +58,7 @@ export default function MemoryTabs() {
         type="button"
         onClick={openCreateModal}
         disabled={atLimit}
-        className="-mr-1 flex items-center justify-center size-6 rounded-lg border-none bg-transparent cursor-pointer text-zinc-50 light:text-slate-900 hover:bg-zinc-800 light:hover:bg-slate-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        className="-mr-1 flex items-center justify-center size-6 rounded-lg border-none bg-transparent cursor-pointer text-slate-700 hover:text-slate-900 dark:text-zinc-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
       >
         <Plus size={16} weight="bold" />
       </button>

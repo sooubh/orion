@@ -175,14 +175,14 @@ export default function SlashCommandsTab({
       {/* Add new */}
       <div
         onClick={openAddModal}
-        className="flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer hover:bg-zinc-700/50 light:hover:bg-slate-100"
+        className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1f2328] transition-colors"
       >
         <Plus
           size={12}
           weight="bold"
-          className="text-white light:text-slate-900"
+          className="text-slate-700 dark:text-zinc-300"
         />
-        <span className="text-xs text-white light:text-slate-900">
+        <span className="text-xs font-medium text-slate-700 dark:text-zinc-300">
           {t("chat_window.add_new")}
         </span>
       </div>

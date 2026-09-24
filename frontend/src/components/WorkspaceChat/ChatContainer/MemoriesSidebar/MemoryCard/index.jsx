@@ -39,12 +39,12 @@ export default function MemoryCard({ memory }) {
     : memories.workspace.length < LIMITS.workspace;
 
   return (
-    <div className="relative shrink-0 bg-zinc-900 light:bg-white light:border light:border-slate-300 rounded-lg p-3 flex gap-0.5 items-start">
+    <div className="relative shrink-0 bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl p-3 flex gap-0.5 items-start shadow-xs">
       <div className="flex-1 min-w-0">
-        <p className="text-sm leading-5 text-zinc-50 light:text-slate-900">
+        <p className="text-sm leading-5 text-slate-900 dark:text-white">
           {memory.content}
         </p>
-        <p className="text-xs leading-4 text-zinc-400 light:text-slate-500 mt-1.5">
+        <p className="text-xs leading-4 text-slate-500 dark:text-zinc-500 mt-1.5">
           {new Date(memory.createdAt).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -56,7 +56,7 @@ export default function MemoryCard({ memory }) {
         ref={buttonRef}
         type="button"
         onClick={() => setMenuOpen(!menuOpen)}
-        className="shrink-0 border-none bg-transparent cursor-pointer text-zinc-400 light:text-slate-400 hover:text-zinc-50 light:hover:text-slate-900 transition-colors p-0"
+        className="shrink-0 border-none bg-transparent cursor-pointer text-slate-400 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-white transition-colors p-0"
       >
         <DotsThreeVertical size={20} weight="bold" />
       </button>

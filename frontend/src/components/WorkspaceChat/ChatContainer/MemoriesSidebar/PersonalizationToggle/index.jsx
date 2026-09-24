@@ -35,13 +35,13 @@ export default function PersonalizationToggle() {
   if (!canToggle || loadingEnabled) return null;
 
   return (
-    <div className="shrink-0 bg-zinc-900 light:bg-white light:border light:border-slate-300 rounded-2xl p-4 space-y-3">
+    <div className="shrink-0 bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-2xl p-4 space-y-3 shadow-xs">
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-zinc-50 light:text-slate-900">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">
             {t("chat_window.memories.toggle.label")}
           </p>
-          <p className="text-xs leading-4 text-zinc-400 light:text-slate-500">
+          <p className="text-xs leading-4 text-slate-500 dark:text-zinc-400 mt-0.5">
             {t("chat_window.memories.toggle.description")}
           </p>
         </div>
@@ -52,12 +52,12 @@ export default function PersonalizationToggle() {
         />
       </div>
       {enabled && (
-        <div className="flex items-start gap-3 pt-2 border-t border-zinc-800 light:border-slate-200">
+        <div className="flex items-start gap-3 pt-2.5 border-t border-slate-200 dark:border-[#1f2328]">
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-50 light:text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">
               {t("chat_window.memories.auto_extraction.label")}
             </p>
-            <p className="text-xs leading-4 text-zinc-400 light:text-slate-500">
+            <p className="text-xs leading-4 text-slate-500 dark:text-zinc-400 mt-0.5">
               {t("chat_window.memories.auto_extraction.description")}
             </p>
           </div>

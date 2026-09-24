@@ -35,7 +35,7 @@ export default function CardMenu({
   return createPortal(
     <div
       ref={menuRef}
-      className="fixed z-[9999] bg-zinc-800 light:bg-slate-50 border border-zinc-700 light:border-slate-300 rounded-lg py-3 px-2 flex flex-col shadow-lg w-[175px]"
+      className="fixed z-[9999] bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl py-2 px-1 flex flex-col shadow-xl w-[175px]"
       style={{ top: pos.top, left: pos.left }}
     >
       <MenuItem label={t("chat_window.memories.menu.edit")} onClick={onEdit} />
@@ -63,7 +63,7 @@ function MenuItem({ label, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left text-sm font-medium text-zinc-50 light:text-slate-800 border-none bg-transparent cursor-pointer hover:bg-zinc-700 light:hover:bg-slate-200 rounded px-2.5 py-1 transition-colors"
+      className="w-full text-left text-sm font-medium text-slate-800 dark:text-zinc-200 border-none bg-transparent cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1f2328] rounded-lg px-2.5 py-1.5 transition-colors"
     >
       {label}
     </button>

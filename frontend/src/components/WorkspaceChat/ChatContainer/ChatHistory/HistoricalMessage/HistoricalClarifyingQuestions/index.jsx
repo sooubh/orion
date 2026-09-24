@@ -27,7 +27,7 @@ function SurveyCard({ survey }) {
   return (
     <div
       style={{ borderRadius: "20px" }}
-      className="border border-solid border-zinc-700 light:border-zinc-300 bg-transparent p-[18px] flex flex-col gap-[18px]"
+      className="border border-slate-200 dark:border-[#22262d] bg-white dark:bg-[#111215] shadow-xs p-[18px] flex flex-col gap-[18px]"
     >
       <SurveyBody questions={questions} result={result} />
     </div>

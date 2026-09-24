@@ -237,11 +237,18 @@ const Workspace = {
     return workspaces;
   },
   bySlug: async function (slug = "") {
-    const workspace = await fetch(`${API_BASE}/workspace/${slug}`, {
-      headers: baseHeaders(),
-    })
-      .then((res) => res.json())
-      .then((res) => res.workspace)
+    if (!slug) return null;
+    const workspace = await fetch(
+      `${API_BASE}/workspace/${encodeURIComponent(slug)}`,
+      {
+        headers: baseHeaders(),
+      }
+    )
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((res) => res?.workspace || null)
       .catch(() => null);
     return workspace;
   },
@@ -316,10 +323,10 @@ const Workspace = {
         if (!res.ok) throw new Error("Could not fetch suggested messages.");
         return res.json();
       })
-      .then((res) => res.suggestedMessages)
+      .then((res) => res?.suggestedMessages || [])
       .catch((e) => {
         console.error(e);
-        return null;
+        return [];
       });
   },
   setSuggestedMessages: async function (slug, messages) {
@@ -573,7 +580,10 @@ const Workspace = {
       `${API_BASE}/workspace/${slug}/is-agent-command-available`,
       { headers: baseHeaders() }
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return { showAgentCommand: true };
+        return res.json();
+      })
       .catch((e) => {
         console.error(e);
         return { showAgentCommand: true };

@@ -25,11 +25,11 @@ export default function SourceItem({ source, onClick }) {
           url={info.href}
           customImage={customImage}
         />
-        <p className="flex-1 font-medium text-sm text-white light:text-slate-900 leading-[15px] truncate">
+        <p className="flex-1 font-semibold text-sm text-slate-900 dark:text-white leading-[15px] truncate">
           {source.title}
         </p>
       </div>
-      <div className="flex flex-col gap-[2px] pl-[22px] text-[10px] text-zinc-400 light:text-slate-500 leading-[14px]">
+      <div className="flex flex-col gap-[2px] pl-[22px] text-[10px] text-slate-500 dark:text-zinc-400 leading-[14px]">
         <p>{subtitle}</p>
         <p>{t("chat_window.source_count", { count: source.references })}</p>
       </div>

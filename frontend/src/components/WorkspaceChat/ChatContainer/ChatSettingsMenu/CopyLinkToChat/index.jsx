@@ -34,9 +34,9 @@ export default function CopyLinkToChatRow() {
     <>
       <div
         onClick={handleClick}
-        className="flex items-center px-2 py-1 rounded cursor-pointer hover:bg-zinc-700 light:hover:bg-slate-200"
+        className="flex items-center px-2 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-[#16181d] text-slate-700 dark:text-zinc-300 transition-colors"
       >
-        <span className="text-sm font-normal text-white light:text-slate-800">
+        <span className="text-sm font-medium">
           {copied ? "Link copied!" : "Copy chat link"}
         </span>
       </div>
@@ -54,10 +54,10 @@ function CopyLinkModal({ isOpen, closeModal, url }) {
     <Modal isOpen={isOpen} onClose={closeModal}>
       <ModalHeader title="Chat link copied!" onClose={closeModal} />
       <ModalBody>
-        <p className="text-sm text-zinc-400 light:text-slate-500">
+        <p className="text-sm text-slate-600 dark:text-zinc-400">
           The link to this chat has been copied to your clipboard.
         </p>
-        <p className="text-sm text-zinc-400 light:text-slate-500">
+        <p className="text-sm text-slate-600 dark:text-zinc-400">
           This <strong>does not</strong> change permissions on the chat and is
           simply a way for you to quick link to you own chats.
         </p>

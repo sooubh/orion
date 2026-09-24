@@ -14,9 +14,9 @@ export default function ModelRouteNotification({ routedTo, isStreaming }) {
 
   return (
     <div className="flex w-full my-2">
-      <div className="rounded-[20px] border border-zinc-700 light:border-slate-300 px-4 py-2 flex items-center gap-2">
+      <div className="rounded-full bg-slate-100 dark:bg-[#16181d] border border-slate-200 dark:border-[#22262d] px-4 py-1.5 flex items-center gap-2 shadow-xs">
         <RouterIcon isStreaming={isStreaming} />
-        <span className="text-sm text-zinc-400 light:text-slate-600 whitespace-nowrap">
+        <span className="text-sm text-slate-700 dark:text-zinc-300 whitespace-nowrap">
           {routedTo.ruleTitle ? (
             <Trans
               i18nKey="model-router.chat.routed-to-rule"
@@ -25,7 +25,7 @@ export default function ModelRouteNotification({ routedTo, isStreaming }) {
                 ruleTitle: routedTo.ruleTitle,
               }}
               components={{
-                route: <span className="text-zinc-50 light:text-slate-950" />,
+                route: <span className="text-slate-950 dark:text-white font-semibold" />,
                 rule: <span />,
               }}
             />
@@ -36,7 +36,7 @@ export default function ModelRouteNotification({ routedTo, isStreaming }) {
                 model: routedTo.model,
               }}
               components={{
-                route: <span className="text-zinc-50 light:text-slate-950" />,
+                route: <span className="text-slate-950 dark:text-white font-semibold" />,
               }}
             />
           )}
@@ -49,7 +49,7 @@ export default function ModelRouteNotification({ routedTo, isStreaming }) {
 function RouterIcon({ isStreaming }) {
   if (!isStreaming)
     return (
-      <Shuffle className="w-4 h-4 text-zinc-50 light:text-slate-950 flex-shrink-0" />
+      <Shuffle className="w-4 h-4 text-slate-900 dark:text-white flex-shrink-0" />
     );
 
   return (
@@ -57,7 +57,7 @@ function RouterIcon({ isStreaming }) {
       autoPlay
       muted
       playsInline
-      className="w-4 h-4 flex-shrink-0 scale-[134%] invert light:invert-0"
+      className="w-4 h-4 flex-shrink-0 scale-[134%] dark:invert"
       aria-label="Routing to model..."
     >
       <source src={RouterAnimation} type="video/webm" />

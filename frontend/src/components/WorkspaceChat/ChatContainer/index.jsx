@@ -467,7 +467,7 @@ export default function ChatContainer({
             workspace={workspace}
             threadSlug={activeThreadSlug}
           />
-          <div className="flex-1 min-w-0 relative md:rounded-[16px] bg-zinc-900 light:bg-white w-full h-full overflow-hidden border-none light:border-solid light:border light:border-theme-modal-border">
+          <div className="flex-1 min-w-0 relative md:rounded-[16px] bg-white dark:bg-[#111215] w-full h-full overflow-hidden border border-slate-200 dark:border-[#1f2328]">
             {isMobile && <SidebarMobileHeader />}
             <WorkspaceModelPicker workspaceSlug={workspace.slug} />
             <div className="hidden md:block absolute top-2 right-[105px] md:right-[120px] z-30">
@@ -476,7 +476,7 @@ export default function ChatContainer({
             <DnDFileUploaderWrapper>
               <div className="flex flex-col h-full w-full items-center justify-center">
                 <div className="flex flex-col items-center w-full max-w-[750px]">
-                  <h1 className="text-white text-xl md:text-2xl mb-11 text-center">
+                  <h1 className="text-slate-900 dark:text-white text-xl md:text-2xl mb-11 text-center font-bold">
                     {t("main-page.greeting")}
                   </h1>
                   <PromptInput
@@ -528,7 +528,7 @@ export default function ChatContainer({
           workspace={workspace}
           threadSlug={activeThreadSlug}
         />
-        <div className="flex-1 min-w-0 relative md:rounded-[16px] bg-zinc-900 light:bg-white text-white light:text-slate-900 h-full overflow-hidden border-none light:border-solid light:border light:border-theme-modal-border">
+        <div className="flex-1 min-w-0 relative md:rounded-[16px] bg-white dark:bg-[#111215] text-slate-900 dark:text-white h-full overflow-hidden border border-slate-200 dark:border-[#1f2328]">
           {isMobile && <SidebarMobileHeader />}
           <WorkspaceModelPicker workspaceSlug={workspace.slug} />
           <div className="hidden md:block absolute top-2 right-[105px] md:right-[120px] z-30">

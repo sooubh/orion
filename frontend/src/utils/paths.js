@@ -77,7 +77,7 @@ export default {
   },
   workspace: {
     chat: (slug, options = {}) => {
-      return applyOptions(`/workspace/${slug}`, options);
+      return applyOptions(slug ? `/workspace/${slug}` : "/workspace", options);
     },
     settings: {
       generalAppearance: (slug) => {

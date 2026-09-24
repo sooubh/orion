@@ -46,17 +46,17 @@ export default function SlashCommandRow({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between px-2 py-1 rounded cursor-pointer group relative ${
+      className={`flex items-center justify-between px-2 py-1.5 rounded-lg cursor-pointer group relative transition-colors ${
         highlighted
-          ? "bg-zinc-700/50 light:bg-slate-100"
-          : "hover:bg-zinc-700/50 light:hover:bg-slate-100"
+          ? "bg-slate-100 dark:bg-[#1f2328]"
+          : "hover:bg-slate-100 dark:hover:bg-[#1f2328]"
       }`}
     >
       <div className="flex gap-1.5 items-center text-xs min-w-0 flex-1">
-        <span className="text-white light:text-slate-900 shrink-0">
+        <span className="text-slate-900 dark:text-white font-medium shrink-0">
           {command}
         </span>
-        <span className="text-zinc-400 light:text-slate-500 italic truncate">
+        <span className="text-slate-500 dark:text-zinc-400 italic truncate">
           {description}
         </span>
       </div>
@@ -70,7 +70,7 @@ export default function SlashCommandRow({
               e.stopPropagation();
               setMenuOpen(!menuOpen);
             }}
-            className="border-none cursor-pointer text-zinc-400 light:text-slate-500 p-0.5 hover:text-white light:hover:text-slate-900 rounded opacity-0 group-hover:opacity-100"
+            className="border-none cursor-pointer text-slate-400 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-white p-0.5 rounded opacity-0 group-hover:opacity-100 transition-colors"
           >
             <DotsThree size={16} weight="bold" />
           </button>
@@ -84,11 +84,11 @@ export default function SlashCommandRow({
                   top: menuPosition.top,
                   left: menuPosition.left,
                 }}
-                className="z-[9999] bg-zinc-800 light:bg-white border border-zinc-700 light:border-slate-300 rounded-lg shadow-lg min-w-[120px] flex flex-col overflow-hidden"
+                className="z-[9999] bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl shadow-xl min-w-[120px] flex flex-col overflow-hidden"
               >
                 <button
                   type="button"
-                  className="border-none px-3 py-1.5 text-xs text-white light:text-slate-900 hover:bg-zinc-700 light:hover:bg-slate-100 cursor-pointer text-left"
+                  className="border-none px-3 py-1.5 text-xs text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#1f2328] cursor-pointer text-left font-medium transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     setMenuOpen(false);

@@ -13,18 +13,18 @@ function FileRow({ item, selected, folderName, toggleSelection, onDelete }) {
   const tooltipContent = useMemo(
     () =>
       JSON.stringify({
-        title: item.title,
+        title: item.title || item.name || "",
         date: formatDateTimeAsMoment(item?.published),
-        extension: getFileExtension(item.url),
+        extension: getFileExtension(item.url || item.name || ""),
       }),
-    [item.title, item.published, item.url]
+    [item.title, item.name, item.published, item.url]
   );
 
   return (
     <tr
       onClick={() => toggleSelection(item, folderName)}
       className={`text-theme-text-primary text-xs grid grid-cols-12 py-2 pl-8 pr-8 hover:bg-theme-file-picker-hover cursor-pointer file-row ${
-        selected ? "selected light:text-white" : ""
+        selected ? "selected" : ""
       }`}
     >
       <div
@@ -46,8 +46,11 @@ function FileRow({ item, selected, folderName, toggleSelection, onDelete }) {
           className="shrink-0 text-base font-bold w-4 h-4 mr-[3px]"
           weight="fill"
         />
-        <p className="whitespace-nowrap overflow-hidden text-ellipsis max-w-[400px]">
-          {middleTruncate(item.title, 55)}
+        <p
+          className="whitespace-nowrap overflow-hidden text-ellipsis max-w-[400px]"
+          title={item.title || item.name || ""}
+        >
+          {middleTruncate(item.title || item.name || item.filename || "", 55)}
         </p>
       </div>
       <div className="col-span-2 flex justify-end items-center gap-x-2">

@@ -83,7 +83,7 @@ export function SourceTypeCircle({
 
   return (
     <div
-      className={`${customImage ? "bg-transparent border-none" : "bg-white light:bg-slate-100 border-zinc-800 light:border-white rounded-full"} flex items-center justify-center overflow-hidden`}
+      className={`${customImage ? "bg-transparent border-none" : "bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 rounded-full"} flex items-center justify-center overflow-hidden`}
       style={{ width: size, height: size }}
     >
       {faviconUrl && !imgError ? (
@@ -102,7 +102,7 @@ export function SourceTypeCircle({
           className="object-contain bg-transparent"
         />
       ) : (
-        <Icon size={iconSize} weight="bold" className="text-black" />
+        <Icon size={iconSize} weight="bold" className="text-slate-800 dark:text-white" />
       )}
     </div>
   );
@@ -151,10 +151,10 @@ export default function Citations({ sources = [] }) {
   return (
     <button
       onClick={handleOpenSourcesSidebar}
-      className="w-fit flex items-center gap-[5px] px-[10px] py-[4px] rounded-full hover:bg-white/5 light:hover:bg-black/5 transition-colors"
+      className="w-fit flex items-center gap-[5px] px-[10px] py-[4px] rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition-colors shadow-xs cursor-pointer"
       type="button"
     >
-      <span className="text-xs text-white light:text-slate-800">
+      <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
         {t("chat_window.sources")}
       </span>
       <div
@@ -167,7 +167,7 @@ export default function Citations({ sources = [] }) {
           return (
             <div
               key={source.title || idx}
-              className={`absolute top-0 size-[22px] rounded-full ${customImage ? "border-none" : "border-2 border-zinc-800 light:border-white"}`}
+              className={`absolute top-0 size-[22px] rounded-full ${customImage ? "border-none" : "border-2 border-slate-200 dark:border-zinc-800"}`}
               style={{ left: `${idx * 17}px`, zIndex: 3 - idx }}
             >
               <SourceTypeCircle
@@ -182,7 +182,7 @@ export default function Citations({ sources = [] }) {
         })}
       </div>
       {remainingCount > 0 && (
-        <span className="text-xs text-white light:text-slate-800">
+        <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
           + {remainingCount}
         </span>
       )}
@@ -209,7 +209,7 @@ export function CitationDetailModal({ source, onClose }) {
               href={linkTo}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-x-1 max-w-full overflow-hidden hover:underline hover:text-blue-300 light:hover:text-blue-600"
+              className="flex items-center gap-x-1 max-w-full overflow-hidden text-sky-700 hover:text-sky-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
             >
               <span className="truncate">{webpageUrl}</span>
               <ArrowSquareOut className="flex-shrink-0" />
@@ -226,14 +226,14 @@ export function CitationDetailModal({ source, onClose }) {
       <ModalBody>
         {chunks.map(({ text, score }, idx) => (
           <Fragment key={idx}>
-            <div className="text-zinc-100 light:text-slate-900">
+            <div className="text-slate-800 dark:text-zinc-100">
               <div className="flex flex-col w-full justify-start gap-y-1">
-                <p className="text-zinc-100 light:text-slate-900 whitespace-pre-line">
+                <p className="text-slate-800 dark:text-zinc-100 whitespace-pre-line">
                   {HTMLDecode(omitChunkHeader(text))}
                 </p>
 
                 {!!score && (
-                  <div className="w-full flex items-center text-xs text-zinc-400 light:text-slate-500 gap-x-2 cursor-default">
+                  <div className="w-full flex items-center text-xs text-slate-600 dark:text-zinc-400 gap-x-2 cursor-default">
                     <div
                       data-tooltip-id="similarity-score"
                       data-tooltip-content={`This is the semantic similarity score of this chunk of text compared to your query calculated by the vector database.`}
@@ -250,7 +250,7 @@ export function CitationDetailModal({ source, onClose }) {
               </div>
             </div>
             {idx !== chunks.length - 1 && (
-              <hr className="border-zinc-800 light:border-slate-200" />
+              <hr className="border-slate-200 dark:border-[#1f2328]" />
             )}
           </Fragment>
         ))}

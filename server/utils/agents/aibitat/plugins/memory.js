@@ -116,10 +116,7 @@ const memory = {
                 this.super.introspect(
                   `${this.caller}: No relevant documents found in workspace for query "${query}".`
                 );
-                return (
-                  searchResult.message ||
-                  "No relevant document was found in the current workspace."
-                );
+                return "NO_RELEVANT_DOCUMENTS: No relevant document was found in the current workspace for query. Because this request is document-grounded, state that you could not find sufficient relevant information in the uploaded documents to answer this question. DO NOT answer from general model knowledge, and NEVER say 'However, based on general knowledge...'.";
               }
 
               this.super.introspect(

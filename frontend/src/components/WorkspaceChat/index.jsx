@@ -51,6 +51,11 @@ export default function WorkspaceChat({ loading, workspace }) {
   }
 
   useEffect(() => {
+    setDragging(false);
+  }, [workspace?.slug, threadSlug]);
+
+  useEffect(() => {
+    let isCancelled = false;
     async function getHistory() {
       if (loading) return;
       if (!workspace?.slug) {
@@ -62,6 +67,7 @@ export default function WorkspaceChat({ loading, workspace }) {
         ? await Workspace.threads.chatHistory(workspace.slug, threadSlug)
         : await Workspace.chatHistory(workspace.slug);
 
+      if (isCancelled) return;
       setLoaded({
         key: `${workspace.slug}:${threadSlug ?? "default"}`,
         workspace,
@@ -70,6 +76,9 @@ export default function WorkspaceChat({ loading, workspace }) {
       });
     }
     getHistory();
+    return () => {
+      isCancelled = true;
+    };
   }, [workspace, loading, threadSlug]);
 
   const hasPendingMessage = !!sessionStorage.getItem(PENDING_HOME_MESSAGE);
@@ -95,7 +104,7 @@ export default function WorkspaceChat({ loading, workspace }) {
               }
             />
             <ModalBody>
-              <p className="text-zinc-300 light:text-slate-700 text-sm">
+              <p className="text-slate-700 dark:text-zinc-300 text-sm">
                 The workspace you're looking for is not available. It may have
                 been deleted or you may not have access to it.
               </p>
@@ -103,7 +112,7 @@ export default function WorkspaceChat({ loading, workspace }) {
             <ModalFooter className="justify-end">
               <a
                 href={paths.home()}
-                className="flex items-center justify-center h-[34px] px-4 rounded-lg text-sm font-medium border-none bg-zinc-50 light:bg-slate-900 text-zinc-950 light:text-white hover:opacity-80 transition-all duration-200"
+                className="flex items-center justify-center h-[34px] px-4 rounded-lg text-sm font-semibold border-none bg-slate-900 dark:bg-white text-white dark:text-zinc-950 hover:bg-slate-800 dark:hover:bg-zinc-200 transition-all duration-200"
               >
                 Return to homepage
               </a>

@@ -2,11 +2,11 @@ import { CaretLeft, CaretRight, X } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 
 const NAV_BUTTON_CLASS =
-  "border-none p-0 flex items-center justify-center text-white/70 light:text-slate-700 hover:text-white light:hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed";
+  "border-none p-0 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors";
 
 function QuestionText({ children }) {
   return (
-    <p className="flex-1 min-w-0 text-white light:text-slate-900 text-sm font-medium leading-5 break-words">
+    <p className="flex-1 min-w-0 text-slate-900 dark:text-white text-sm font-semibold leading-5 break-words">
       {children}
     </p>
   );
@@ -25,7 +25,7 @@ function PaginationControls({ index, total, onPrev, onNext, isFirst, isLast }) {
       >
         <CaretLeft size={16} />
       </button>
-      <span className="text-xs text-zinc-400 light:text-zinc-400 leading-4 whitespace-nowrap select-none">
+      <span className="text-xs text-slate-500 dark:text-zinc-400 leading-4 whitespace-nowrap select-none">
         {t("chat_window.agent_invocation.clarifying_pagination", {
           current: index + 1,
           total,
@@ -52,7 +52,7 @@ function CloseButton({ disabled, onClick }) {
       onClick={onClick}
       disabled={disabled}
       aria-label={t("chat_window.agent_invocation.clarifying_close_aria")}
-      className="border-none p-0 flex items-center justify-center text-white/70 light:text-slate-700 hover:text-white light:hover:text-slate-900 disabled:opacity-30 shrink-0"
+      className="border-none p-0 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white disabled:opacity-30 shrink-0 cursor-pointer transition-colors"
     >
       <X size={16} />
     </button>

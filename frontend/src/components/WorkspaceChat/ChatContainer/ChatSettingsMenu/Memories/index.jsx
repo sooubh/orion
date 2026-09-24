@@ -31,9 +31,9 @@ export default function MemoriesRow({ onClose }) {
   return (
     <div
       onClick={handleClick}
-      className="flex items-center px-2 py-1 rounded cursor-pointer hover:bg-zinc-700 light:hover:bg-slate-200"
+      className="flex items-center px-2 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-[#16181d] text-slate-700 dark:text-zinc-300 transition-colors"
     >
-      <span className="text-sm font-normal text-white light:text-slate-800">
+      <span className="text-sm font-medium">
         {t("chat_window.memories.title")}
       </span>
     </div>

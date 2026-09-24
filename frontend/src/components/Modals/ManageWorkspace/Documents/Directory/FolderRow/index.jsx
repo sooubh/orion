@@ -94,7 +94,7 @@ export default function FolderRow({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`text-theme-text-primary text-xs grid grid-cols-12 py-2 pl-3.5 pr-8 hover:bg-theme-file-picker-hover cursor-pointer file-row ${
-          selected || partial ? "selected light:text-white !text-white" : ""
+          selected || partial ? "selected" : ""
         } ${
           isDropTarget
             ? "outline-dashed outline-2 -outline-offset-2 outline-sky-400 bg-sky-400/10"
@@ -102,9 +102,7 @@ export default function FolderRow({
         }`}
       >
         <div
-          className={`col-span-6 flex gap-x-[4px] items-center ${
-            selected || partial ? "!text-white" : "text-theme-text-primary"
-          }`}
+          className={`col-span-6 flex gap-x-[4px] items-center text-theme-text-primary`}
         >
           <div
             className={`shrink-0 w-3 h-3 rounded border-[1px] border-solid border-white ${
@@ -135,14 +133,12 @@ export default function FolderRow({
             className="shrink-0 text-base font-bold w-4 h-4 mr-[3px]"
             weight="fill"
           />
-          <p className="whitespace-nowrap overflow-show max-w-[400px]">
+          <p className="whitespace-nowrap overflow-show max-w-[400px]" title={item.name}>
             {middleTruncate(item.name, 35)}
           </p>
           {displayCount > 0 && (
             <span
-              className={`text-theme-text-secondary text-[10px] font-medium ml-1.5 shrink-0 ${
-                selected || partial ? "light:!text-white" : ""
-              }`}
+              className={`text-theme-text-secondary text-[10px] font-medium ml-1.5 shrink-0`}
             >
               ({displayCount})
             </span>

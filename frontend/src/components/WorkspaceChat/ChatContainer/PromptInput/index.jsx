@@ -341,7 +341,7 @@ export default function PromptInput({
               centered={centered}
               highlightedIndexRef={toolsHighlightRef}
             />
-            <div className="bg-zinc-800 light:bg-white light:border light:border-slate-300 rounded-[20px] pwa:rounded-3xl flex flex-col px-5 overflow-hidden">
+            <div className="bg-white dark:bg-[#111215] border border-slate-300 dark:border-[#1f2328] rounded-[20px] pwa:rounded-3xl flex flex-col px-5 overflow-hidden shadow-sm dark:shadow-none focus-within:border-sky-500 dark:focus-within:border-sky-500 transition-colors">
               <AttachmentManager attachments={attachments} />
               <div className="flex items-center">
                 <textarea
@@ -361,7 +361,7 @@ export default function PromptInput({
                   }}
                   value={promptInput}
                   spellCheck={Appearance.get("enableSpellCheck")}
-                  className={`border-none cursor-text max-h-[50vh] md:max-h-[350px] md:min-h-[40px] pt-[20px] w-full leading-5 text-white light:text-slate-600 bg-transparent placeholder:text-white/60 light:placeholder:text-slate-400 resize-none active:outline-none focus:outline-none flex-grow pwa:!text-[16px] ${textSizeClass}`}
+                  className={`border-none cursor-text max-h-[50vh] md:max-h-[350px] md:min-h-[40px] pt-[20px] w-full leading-5 text-slate-900 dark:text-white bg-transparent placeholder:text-slate-400 dark:placeholder:text-zinc-500 resize-none active:outline-none focus:outline-none flex-grow pwa:!text-[16px] ${textSizeClass}`}
                   placeholder={t("chat_window.send_message")}
                 />
               </div>
@@ -433,11 +433,11 @@ function AgentSessionButton({
         data-tooltip-id="agent-session"
         data-tooltip-content={t("chat_window.start_agent_session")}
         aria-label={t("chat_window.start_agent_session")}
-        className="group border-none relative flex justify-center items-center cursor-pointer w-6 h-6 rounded-full hover:bg-zinc-700 light:hover:bg-slate-200"
+        className="group border-none relative flex justify-center items-center cursor-pointer w-6 h-6 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
       >
         <At
           size={18}
-          className="pointer-events-none text-zinc-300 light:text-slate-600 group-hover:text-white light:group-hover:text-slate-600 shrink-0"
+          className="pointer-events-none text-slate-500 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white shrink-0 transition-colors"
         />
       </button>
       <Tooltip
@@ -467,19 +467,13 @@ function ToolsButton({
         setShowTools(!showTools);
         textareaRef.current?.focus();
       }}
-      className={`group border-none cursor-pointer flex items-center justify-center h-6 px-2 rounded-full ${
+      className={`group border-none cursor-pointer flex items-center justify-center h-6 px-2.5 rounded-full transition-colors ${
         showTools
-          ? "bg-zinc-700 light:bg-slate-200"
-          : "hover:bg-zinc-700 light:hover:bg-slate-200"
+          ? "bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-white font-semibold"
+          : "hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
       }`}
     >
-      <span
-        className={`text-sm font-medium ${
-          showTools
-            ? "text-white light:text-slate-800"
-            : "text-zinc-300 light:text-slate-600 group-hover:text-white light:group-hover:text-slate-800"
-        }`}
-      >
+      <span className="text-sm font-medium">
         {t("chat_window.tools")}
       </span>
     </button>
@@ -497,8 +491,8 @@ function SendPromptButton({ formRef, promptInput, isDisabled }) {
         disabled={isDisabled || !promptInput.trim().length}
         className={`border-none flex justify-center items-center rounded-full w-8 h-8 transition-all ${
           promptInput.trim().length && !isDisabled
-            ? "cursor-pointer bg-white hover:bg-zinc-200 light:bg-slate-800 light:hover:bg-slate-600"
-            : "cursor-not-allowed bg-zinc-600 light:bg-slate-400"
+            ? "cursor-pointer bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 shadow-xs"
+            : "cursor-not-allowed bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-600"
         }`}
         data-tooltip-id="send-prompt"
         data-tooltip-content={
@@ -509,7 +503,7 @@ function SendPromptButton({ formRef, promptInput, isDisabled }) {
         aria-label={t("chat_window.send")}
       >
         <ArrowUp
-          className="w-[18px] h-[18px] pointer-events-none text-zinc-800 light:text-white"
+          className="w-[18px] h-[18px] pointer-events-none"
           weight="bold"
         />
         <span className="sr-only">{t("chat_window.send")}</span>

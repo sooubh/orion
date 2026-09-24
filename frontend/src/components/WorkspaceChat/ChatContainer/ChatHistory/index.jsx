@@ -155,7 +155,7 @@ export default forwardRef(function (
     <MessageActionsProvider>
       <ThoughtExpansionProvider>
         <div
-          className={`markdown text-white/80 light:text-theme-text-primary font-light ${textSizeClass} h-full md:h-[83%] pb-[100px] pt-6 md:pt-0 md:pb-20 md:mx-0 overflow-y-scroll flex flex-col items-center justify-start ${showScrollbar ? "show-scrollbar" : "no-scroll"}`}
+          className={`markdown text-slate-900 dark:text-zinc-100 font-light ${textSizeClass} h-full md:h-[83%] pb-[100px] pt-6 md:pt-0 md:pb-20 md:mx-0 overflow-y-scroll flex flex-col items-center justify-start ${showScrollbar ? "show-scrollbar" : "no-scroll"}`}
           id="chat-history"
           ref={chatHistoryRef}
           {...scrollHandlers}
@@ -173,13 +173,13 @@ export default forwardRef(function (
           )}
         </div>
         {!isAtBottom && (
-          <div className="absolute bottom-40 right-10 z-50 cursor-pointer animate-pulse">
+          <div className="absolute bottom-40 right-10 z-50 cursor-pointer">
             <div className="flex flex-col items-center">
               <div
-                className="p-1 rounded-full border border-white/10 bg-white/10 hover:bg-white/20 hover:text-white"
+                className="p-2 rounded-full border border-slate-200 dark:border-[#1f2328] bg-white dark:bg-[#111215] hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 shadow-md transition-colors"
                 onClick={() => scrollToBottom(true)}
               >
-                <ArrowDown weight="bold" className="text-white/60 w-5 h-5" />
+                <ArrowDown weight="bold" className="w-4 h-4" />
               </div>
             </div>
           </div>

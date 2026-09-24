@@ -83,14 +83,14 @@ const WORKSPACE_AGENT = {
       role +=
         "\n\nWhen you need information from the user (URLs, file paths, preferences, choices, etc.), you MUST use the request-user-input tool. Do not ask questions in your text response - the user cannot reply to text. Only the tool can collect user input.";
 
-    // Document retrieval guidelines to prevent filename guessing and ensure content/semantic search
+    // Document Grounding & Retrieval Guidelines
     role +=
-      "\n\nDocument Retrieval Guidelines:\n" +
-      "- When answering questions about uploaded documents, ALWAYS search document content using rag-memory based on the user's intent, concepts, measurements, and keywords.\n" +
-      "- NEVER invent, fabricate, or guess document filenames from natural-language requests. Filename lookup should only be used if the user explicitly provided an exact filename (e.g. 'Open report.pdf').\n" +
-      "- When the user asks to analyze, compare, or summarize findings, equipment data, or procedures, search for relevant content across all documents in the workspace using rag-memory.\n" +
-      "- Ground your answers strictly in the retrieved evidence from authorized documents and cite the source document name (e.g. [03_CONFIDENTIAL_Inspection_Report.pdf]).\n" +
-      "- If no relevant document is found after searching content, state that no relevant document was found in the workspace. Never claim a document does not exist merely because a guessed filename was not found.";
+      "\n\nDocument Grounding & Retrieval Guidelines:\n" +
+      "- Mode Distinction: Distinguish between Document-Grounded requests and General-Knowledge requests. When a query is document-grounded (e.g. asking from uploaded documents, workspace files, or about specific workspace assets, reports, or procedures), the answer must be derived strictly and exclusively from retrieved authorized document context. Only when a query is general-knowledge and does NOT request uploaded documents may general knowledge be used.\n" +
+      "- Search by Content First: ALWAYS search document content using rag-memory based on the user's intent, concepts, semantic meaning, measurements, and keywords. NEVER invent, fabricate, or guess document filenames from natural-language requests. Filename lookup should only be used if the user explicitly provided an exact filename (e.g. 'Open report.pdf'). Never claim a document does not exist merely because a guessed filename was not found.\n" +
+      "- Strict Evidence Requirement: Ground answers strictly and exclusively in the retrieved evidence from authorized documents and cite the source document name (e.g. [03_CONFIDENTIAL_Inspection_Report.pdf]). Never add unsupported claims from general model knowledge. Never claim \"According to the uploaded documents...\" unless relevant content was actually retrieved.\n" +
+      "- Mandatory No-Fallback Rule: If rag-memory returns no relevant documents or insufficient evidence, NEVER fall back to general model knowledge and NEVER say \"However, based on general knowledge...\". Return a truthful failure response: \"I could not find sufficient relevant information in the uploaded documents to answer this question.\"\n" +
+      "- Multi-Document Comparison: When comparing documents, analyzing findings, equipment data, or procedures across documents, search for all concepts across all documents in the workspace using rag-memory and ground all comparative points in retrieved evidence.";
 
     return {
       role,

@@ -89,7 +89,7 @@ class HybridSearch {
 
     // 5. Detect explicit open/summarize document intent
     const isOpenDocumentQuery =
-      /^(?:summarize|summary|overview|what(?:\s+is|\s+'s)?\s+in|explain|describe|tell\s+me\s+about|review)\s+(?:the\s+|all\s+|my\s+)?(?:document|documents|file|files|upload|workspace|data|content)\b/i.test(
+      /^(?:summarize|summary|overview|what(?:\s+is|\s+'s)?\s+in|explain|describe|tell\s+me\s+about|review)\s+(?:the\s+|all\s+|my\s+)?(?:document|documents|file|files|upload|uploads|workspace|data|content)\b/i.test(
         trimmed
       ) ||
       /^(?:what\s+does\s+(?:the|this|my)\s+(?:document|file|report|data)\s+(?:say|contain|have|cover))/i.test(
@@ -98,12 +98,39 @@ class HybridSearch {
       /^(?:give\s+me\s+a\s+(?:summary|brief|overview|breakdown)\s+of\s+(?:the|this|all)\s+(?:document|documents|file|files))/i.test(
         trimmed
       ) ||
-      /^(?:summarize|summary|overview)\b/i.test(trimmed);
+      /^(?:summarize|summary|overview)\s*(?:all|everything|documents?|files?)?\s*$/i.test(trimmed);
+
+    // 6. Detect strict document-grounded constraint or intent
+    const isDocumentGrounded =
+      /(?:use|using)\s+only\s+(?:the\s+)?(?:uploaded\s+)?(?:documents?|files?|workspace)/i.test(trimmed) ||
+      /\buploaded\b|\bworkspace\b/i.test(trimmed) ||
+      /\b(?:C-204|[A-Z]{1,4}-\d{1,4})\b/i.test(trimmed) ||
+      /compare\s+(?:the\s+)?information\b/i.test(trimmed) ||
+      /(?:according\s+to|based\s+on|from|in)\s+(?:the\s+)?(?:uploaded\s+)?[a-zA-Z0-9_\-\s]*(?:documents?|files?|workspace|sop|report)/i.test(trimmed);
+
+    // 7. Extract multi-document / comparison subqueries
+    const subqueries = [];
+    const compRegex =
+      /(?:difference\s+between|compare|comparison\s+of|versus|vs\.?)\s+(?:the\s+)?(?:information\s+in\s+)?(?:the\s+)?([^,]+?)\s+(?:and|with|to|vs\.?)\s+(?:the\s+)?([^,.]+)/i;
+    const compMatch = trimmed.match(compRegex);
+    if (compMatch) {
+      const cleanSub = (s) =>
+        s
+          .replace(/^(?:the|an?|uploaded|all|any)\s+/gi, "")
+          .replace(/\s+(?:in\s+\d+\s+points?|and\s+explain.*|and\s+summarize.*)$/gi, "")
+          .trim();
+      const s1 = cleanSub(compMatch[1]);
+      const s2 = cleanSub(compMatch[2]);
+      if (s1 && s1.length > 2) subqueries.push(s1);
+      if (s2 && s2.length > 2) subqueries.push(s2);
+    }
 
     return {
       isExplicitFilename,
       targetFilename,
       isOpenDocumentQuery,
+      isDocumentGrounded,
+      subqueries,
       entities,
       measurements,
       keywords,
@@ -222,15 +249,30 @@ class HybridSearch {
     // 1. SEMANTIC VECTOR RETRIEVAL
     if (hasVectorized && LLMConnector) {
       try {
-        vectorResults = await VectorDb.performSimilaritySearch({
-          namespace,
-          input: query,
-          LLMConnector,
-          similarityThreshold: 0.15, // Cast a slightly wider net for hybrid reranking
-          topN: Math.max(topN * 4, 24),
-          filterIdentifiers,
-          rerank,
-        });
+        const queriesToSearch = [query];
+        if (analysis.subqueries && analysis.subqueries.length > 0) {
+          for (const sq of analysis.subqueries) {
+            if (!queriesToSearch.includes(sq)) queriesToSearch.push(sq);
+          }
+        }
+
+        for (const q of queriesToSearch) {
+          const vRes = await VectorDb.performSimilaritySearch({
+            namespace,
+            input: q,
+            LLMConnector,
+            similarityThreshold: 0.15, // Cast a slightly wider net for hybrid reranking
+            topN: Math.max(topN * 4, 24),
+            filterIdentifiers,
+            rerank,
+          });
+          if (vRes?.sources?.length) {
+            vectorResults.sources.push(...vRes.sources);
+          }
+          if (vRes?.contextTexts?.length) {
+            vectorResults.contextTexts.push(...vRes.contextTexts);
+          }
+        }
       } catch (err) {
         console.warn("[HybridSearch] Vector similarity search error:", err.message);
       }
@@ -248,33 +290,38 @@ class HybridSearch {
       const title = meta.title || meta.filename || "unknown";
       const vectorScore = meta.score ?? (1 - (meta._distance || 0.5));
       const classification = this.resolveChunkClassification({ title, text, metadata: meta, docMetaMap });
+      const normalizedVec = Math.max(0, Math.min(1, vectorScore));
 
-      candidateMap.set(id, {
-        id,
-        text,
-        title,
-        docpath: meta.docpath || meta.chunkSource || "",
-        classification,
-        vectorScore: Math.max(0, Math.min(1, vectorScore)),
-        lexicalScore: 0,
-        metadataScore: 0,
-        metadata: {
-          ...meta,
+      if (candidateMap.has(id)) {
+        const existing = candidateMap.get(id);
+        existing.vectorScore = Math.max(existing.vectorScore, normalizedVec);
+      } else {
+        candidateMap.set(id, {
+          id,
+          text,
           title,
+          docpath: meta.docpath || meta.chunkSource || "",
           classification,
-        },
-      });
+          vectorScore: normalizedVec,
+          lexicalScore: 0,
+          metadataScore: 0,
+          metadata: {
+            ...meta,
+            title,
+            classification,
+          },
+        });
+      }
     });
 
     // 3. RETRIEVE WORKSPACE DOCUMENT CHUNKS FOR LEXICAL / ENTITY MATCHING
-    // Avoid loading entire tables into memory if vector search already yielded candidates; safeguard with bounded query limit(100)
-    if (hasVectorized && VectorDb.name === "LanceDb" && candidateMap.size === 0) {
+    if (hasVectorized && VectorDb.name === "LanceDb") {
       try {
         const { client } = await VectorDb.connect();
         const exists = await VectorDb.namespaceExists(client, namespace);
         if (exists) {
           const table = await client.openTable(namespace);
-          const allRows = await table.query().limit(100).toArray();
+          const allRows = await table.query().limit(200).toArray();
 
           for (const row of allRows) {
             const id = row.id;
@@ -473,14 +520,19 @@ class HybridSearch {
           // Pure semantic inquiry: vector similarity is primary
           item.combinedScore = item.vectorScore;
         } else {
-          // Blended search: dense vector + sparse lexical signals with floor
-          item.combinedScore = Math.max(
-            item.vectorScore * 0.85,
-            0.50 * item.vectorScore +
-            0.35 * item.lexicalScore +
-            0.15 * item.metadataScore +
-            entityBonus
-          );
+          // Blended search: dense vector + sparse lexical signals
+          const hasZeroLexicalOverlap = item.lexicalScore === 0 && item.metadataScore === 0 && !hasExactEntity;
+          const pureVectorFloor = item.vectorScore >= 0.55 ? item.vectorScore * 0.85 : 0;
+          if (hasZeroLexicalOverlap) {
+            item.combinedScore = pureVectorFloor;
+          } else {
+            const blendedScore =
+              0.50 * item.vectorScore +
+              0.35 * item.lexicalScore +
+              0.15 * item.metadataScore +
+              entityBonus;
+            item.combinedScore = Math.max(pureVectorFloor, blendedScore);
+          }
         }
       }
 
@@ -508,16 +560,29 @@ class HybridSearch {
     const docChunkCount = new Map();
     const maxChunksPerDoc = Math.max(2, Math.ceil(topN / 2));
 
+    // Pass 1: Select up to maxChunksPerDoc per document to guarantee multi-document coverage
     for (const candidate of scoredCandidates) {
       const docKey = candidate.title;
       const count = docChunkCount.get(docKey) || 0;
 
-      if (count < maxChunksPerDoc || selectedChunks.length < topN) {
+      if (count < maxChunksPerDoc) {
         selectedChunks.push(candidate);
         docChunkCount.set(docKey, count + 1);
       }
 
-      if (selectedChunks.length >= topN * 1.5) break;
+      if (selectedChunks.length >= topN) break;
+    }
+
+    // Pass 2: If slots remain, backfill with next best candidates regardless of document
+    if (selectedChunks.length < topN) {
+      const selectedIds = new Set(selectedChunks.map((c) => c.id));
+      for (const candidate of scoredCandidates) {
+        if (!selectedIds.has(candidate.id)) {
+          selectedChunks.push(candidate);
+          selectedIds.add(candidate.id);
+        }
+        if (selectedChunks.length >= topN) break;
+      }
     }
 
     // Sort selected chunks by score
@@ -865,10 +930,10 @@ class HybridSearch {
       user,
       LLMConnector,
       topN: 3,
-      similarityThreshold: 0.20,
+      similarityThreshold: 0.35,
     });
 
-    if (searchResults.sources?.length > 0) {
+    if (searchResults.sources?.length > 0 && searchResults.sources[0].score >= 0.35) {
       const topHit = searchResults.sources[0];
       const matchedDoc =
         parsedDocs.find((d) => d.filename === topHit.title || d.docId === topHit.id) ||

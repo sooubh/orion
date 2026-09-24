@@ -109,8 +109,8 @@ export default function WorkspaceFileRow({
         !disableSelection
           ? "hover:bg-theme-file-picker-hover cursor-pointer"
           : ""
-      } ${isMovedItem ? "selected light:text-white" : ""} ${
-        selected ? "selected light:text-white" : ""
+      } ${isMovedItem ? "selected" : ""} ${
+        selected ? "selected" : ""
       }`}
       onClick={toggleRowSelection}
     >
@@ -118,9 +118,9 @@ export default function WorkspaceFileRow({
         className="col-span-10 w-fit flex gap-x-[2px] items-center relative"
         data-tooltip-id="ws-directory-item"
         data-tooltip-content={JSON.stringify({
-          title: item.title,
+          title: item.title || item.name || "",
           date: formatDateTimeAsMoment(item?.published),
-          extension: getFileExtension(item.url),
+          extension: getFileExtension(item.url || item.name || ""),
         })}
       >
         <div className="shrink-0 w-3 h-3">
@@ -142,8 +142,11 @@ export default function WorkspaceFileRow({
           className="shrink-0 text-base font-bold w-4 h-4 mr-[3px] ml-1"
           weight="fill"
         />
-        <p className="whitespace-nowrap overflow-hidden text-ellipsis max-w-[400px]">
-          {middleTruncate(item.title, 50)}
+        <p
+          className="whitespace-nowrap overflow-hidden text-ellipsis max-w-[400px]"
+          title={item.title || item.name || ""}
+        >
+          {middleTruncate(item.title || item.name || item.filename || "", 50)}
         </p>
       </div>
       <div className="col-span-2 flex justify-end items-center">

@@ -39,17 +39,17 @@ export default function SourcesSidebar() {
     <>
       <ChatSidebar isOpen={sidebarOpen}>
         <div
-          className="ml-4 w-[350px] bg-zinc-900 light:bg-white light:border-2 light:border-slate-300 md:rounded-[16px] p-4 flex flex-col gap-4 overflow-hidden mt-[72px]"
+          className="ml-4 w-[350px] bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] md:rounded-[16px] p-4 flex flex-col gap-4 overflow-hidden mt-[72px] shadow-xl"
           style={{ maxHeight: "calc(100% - 88px)" }}
         >
           <div className="flex items-start justify-between">
-            <p className="font-medium text-base leading-6 text-white light:text-slate-900">
+            <p className="font-semibold text-base leading-6 text-slate-900 dark:text-white">
               {t("chat_window.sources")}
             </p>
             <button
               onClick={closeSidebar}
               type="button"
-              className="text-white/60 light:text-slate-400 hover:text-white light:hover:text-slate-900 transition-colors border-none bg-transparent cursor-pointer"
+              className="text-slate-400 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-white transition-colors border-none bg-transparent cursor-pointer p-1"
             >
               <X size={16} weight="bold" />
             </button>

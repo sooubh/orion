@@ -105,13 +105,13 @@ function SidebarHeader() {
 
   return (
     <div className="flex items-start justify-between shrink-0">
-      <p className="font-medium text-base leading-6 text-zinc-50 light:text-slate-900">
+      <p className="font-semibold text-base leading-6 text-slate-900 dark:text-white">
         {t("chat_window.memories.title")}
       </p>
       <button
         onClick={closeSidebar}
         type="button"
-        className="text-zinc-50 light:text-slate-900 hover:text-white light:hover:text-slate-400 transition-colors border-none bg-transparent cursor-pointer"
+        className="text-slate-400 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-white transition-colors border-none bg-transparent cursor-pointer p-1"
       >
         <X size={16} weight="bold" />
       </button>
@@ -123,12 +123,12 @@ function EmptyState() {
   const { t } = useTranslation();
   const { openCreateModal } = useMemoriesContext();
   return (
-    <p className="text-sm leading-5 text-zinc-400 light:text-slate-600 text-center">
+    <p className="text-sm leading-5 text-slate-600 dark:text-zinc-400 text-center">
       {t("chat_window.memories.empty")}{" "}
       <button
         type="button"
         onClick={openCreateModal}
-        className="text-zinc-50 light:text-slate-900 underline border-none bg-transparent cursor-pointer p-0 text-sm leading-5 font-normal"
+        className="text-slate-900 dark:text-white underline font-semibold border-none bg-transparent cursor-pointer p-0 text-sm leading-5"
       >
         {t("chat_window.memories.empty_cta")}
       </button>

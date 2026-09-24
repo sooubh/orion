@@ -265,6 +265,130 @@ class AIbitat {
   }
 
   /**
+   * Intercepts document-grounded failures and general knowledge fallbacks.
+   * If retrieval failed or the user strictly required uploaded documents and no sources were found,
+   * replaces hallucinated or general knowledge outputs with the truthful document-grounded failure message.
+   *
+   * @param {string} textResponse
+   * @param {Array<object>} messages
+   * @returns {{ intercepted: boolean, text: string }}
+   */
+  interceptDocumentGroundedFailure(textResponse = "", messages = []) {
+    const FAILURE_MESSAGE =
+      "I could not find sufficient relevant information in the uploaded documents to answer this question.";
+
+    if (!textResponse || typeof textResponse !== "string") {
+      return { intercepted: false, text: textResponse || "" };
+    }
+
+    if (textResponse.trim() === FAILURE_MESSAGE) {
+      return { intercepted: false, text: FAILURE_MESSAGE };
+    }
+
+    // 1. Gather all user prompts from the conversation turn & invocation props
+    const userMessages = (messages || []).filter((m) => m.role === "user");
+    const userPromptTexts = userMessages
+      .map((m) => (typeof m.content === "string" ? m.content : ""))
+      .filter((txt) => !txt.startsWith("[Attached image(s)"));
+    const invocationPrompt =
+      typeof this.handlerProps?.invocation?.prompt === "string"
+        ? this.handlerProps.invocation.prompt
+        : "";
+    const combinedUserQuery = [invocationPrompt, ...userPromptTexts]
+      .join(" \n ")
+      .trim();
+
+    // 2. Check if the user query was document-grounded
+    const { HybridSearch } = require("../../retrieval/hybridSearch");
+    const analysis = HybridSearch.analyzeQuery(combinedUserQuery);
+
+    const DOC_GROUNDED_REGEX =
+      /(?:use|using)\s+only\s+(?:the\s+)?(?:uploaded\s+)?(?:documents?|files?|workspace)|(?:according\s+to|based\s+on|from|in)\s+(?:the\s+)?uploaded\b|\buploaded\b|\bworkspace\b|\b(?:C-204|[A-Z]{1,4}-\d{1,4})\b|compare\s+(?:the\s+)?information\b|(?:according\s+to|based\s+on|from|in)\s+(?:the\s+)?(?:uploaded\s+)?[a-zA-Z0-9_\-\s]*(?:documents?|files?|workspace|sop|report)/i;
+
+    const isPromptDocumentGrounded =
+      Boolean(analysis?.isDocumentGrounded) ||
+      DOC_GROUNDED_REGEX.test(combinedUserQuery);
+
+    // 3. Check if rag-memory was invoked and returned NO_RELEVANT_DOCUMENTS or no sources found
+    const ragMemoryCalls = (messages || []).filter(
+      (m) => m.role === "function" && m.name === "rag-memory"
+    );
+    const ragMemoryInvoked = ragMemoryCalls.length > 0;
+    const ragMemoryNoSources = ragMemoryCalls.some((m) => {
+      const c = typeof m.content === "string" ? m.content : "";
+      return (
+        c.includes("NO_RELEVANT_DOCUMENTS") ||
+        /no\s+relevant\s+documents?(?:\s+(?:were|are|was))?\s*found/i.test(c) ||
+        /no\s+relevant\s+document\s+was\s+found/i.test(c) ||
+        /no\s+sources\s+found/i.test(c) ||
+        /no\s+documents?\s+found/i.test(c)
+      );
+    });
+
+    const hasCitations =
+      Array.isArray(this._pendingCitations) && this._pendingCitations.length > 0;
+
+    const isDocumentGroundedTurn =
+      isPromptDocumentGrounded ||
+      (ragMemoryInvoked && (!hasCitations || ragMemoryNoSources));
+
+    // 4. Strict document-only constraint detection
+    // e.g. "Use only the uploaded documents", "Only from the uploaded documents"
+    const STRICT_DOC_ONLY_REGEX =
+      /(?:use|using)\s+only\s+(?:the\s+)?(?:uploaded\s+)?(?:documents?|files?|workspace)|only\s+(?:from|based\s+on|use|using)\s+(?:the\s+)?(?:uploaded\s+)?(?:documents?|files?|workspace)|strictly\s+(?:from|based\s+on|according\s+to)\s+(?:the\s+)?(?:uploaded\s+)?(?:documents?|files?|workspace)|only\s+(?:the\s+)?uploaded\s+(?:documents?|files?)/i;
+
+    const hasStrictDocConstraint =
+      STRICT_DOC_ONLY_REGEX.test(combinedUserQuery);
+
+    // If the user explicitly requested "Use only the uploaded documents" (or similar strict document-only constraint)
+    // and NO relevant sources were retrieved, ensure the response is strictly the failure message and never general model knowledge.
+    if (hasStrictDocConstraint && !hasCitations) {
+      this.handlerProps?.log?.(
+        `[StrictDocumentGrounding] Intercepted ungrounded answer for strict document constraint without retrieved sources.`
+      );
+      this.clearCitations();
+      return { intercepted: true, text: FAILURE_MESSAGE };
+    }
+
+    // 5. Fallback to general knowledge detection
+    // e.g. "However, based on general knowledge..." or attempts to answer from general knowledge after failing retrieval
+    const GENERAL_KNOWLEDGE_FALLBACK_REGEX =
+      /(?:no\s+relevant\s+documents?(?:\s+(?:were|are|was))?\s+found|could\s+not\s+find\s+(?:any|sufficient)\s+relevant\s+documents?).*?(?:however|but\s+based|based\s+on\s+general|from\s+general|general\s+model\s+knowledge)/is;
+
+    const GENERAL_KNOWLEDGE_EXPLICIT_REGEX =
+      /(?:however,?\s+based\s+on\s+general\s+knowledge|based\s+on\s+general\s+knowledge|from\s+general\s+(?:model\s+)?knowledge)/i;
+
+    if (
+      isDocumentGroundedTurn &&
+      (GENERAL_KNOWLEDGE_FALLBACK_REGEX.test(textResponse) ||
+        GENERAL_KNOWLEDGE_EXPLICIT_REGEX.test(textResponse))
+    ) {
+      this.handlerProps?.log?.(
+        `[StrictDocumentGrounding] Intercepted general knowledge fallback in document-grounded turn.`
+      );
+      this.clearCitations();
+      return { intercepted: true, text: FAILURE_MESSAGE };
+    }
+
+    // Also normalize failed retrieval messages in document-grounded turns without citations
+    if (
+      isDocumentGroundedTurn &&
+      !hasCitations &&
+      /(?:no\s+relevant\s+documents?(?:\s+(?:were|are|was))?\s+found|could\s+not\s+find\s+(?:any|sufficient)\s+relevant\s+documents?)/i.test(
+        textResponse
+      )
+    ) {
+      this.handlerProps?.log?.(
+        `[StrictDocumentGrounding] Normalizing retrieval failure output to standard failure message.`
+      );
+      this.clearCitations();
+      return { intercepted: true, text: FAILURE_MESSAGE };
+    }
+
+    return { intercepted: false, text: textResponse };
+  }
+
+  /**
    * Send routing metadata to the frontend for the given message UUID.
    * Only emits if routing metadata exists in handlerProps.
    * @param {string} messageUuid - The UUID of the message to attach routing info to
@@ -1211,6 +1335,21 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
     }
 
     const responseUuid = completionStream?.uuid || v4();
+
+    // Check final text response before returning to user
+    const interceptedCheck = this.interceptDocumentGroundedFailure(
+      completionStream?.textResponse,
+      messages
+    );
+    if (interceptedCheck.intercepted) {
+      completionStream.textResponse = interceptedCheck.text;
+      eventHandler?.("reportStreamEvent", {
+        type: "fullTextResponse",
+        uuid: responseUuid,
+        content: interceptedCheck.text,
+      });
+    }
+
     eventHandler?.("reportStreamEvent", {
       type: "usageMetrics",
       uuid: responseUuid,
@@ -1583,6 +1722,20 @@ https://docs.anythingllm.com/agent/intelligent-tool-selection
         depth + 1,
         msgUUID
       );
+    }
+
+    // Check final text response before returning to user
+    const interceptedCheck = this.interceptDocumentGroundedFailure(
+      completion?.textResponse,
+      messages
+    );
+    if (interceptedCheck.intercepted) {
+      if (completion) completion.textResponse = interceptedCheck.text;
+      eventHandler?.("reportStreamEvent", {
+        type: "fullTextResponse",
+        uuid: msgUUID,
+        content: interceptedCheck.text,
+      });
     }
 
     // Closed-Loop Verification for calculations in text responses

@@ -60,6 +60,11 @@ export function DnDFileUploaderProvider({
   }, []);
 
   useEffect(() => {
+    setFiles([]);
+    setDragging(false);
+  }, [workspace?.slug, threadSlug]);
+
+  useEffect(() => {
     window.addEventListener(REMOVE_ATTACHMENT_EVENT, handleRemove);
     window.addEventListener(CLEAR_ATTACHMENTS_EVENT, resetAttachments);
     window.addEventListener(PASTE_ATTACHMENT_EVENT, handlePastedAttachment);
@@ -425,40 +430,79 @@ export function DnDFileUploaderProvider({
 export default function DnDFileUploaderWrapper({ children }) {
   const { onDrop, ready, dragging, setDragging } =
     useContext(DndUploaderContext);
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles, rejectedFiles, event) => {
+      setDragging?.(false);
+      onDrop?.(acceptedFiles, rejectedFiles, event);
+    },
     disabled: !ready,
     noClick: true,
     noKeyboard: true,
-    onDragEnter: () => setDragging(true),
-    onDragLeave: () => setDragging(false),
+    onDragEnter: () => setDragging?.(true),
+    onDragLeave: () => setDragging?.(false),
   });
+
+  const isOverlayVisible = isDragActive || !!dragging;
+
+  useEffect(() => {
+    function handleDragEnd() {
+      setDragging?.(false);
+    }
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        setDragging?.(false);
+      }
+    }
+    window.addEventListener("dragend", handleDragEnd);
+    window.addEventListener("drop", handleDragEnd);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("dragend", handleDragEnd);
+      window.removeEventListener("drop", handleDragEnd);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [setDragging]);
 
   return (
     <div
       className={`relative flex flex-col h-full w-full md:mt-0 mt-[40px] p-[1px]`}
       {...getRootProps()}
     >
-      <div
-        hidden={!dragging}
-        className="absolute top-0 w-full h-full bg-dark-text/90 light:bg-[#C2E7FE]/90 rounded-2xl border-[4px] border-white z-[9999]"
-      >
-        <div className="w-full h-full flex justify-center items-center rounded-xl">
-          <div className="flex flex-col gap-y-[14px] justify-center items-center">
-            <img
-              src={DndIcon}
-              width={69}
-              height={69}
-              alt="Drag and drop icon"
-            />
-            <p className="text-white text-[24px] font-semibold">Add anything</p>
-            <p className="text-white text-[16px] text-center">
-              Drop a file or image here to attach it to your <br />
-              workspace auto-magically.
-            </p>
+      {isOverlayVisible && (
+        <div
+          role="dialog"
+          aria-label="File upload dropzone overlay"
+          onClick={() => setDragging?.(false)}
+          className="absolute top-0 w-full h-full bg-slate-900/95 dark:bg-[#090a0b]/95 rounded-2xl border-4 border-slate-300 dark:border-zinc-700 z-[9999] backdrop-blur-xs flex items-center justify-center cursor-pointer"
+        >
+          <div className="w-full h-full flex justify-center items-center rounded-xl relative">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDragging?.(false);
+              }}
+              className="absolute top-4 right-4 text-slate-300 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-600 transition-colors shadow-sm pointer-events-auto"
+            >
+              Cancel (Esc)
+            </button>
+            <div className="flex flex-col gap-y-[14px] justify-center items-center pointer-events-none">
+              <img
+                src={DndIcon}
+                width={69}
+                height={69}
+                alt="Drag and drop icon"
+              />
+              <p className="text-white text-[24px] font-bold">Add anything</p>
+              <p className="text-slate-200 text-[16px] text-center">
+                Drop a file or image here to attach it to your <br />
+                workspace auto-magically.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <input id="dnd-chat-file-uploader" {...getInputProps()} />
       {children}
     </div>

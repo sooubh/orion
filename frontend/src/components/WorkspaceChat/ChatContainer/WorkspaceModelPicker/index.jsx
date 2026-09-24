@@ -114,25 +114,19 @@ export default function WorkspaceModelPicker({ workspaceSlug = null }) {
         <button
           type="button"
           onClick={() => setShowSelector(!showSelector)}
-          className={`group border-none cursor-pointer px-2.5 py-1 flex items-center rounded-full transition-all ${
+          className={`group border cursor-pointer px-2.5 py-1 flex items-center rounded-full transition-all text-xs font-medium shadow-xs ${
             showSelector
-              ? "bg-zinc-700 light:bg-slate-200"
-              : "hover:bg-zinc-700 light:hover:bg-slate-200"
+              ? "bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-white border-slate-300 dark:border-zinc-600"
+              : "bg-white dark:bg-[#111215] hover:bg-slate-100 dark:hover:bg-[#1f2328] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-[#1f2328]"
           }`}
         >
-          <span
-            className={`text-xs ${
-              showSelector
-                ? "text-white light:text-slate-800"
-                : "text-zinc-500 light:text-slate-500 group-hover:text-white light:group-hover:text-slate-800"
-            }`}
-          >
+          <span className="truncate max-w-[180px] md:max-w-[240px] inline-block">
             {modelName || t("chat_window.select_model")}
           </span>
         </button>
 
         {showSelector && (
-          <div className="absolute left-0 top-full mt-1 bg-zinc-800 light:bg-white border border-zinc-700 light:border-slate-300 rounded-xl shadow-lg w-[620px] overflow-hidden">
+          <div className="absolute left-0 top-full mt-1 bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl shadow-xl w-[620px] overflow-hidden">
             <LLMSelectorModal
               key={refreshKey}
               workspaceSlug={slug}

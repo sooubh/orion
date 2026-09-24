@@ -41,7 +41,7 @@ function ActionMenu({ chatId, forkThread, isEditing, role }) {
     <div className="mt-2 -ml-0.5 relative" ref={menuRef}>
       <button
         onClick={toggleMenu}
-        className="border-none text-zinc-300 light:text-slate-500 transition-colors duration-200"
+        className="border-none text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white transition-colors duration-200 cursor-pointer p-0.5"
         data-tooltip-id="action-menu"
         data-tooltip-content={t("chat_window.more_actions")}
         aria-label={t("chat_window.more_actions")}
@@ -51,18 +51,18 @@ function ActionMenu({ chatId, forkThread, isEditing, role }) {
       {open && (
         <div
           data-action-menu-open
-          className="absolute -top-1 left-7 mt-1 border-[1.5px] border-white/40 rounded-lg bg-theme-action-menu-bg flex flex-col shadow-[0_4px_14px_rgba(0,0,0,0.25)] text-white z-99"
+          className="absolute -top-1 left-7 mt-1 border border-slate-200 dark:border-[#1f2328] rounded-xl bg-white dark:bg-[#111215] flex flex-col shadow-xl text-slate-900 dark:text-white z-99 overflow-hidden min-w-[120px]"
         >
           <button
             onClick={handleFork}
-            className="border-none rounded-t-lg flex items-center text-white gap-x-2 hover:bg-theme-action-menu-item-hover py-1.5 px-2 transition-colors duration-200 w-full text-left"
+            className="border-none flex items-center text-slate-700 dark:text-zinc-200 gap-x-2 hover:bg-slate-100 dark:hover:bg-[#1f2328] py-2 px-3 transition-colors duration-200 w-full text-left cursor-pointer"
           >
             <TreeView size={18} />
             <span className="text-sm">{t("chat_window.fork")}</span>
           </button>
           <button
             onClick={handleDelete}
-            className="border-none flex rounded-b-lg items-center text-white gap-x-2 hover:bg-theme-action-menu-item-hover py-1.5 px-2 transition-colors duration-200 w-full text-left"
+            className="border-none flex items-center text-rose-600 dark:text-rose-400 gap-x-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 py-2 px-3 transition-colors duration-200 w-full text-left cursor-pointer"
           >
             <Trash size={18} />
             <span className="text-sm">{t("chat_window.delete")}</span>

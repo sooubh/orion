@@ -33,7 +33,25 @@ This test document should be completely removed from workspace memory and disk.
 
   before(async () => {
     workspace = await Workspace.get({ slug: "my-workspace" });
-    assert.ok(workspace, "Workspace 'my-workspace' must exist for test");
+    if (!workspace) {
+      const { workspace: newWs } = await Workspace.new("my-workspace");
+      workspace = newWs;
+    }
+    const docs = await Document.where({ workspaceId: workspace.id });
+    if (docs.length === 0) {
+      const files = [
+        "custom-documents/01_PUBLIC_Company_Overview.txt-8cd52631-07df-4fb6-82d7-57deccfcbe7d.json",
+        "custom-documents/02_INTERNAL_Maintenance_Schedule.txt-c2104e77-9002-4b2a-a912-32e56cf91022.json",
+        "custom-documents/03_CONFIDENTIAL_Inspection_Report.pdf-d9aaa1c0-445e-4f73-9bbf-567913f751be.json",
+        "custom-documents/04_CONFIDENTIAL_Maintenance_SOP.docx-1d249a93-c8c6-4caf-9a91-deaa15bd5be1.json",
+        "custom-documents/05_RESTRICTED_Engineering_Change_Note.pdf-dbc701a2-a2b0-4cca-afc6-296862784d41.json",
+        "custom-documents/06_CONFIDENTIAL_Equipment_Readings.csv-69d3289d-0d2b-4fa5-bb38-b544a7545776.json",
+        "custom-documents/07_INTERNAL_Safety_Checklist.csv-df0ebacf-2370-4979-9053-207ebe1ca017.json",
+        "custom-documents/08_CONFIDENTIAL_Scanned_Inspection_Note.pdf-c1545777-e832-4e08-8f5d-d79ce5657a17.json",
+        "custom-documents/09_CONFIDENTIAL_P_and_ID_Test_Diagram.pdf-d7cd639d-84ae-4efd-be67-78aa544d91bb.json",
+      ];
+      await Document.addDocuments(workspace, files);
+    }
 
     const resolved = await resolveProviderConnector({
       workspace,

@@ -50,6 +50,9 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", resolvedTheme);
+    document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+    document.documentElement.classList.toggle("light", resolvedTheme === "light");
+    document.body.classList.toggle("dark", resolvedTheme === "dark");
     document.body.classList.toggle("light", resolvedTheme === "light");
     localStorage.setItem("theme", theme);
     window.dispatchEvent(new Event(REFETCH_LOGO_EVENT));

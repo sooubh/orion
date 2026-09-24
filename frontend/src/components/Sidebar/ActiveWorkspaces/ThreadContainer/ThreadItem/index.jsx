@@ -49,8 +49,8 @@ export default function ThreadItem({
         style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
         className={`${
           isActive
-            ? "border-l-2 border-b-2 border-white light:border-blue-800 z-[2]"
-            : "border-l border-b border-zinc-500 light:border-slate-400 z-[1]"
+            ? "border-l-2 border-b-2 border-sky-600 dark:border-white z-[2]"
+            : "border-l border-b border-slate-300 dark:border-zinc-500 z-[1]"
         } h-[50%] absolute top-0 left-3 rounded-bl-lg`}
       ></div>
       {/* Downstroke border for next item */}
@@ -59,8 +59,8 @@ export default function ThreadItem({
           style={{ width: THREAD_CALLOUT_DETAIL_WIDTH / 2 }}
           className={`${
             idx <= activeIdx && !isActive
-              ? "border-l-2 border-white light:border-blue-800 z-[2]"
-              : "border-l border-zinc-500 light:border-slate-400 z-[1]"
+              ? "border-l-2 border-sky-600 dark:border-white z-[2]"
+              : "border-l border-slate-300 dark:border-zinc-500 z-[1]"
           } h-[100%] absolute top-0 left-3`}
         ></div>
       )}
@@ -71,13 +71,13 @@ export default function ThreadItem({
         className="h-full"
       />
       <div
-        className={`flex w-full items-center justify-between pr-2 group/thread relative ${isActive ? "bg-[var(--theme-sidebar-thread-selected)] light:bg-blue-200" : "hover:bg-theme-sidebar-subitem-hover light:hover:bg-slate-300"} rounded-[4px]`}
+        className={`flex w-full items-center justify-between pr-2 group/thread relative ${isActive ? "bg-sky-100 dark:bg-[var(--theme-sidebar-thread-selected)] text-sky-950 dark:text-sky-300 font-semibold" : "hover:bg-slate-100 dark:hover:bg-theme-sidebar-subitem-hover text-slate-700 dark:text-theme-text-primary"} rounded-[4px]`}
       >
         {thread.deleted ? (
           <div className="w-full flex justify-between">
             <div className="w-full pl-2 py-1">
               <p
-                className={`text-left text-sm text-slate-400/50 light:text-slate-500 italic`}
+                className={`text-left text-sm text-slate-500 dark:text-slate-400/50 italic`}
               >
                 deleted thread
               </p>
@@ -89,7 +89,7 @@ export default function ThreadItem({
                 onClick={() => toggleMarkForDeletion(thread.id)}
               >
                 <ArrowCounterClockwise
-                  className="text-zinc-300 hover:text-white light:text-theme-text-secondary light:hover:text-theme-text-primary"
+                  className="text-slate-500 hover:text-slate-800 dark:text-zinc-300 dark:hover:text-white"
                   size={18}
                 />
               </button>
@@ -107,8 +107,8 @@ export default function ThreadItem({
             <p
               className={`text-left text-sm truncate max-w-[150px] ${
                 isActive
-                  ? "font-semibold text-theme-text-primary light:text-blue-900"
-                  : "text-theme-text-primary font-medium light:text-slate-800"
+                  ? "font-bold text-sky-950 dark:text-white"
+                  : "text-slate-700 dark:text-zinc-300 font-medium"
               }`}
             >
               {thread.name}
@@ -126,7 +126,7 @@ export default function ThreadItem({
                 onClick={() => toggleMarkForDeletion(thread.id)}
               >
                 <X
-                  className="text-zinc-300 light:text-theme-text-secondary hover:text-white light:hover:text-theme-text-primary"
+                  className="text-slate-500 hover:text-slate-800 dark:text-zinc-300 dark:hover:text-white"
                   weight="bold"
                   size={18}
                 />
@@ -140,7 +140,7 @@ export default function ThreadItem({
                   aria-label="Thread options"
                 >
                   <DotsThree
-                    className="text-slate-300 light:text-theme-text-secondary hover:text-white light:hover:text-theme-text-primary"
+                    className="text-slate-500 hover:text-slate-800 dark:text-zinc-300 dark:hover:text-white"
                     size={25}
                   />
                 </button>

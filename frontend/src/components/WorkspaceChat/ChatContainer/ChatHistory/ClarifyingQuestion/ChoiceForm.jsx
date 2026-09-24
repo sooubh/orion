@@ -7,21 +7,21 @@ function OptionButton({ label, description, index, selected, onClick }) {
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`border-none w-full flex items-center gap-[9px] p-2 rounded-lg text-left transition-colors ${
+      className={`border w-full flex items-center gap-[9px] p-2 rounded-lg text-left transition-colors cursor-pointer ${
         selected
-          ? "bg-zinc-800 light:bg-slate-200"
-          : "bg-transparent hover:bg-zinc-800/60 light:hover:bg-slate-200/60"
+          ? "bg-slate-100 dark:bg-[#1f2328] border-slate-300 dark:border-[#2a2e36]"
+          : "bg-transparent hover:bg-slate-50 dark:hover:bg-[#1a1d22] border-transparent"
       }`}
     >
-      <span className="flex items-center justify-center shrink-0 w-7 h-7 rounded-lg bg-zinc-700 light:bg-slate-300 text-white light:text-slate-900 text-base font-medium leading-6">
+      <span className="flex items-center justify-center shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-[#252a30] text-slate-800 dark:text-zinc-200 text-sm font-semibold leading-6">
         {index + 1}
       </span>
       <span className="flex flex-col min-w-0">
-        <span className="text-white light:text-slate-900 text-sm leading-5">
+        <span className="text-slate-900 dark:text-white text-sm leading-5 font-medium">
           {label}
         </span>
         {description && (
-          <span className="text-xs text-zinc-400 light:text-slate-500 leading-4">
+          <span className="text-xs text-slate-600 dark:text-zinc-400 leading-4">
             {description}
           </span>
         )}
@@ -38,20 +38,20 @@ function OtherRow({ selected, onToggle, allowSkip, onSkip }) {
         type="button"
         aria-pressed={selected}
         onClick={onToggle}
-        className={`border-none flex flex-1 min-w-0 items-center gap-[9px] p-2 rounded-lg text-left transition-colors ${
+        className={`border flex flex-1 min-w-0 items-center gap-[9px] p-2 rounded-lg text-left transition-colors cursor-pointer ${
           selected
-            ? "bg-zinc-800 light:bg-slate-200"
-            : "bg-transparent hover:bg-zinc-800/60 light:hover:bg-slate-200/60"
+            ? "bg-slate-100 dark:bg-[#1f2328] border-slate-300 dark:border-[#2a2e36]"
+            : "bg-transparent hover:bg-slate-50 dark:hover:bg-[#1a1d22] border-transparent"
         }`}
       >
-        <span className="flex items-center justify-center shrink-0 w-7 h-7 rounded-lg bg-zinc-700 light:bg-slate-300 text-white light:text-slate-900">
+        <span className="flex items-center justify-center shrink-0 w-7 h-7 rounded-lg bg-slate-200 dark:bg-[#252a30] text-slate-800 dark:text-zinc-200">
           <PencilSimple size={16} />
         </span>
         <span
           className={`text-sm leading-5 ${
             selected
-              ? "text-white light:text-slate-900"
-              : "text-zinc-400 light:text-slate-600"
+              ? "text-slate-900 dark:text-white font-medium"
+              : "text-slate-600 dark:text-zinc-400"
           }`}
         >
           {t("chat_window.agent_invocation.clarifying_other")}
@@ -68,7 +68,7 @@ function SkipButton({ onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="border border-solid border-zinc-600 light:border-slate-300 bg-transparent rounded-lg h-7 px-3 flex items-center justify-center text-white light:text-slate-900 text-xs font-medium leading-4 shrink-0 hover:bg-zinc-700/40 light:hover:bg-slate-200/60"
+      className="border border-slate-300 dark:border-zinc-700 bg-transparent rounded-lg h-7 px-3 flex items-center justify-center text-slate-700 dark:text-zinc-300 text-xs font-medium leading-4 shrink-0 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
     >
       {t("chat_window.agent_invocation.batch_skip_this")}
     </button>
@@ -86,7 +86,7 @@ function OtherInput({ value, onChange }) {
       placeholder={t(
         "chat_window.agent_invocation.clarifying_other_placeholder"
       )}
-      className="mt-2 w-full border border-solid border-zinc-700 light:border-slate-500 bg-zinc-800 light:bg-white text-white light:text-slate-900 placeholder:text-zinc-500 light:placeholder:text-slate-500 text-sm rounded-lg focus:outline-white light:focus:outline-slate-400 outline-none p-2"
+      className="mt-2 w-full border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#16181d] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 p-2"
     />
   );
 }

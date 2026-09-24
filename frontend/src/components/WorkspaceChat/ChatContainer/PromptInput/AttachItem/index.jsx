@@ -98,16 +98,16 @@ export default function AttachItem({
         type="button"
         onClick={handleClick}
         onPointerEnter={fetchFiles}
-        className="group border-none relative flex justify-center items-center cursor-pointer w-6 h-6 rounded-full hover:bg-zinc-700 light:hover:bg-slate-200"
+        className="group border-none relative flex justify-center items-center cursor-pointer w-6 h-6 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
       >
         <div className="relative">
           <Plus
             size={18}
-            className="pointer-events-none text-zinc-300 light:text-slate-600 group-hover:text-white light:group-hover:text-slate-600 shrink-0"
+            className="pointer-events-none text-slate-500 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white shrink-0 transition-colors"
             weight="bold"
           />
           {files.length > 0 && (
-            <div className="absolute -top-2.5 -right-2 bg-white text-black light:invert text-[8px] rounded-full px-1 flex items-center justify-center">
+            <div className="absolute -top-2.5 -right-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[9px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center shadow-xs">
               {files.length}
             </div>
           )}

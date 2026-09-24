@@ -15,12 +15,12 @@ export default function SuggestedMessages({
         return (
           <div key={index}>
             {index > 0 && (
-              <div className="border-t border-zinc-800 light:border-theme-chat-input-border" />
+              <div className="border-t border-slate-200 dark:border-zinc-800" />
             )}
             <button
               type="button"
               onClick={() => sendCommand({ text, autoSubmit: true })}
-              className="w-full text-left py-3 px-3 text-white/80 text-sm font-normal leading-5 hover:text-white transition-colors light:text-theme-text-primary light:hover:text-theme-text-primary/80 hover:bg-zinc-800 light:hover:bg-black/20 rounded-lg"
+              className="w-full text-left py-2.5 px-3 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white text-xs font-medium leading-relaxed hover:bg-slate-100 dark:hover:bg-[#1a1c20] rounded-xl transition-colors cursor-pointer"
             >
               {text}
             </button>

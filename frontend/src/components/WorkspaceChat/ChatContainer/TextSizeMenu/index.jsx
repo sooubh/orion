@@ -59,41 +59,37 @@ export default function TextSizeMenu() {
         ref={buttonRef}
         type="button"
         onClick={() => setShowMenu(!showMenu)}
-        className={`group border-none cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-full transition-all ${
+        className={`group border cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-full transition-all shadow-xs ${
           showMenu
-            ? "bg-zinc-700 light:bg-slate-200"
-            : "hover:bg-zinc-700 light:hover:bg-slate-200"
+            ? "bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-white border-slate-300 dark:border-zinc-600"
+            : "bg-white dark:bg-[#111215] hover:bg-slate-100 dark:hover:bg-[#1f2328] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-[#1f2328]"
         }`}
       >
         <SlidersHorizontal
           size={18}
-          className={
-            showMenu
-              ? "text-white light:text-slate-800"
-              : "text-zinc-300 light:text-slate-600 group-hover:text-white light:group-hover:text-slate-800"
-          }
+          className="text-slate-700 dark:text-zinc-300"
         />
       </button>
 
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute right-0 top-[42px] bg-zinc-800 light:bg-white border border-zinc-700 light:border-slate-300 rounded-lg p-3 w-[200px] flex flex-col gap-1 shadow-lg"
+          className="absolute right-0 top-[42px] bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl p-3 w-[200px] flex flex-col gap-1 shadow-xl"
         >
-          <p className="text-[10px] font-medium text-zinc-400 light:text-slate-500 px-2 mb-0.5">
+          <p className="text-[10px] font-medium text-slate-500 dark:text-zinc-400 px-2 mb-0.5">
             {t("chat_window.text_size_label")}
           </p>
           {TEXT_SIZES.map(({ key, label, textClass }) => (
             <div
               key={key}
               onClick={() => handleTextSizeChange(key)}
-              className={`flex items-center px-2 py-1 rounded cursor-pointer ${
+              className={`flex items-center px-2 py-1.5 rounded-lg cursor-pointer transition-colors ${
                 selectedSize === key
-                  ? "bg-zinc-700 light:bg-slate-200"
-                  : "hover:bg-zinc-700/50 light:hover:bg-slate-100"
+                  ? "bg-slate-100 dark:bg-[#1f2328] font-semibold text-slate-900 dark:text-white"
+                  : "hover:bg-slate-50 dark:hover:bg-[#16181d] text-slate-700 dark:text-zinc-300"
               }`}
             >
-              <span className={`${textClass} text-white light:text-slate-900`}>
+              <span className={textClass}>
                 {label}
               </span>
             </div>

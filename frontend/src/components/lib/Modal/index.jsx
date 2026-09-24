@@ -58,7 +58,7 @@ export default function Modal({
   const content = (
     <div className={backdrop}>
       <div
-        className={`relative w-full ${SIZE_CLASSES[size] || SIZE_CLASSES.md} mx-4 flex flex-col gap-y-5 p-6 rounded-lg shadow-xs max-h-[90vh] overflow-y-auto bg-zinc-900 light:bg-white border border-zinc-800 light:border-slate-300`}
+        className={`relative w-full ${SIZE_CLASSES[size] || SIZE_CLASSES.md} mx-4 flex flex-col gap-y-5 p-6 rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] text-slate-900 dark:text-white`}
       >
         {children}
       </div>
@@ -82,7 +82,7 @@ export function ModalHeader({ title, subtitle, onClose, children }) {
   return (
     <div className="flex flex-col gap-y-1 w-full">
       <div className="flex items-start justify-between gap-x-2 w-full">
-        <h3 className="text-base font-semibold text-slate-50 light:text-slate-900 break-words">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white break-words">
           {title}
         </h3>
         {onClose && (
@@ -90,14 +90,14 @@ export function ModalHeader({ title, subtitle, onClose, children }) {
             onClick={onClose}
             type="button"
             aria-label="Close"
-            className="border-none bg-transparent p-1 -m-1 rounded-lg text-slate-50 light:text-slate-900 hover:bg-zinc-800 light:hover:bg-slate-100 transition-colors duration-200"
+            className="border-none bg-transparent p-1 -m-1 rounded-lg text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors duration-200 cursor-pointer"
           >
             <X size={16} weight="bold" />
           </button>
         )}
       </div>
       {subtitle && (
-        <p className="text-xs text-zinc-400 light:text-slate-600">{subtitle}</p>
+        <p className="text-xs text-slate-500 dark:text-zinc-400">{subtitle}</p>
       )}
       {children}
     </div>
@@ -140,7 +140,7 @@ export function ModalFooter({ children, className = "" }) {
 }
 
 const FIELD_BASE =
-  "w-full text-sm rounded-lg outline-none bg-zinc-800 border border-zinc-800 text-zinc-100 placeholder:text-zinc-400 light:bg-white light:border-slate-300 light:text-slate-900 light:placeholder:text-slate-400 focus:border-sky-500 light:focus:border-sky-500 disabled:opacity-50 disabled:cursor-not-allowed";
+  "w-full text-sm rounded-lg outline-none bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:border-sky-500 dark:focus:border-sky-500 disabled:opacity-50 disabled:cursor-not-allowed";
 
 /**
  * Field label matching the Figma input label (Medium 14).
@@ -153,11 +153,11 @@ export function ModalLabel({ children, optional, className = "", ...props }) {
   return (
     <label
       {...props}
-      className={`text-sm font-medium text-zinc-50 light:text-slate-700 ${className}`}
+      className={`text-sm font-medium text-slate-800 dark:text-zinc-200 ${className}`}
     >
       {children}
       {optional && (
-        <span className="font-normal text-zinc-400 light:text-slate-500">
+        <span className="font-normal text-slate-500 dark:text-zinc-400">
           {" "}
           (Optional)
         </span>
@@ -174,7 +174,7 @@ export function ModalLabel({ children, optional, className = "", ...props }) {
  */
 export function ModalHint({ children, className = "" }) {
   return (
-    <p className={`text-xs text-zinc-400 light:text-slate-600 ${className}`}>
+    <p className={`text-xs text-slate-500 dark:text-zinc-400 ${className}`}>
       {children}
     </p>
   );
@@ -211,7 +211,7 @@ export function ModalInput({
       )}
       <div className="relative flex items-center w-full">
         {leading && (
-          <span className="absolute left-3.5 text-sm text-zinc-400 light:text-slate-500 pointer-events-none">
+          <span className="absolute left-3.5 text-sm text-slate-400 dark:text-zinc-500 pointer-events-none">
             {leading}
           </span>
         )}
@@ -268,7 +268,7 @@ export function ModalTextarea({
 }
 
 const BUTTON_BASE =
-  "flex items-center justify-center h-[34px] px-4 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+  "flex items-center justify-center h-[34px] px-4 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
 /**
  * Filled primary action button (Save/Create). Dark: light fill on dark text;
@@ -281,7 +281,7 @@ export function ModalPrimaryButton({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`${BUTTON_BASE} border-none bg-zinc-50 light:bg-slate-900 text-zinc-950 light:text-white hover:opacity-80 ${className}`}
+      className={`${BUTTON_BASE} border-none bg-slate-900 dark:bg-white text-white dark:text-zinc-950 hover:bg-slate-800 dark:hover:bg-zinc-200 font-semibold shadow-xs ${className}`}
     >
       {children}
     </button>
@@ -298,7 +298,7 @@ export function ModalSecondaryButton({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`${BUTTON_BASE} bg-transparent border border-zinc-700 light:border-slate-600 text-slate-50 light:text-slate-700 hover:bg-zinc-800 light:hover:bg-slate-100 ${className}`}
+      className={`${BUTTON_BASE} bg-transparent border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 ${className}`}
     >
       {children}
     </button>
@@ -315,7 +315,7 @@ export function ModalDangerButton({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`${BUTTON_BASE} border-none bg-red-500 light:bg-red-600 text-white hover:opacity-80 ${className}`}
+      className={`${BUTTON_BASE} border-none bg-rose-600 hover:bg-rose-500 text-white font-semibold ${className}`}
     >
       {children}
     </button>

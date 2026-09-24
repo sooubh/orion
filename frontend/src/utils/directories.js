@@ -26,6 +26,7 @@ export function getFileExtension(path) {
 }
 
 export function middleTruncate(str, n) {
+  if (!str || typeof str !== "string") return "";
   const fileExtensionPattern = /([^.]*)$/;
   const extensionMatch = str.includes(".") && str.match(fileExtensionPattern);
 

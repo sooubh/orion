@@ -745,6 +745,11 @@ dialog::backdrop {
   font-weight: bolder;
 }
 
+[data-theme="light"] .markdown table thead,
+:not(.dark) .markdown table thead {
+  color: #0f172a;
+}
+
 .markdown hr {
   border: 0;
   border-top: 1px solid #cdcdcd40;
@@ -776,8 +781,11 @@ dialog::backdrop {
 
 [data-theme="light"] .markdown table,
 [data-theme="light"] .markdown table th,
-[data-theme="light"] .markdown table td {
-  color: #000;
+[data-theme="light"] .markdown table td,
+:not(.dark) .markdown table,
+:not(.dark) .markdown table th,
+:not(.dark) .markdown table td {
+  color: #0f172a;
 }
 
 /* List Styles */
@@ -864,7 +872,15 @@ dialog::backdrop {
 
 .markdown strong {
   font-weight: 600;
+  color: inherit;
+}
+
+.dark .markdown strong {
   color: #fff;
+}
+
+:not(.dark) .markdown strong {
+  color: #0f172a;
 }
 
 .file-row {

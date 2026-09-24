@@ -18,7 +18,7 @@ const docSummarizer = {
           super: aibitat,
           name: this.name,
           description:
-            "List all documents in the workspace or summarize an explicitly specified document. To search document content by topic, concept, question, or measurements, use rag-memory instead. Only use summarize when a specific document is identified.",
+            "List all documents in the workspace or summarize an explicitly identified document by exact name. For natural-language queries, questions, comparisons, differences, or concepts, rag-memory must be used.",
           examples: [
             {
               prompt: "List my files",

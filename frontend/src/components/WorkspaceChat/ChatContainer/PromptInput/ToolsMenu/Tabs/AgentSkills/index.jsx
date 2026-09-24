@@ -244,23 +244,23 @@ export default function AgentSkillsTab({
         <div className="flex items-center gap-1.5 px-2 py-1.5">
           <CircleNotch
             size={12}
-            className="text-zinc-500 light:text-slate-400 animate-spin"
+            className="text-slate-400 dark:text-zinc-500 animate-spin"
             weight="bold"
           />
-          <span className="text-[10px] text-zinc-500 light:text-slate-400">
+          <span className="text-[10px] text-slate-500 dark:text-zinc-400">
             {t("chat_window.loading_mcp_servers")}
           </span>
         </div>
       )}
       {filteredSections.length === 0 && !mcpLoading && searchQuery.trim() && (
-        <p className="text-xs text-zinc-500 light:text-slate-400 text-center py-2">
+        <p className="text-xs text-slate-500 dark:text-zinc-400 text-center py-2">
           {t("chat_window.no_tools_found")}
         </p>
       )}
       <Link to={paths.settings.agentSkills()}>
-        <button className="border-none flex items-center gap-1.5 px-2 h-6 rounded cursor-pointer hover:bg-zinc-700/50 light:hover:bg-slate-100 text-theme-text-primary">
-          <Wrench size={12} className="text-theme-text-primary" />
-          <span className="text-xs text-theme-text-primary">
+        <button className="border-none flex items-center gap-1.5 px-2.5 h-7 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1f2328] text-slate-700 dark:text-zinc-300 font-medium transition-colors">
+          <Wrench size={13} className="text-slate-500 dark:text-zinc-400" />
+          <span className="text-xs">
             {t("chat_window.manage_agent_skills")}
           </span>
         </button>
@@ -274,7 +274,7 @@ function SearchInput({ value, onChange, placeholder }) {
     <div className="relative shrink-0">
       <MagnifyingGlass
         size={12}
-        className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 light:text-slate-400"
+        className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500"
         weight="bold"
       />
       <input
@@ -290,7 +290,7 @@ function SearchInput({ value, onChange, placeholder }) {
           }
           if (e.key === "Enter") e.preventDefault();
         }}
-        className="w-full pl-7 pr-2 py-1 text-xs bg-zinc-700/50 light:bg-slate-100 border border-zinc-600 light:border-slate-300 rounded text-white light:text-slate-900 placeholder:text-zinc-500 light:placeholder:text-slate-400 outline-none focus:border-zinc-500 light:focus:border-slate-400"
+        className="w-full pl-7 pr-2.5 py-1 text-xs bg-slate-50 dark:bg-[#090a0b] border border-slate-200 dark:border-[#1f2328] rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-sky-500 dark:focus:border-sky-500"
       />
     </div>
   );

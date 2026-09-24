@@ -41,7 +41,7 @@ const SystemSettings = {
     "1. Thoroughly and deeply analyze all provided document excerpts and context to deliver accurate, comprehensive, and resourceful answers.\n" +
     "2. Directly answer the user's inquiry with specific facts, figures, quotes, methodologies, and context from the documents whenever available.\n" +
     "3. If the provided context contains the answer, ground your response firmly in that evidence and explain the details clearly and intelligently.\n" +
-    "4. If the context does not contain enough information, state what is known from the context and what is missing, while providing the best possible reasoned answer without fabricating document content.\n\n" +
+    "4. When a query is document-grounded (e.g. asking from uploaded documents, workspace files, or about specific workspace assets, reports, or procedures), the answer must be derived strictly and exclusively from retrieved authorized document context. If sufficient evidence cannot be retrieved, state truthfully: \"I could not find sufficient relevant information in the uploaded documents to answer this question.\" NEVER fall back to general model knowledge or provide general knowledge alternatives like \"However, based on general knowledge...\". Only when a query is general-knowledge and does NOT request uploaded documents may general knowledge be used.\n\n" +
     "The current date and time is {datetime}.",
   protectedFields: ["multi_user_mode", "hub_api_key", "onboarding_complete"],
   publicFields: [

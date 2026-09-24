@@ -153,7 +153,7 @@ export default function ToolsMenu({
           if (e.currentTarget.contains(e.target)) e.preventDefault();
         }}
         style={{ maxHeight }}
-        className={`absolute left-2 right-2 md:left-14 md:right-auto md:w-[400px] z-50 bg-zinc-800 light:bg-white border border-zinc-700 light:border-slate-300 rounded-lg p-3 flex flex-col gap-2.5 shadow-lg overflow-hidden ${
+        className={`absolute left-2 right-2 md:left-14 md:right-auto md:w-[400px] z-50 bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl p-3 flex flex-col gap-2.5 shadow-xl overflow-hidden ${
           centered ? "top-full mt-2" : "bottom-full mb-2"
         }`}
       >
@@ -189,10 +189,10 @@ function TabButton({ active, onClick, children }) {
     <button
       type="button"
       onClick={onClick}
-      className={`border-none cursor-pointer hover:bg-zinc-700/50 light:hover:bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-medium text-center whitespace-nowrap ${
+      className={`border-none cursor-pointer px-2 py-1 rounded-lg text-xs font-semibold text-center whitespace-nowrap transition-colors ${
         active
-          ? "bg-zinc-700 text-white light:bg-slate-200 light:text-slate-800"
-          : "text-zinc-400 light:text-slate-800"
+          ? "bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-white"
+          : "hover:bg-slate-100 dark:hover:bg-[#1f2328] text-slate-600 dark:text-zinc-400"
       }`}
     >
       {children}

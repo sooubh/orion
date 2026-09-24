@@ -24,7 +24,7 @@ export default function StatusResponse({ messages = [], isThinking = false }) {
               transition: "all 0.1s ease-in-out",
               borderRadius: "16px",
             }}
-            className="relative bg-zinc-800 light:bg-slate-100 p-4"
+            className="relative bg-slate-100 dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] p-4 shadow-xs"
           >
             <div className="absolute top-4 left-4 w-[18px] h-[18px]">
               {isThinking ? (
@@ -33,7 +33,7 @@ export default function StatusResponse({ messages = [], isThinking = false }) {
                   loop
                   muted
                   playsInline
-                  className="w-[18px] h-[18px] scale-[165%] transition-opacity duration-200 light:invert light:opacity-50"
+                  className="w-[18px] h-[18px] scale-[165%] transition-opacity duration-200 dark:brightness-100 brightness-75"
                   data-tooltip-id="agent-thinking"
                   data-tooltip-content="Agent is thinking..."
                   aria-label="Agent is thinking..."
@@ -44,7 +44,7 @@ export default function StatusResponse({ messages = [], isThinking = false }) {
                 <img
                   src={AgentStatic}
                   alt="Agent complete"
-                  className="w-[18px] h-[18px] transition-opacity duration-200 light:invert light:opacity-50"
+                  className="w-[18px] h-[18px] transition-opacity duration-200 dark:brightness-100 brightness-75"
                   data-tooltip-id="agent-thinking"
                   data-tooltip-content="Agent has finished thinking"
                   aria-label="Agent has finished thinking"
@@ -54,7 +54,7 @@ export default function StatusResponse({ messages = [], isThinking = false }) {
             {previousThoughts?.length > 0 && (
               <button
                 onClick={handleExpandClick}
-                className="absolute top-4 right-4 border-none text-zinc-200 light:text-slate-800 transition-colors"
+                className="absolute top-4 right-4 border-none text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
                 data-tooltip-id="expand-cot"
                 data-tooltip-content={
                   isExpanded ? "Hide thought chain" : "Show thought chain"
@@ -71,7 +71,7 @@ export default function StatusResponse({ messages = [], isThinking = false }) {
             <div
               className={`ml-[28px] mr-[26px] transition-[max-height] duration-300 ease-in-out origin-top ${isExpanded ? "" : "overflow-hidden max-h-[18px]"}`}
             >
-              <div className="text-zinc-200 light:text-slate-800 font-mono text-sm leading-[18px]">
+              <div className="text-slate-800 dark:text-zinc-200 font-mono text-sm leading-[18px]">
                 {!isExpanded ? (
                   <span className="block w-full truncate">
                     {currentThought.content}

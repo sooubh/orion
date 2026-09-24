@@ -4,6 +4,8 @@ import Workspace from "@/models/workspace";
 import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import showToast from "@/utils/toast";
+import { LAST_VISITED_WORKSPACE } from "@/utils/constants";
+import { safeJsonParse } from "@/utils/request";
 
 export default function DeleteWorkspace({ workspace, visible = true }) {
   const { slug } = useParams();
@@ -26,6 +28,13 @@ export default function DeleteWorkspace({ workspace, visible = true }) {
       showToast("Workspace could not be deleted!", "error", { clear: true });
       setDeleting(false);
       return;
+    }
+
+    const lastVisited = safeJsonParse(
+      localStorage.getItem(LAST_VISITED_WORKSPACE)
+    );
+    if (lastVisited?.slug === workspace.slug) {
+      localStorage.removeItem(LAST_VISITED_WORKSPACE);
     }
 
     workspace.slug === slug

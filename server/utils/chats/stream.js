@@ -274,6 +274,41 @@ async function streamChatWithWorkspace(
   contextTexts = [...contextTexts, ...filledSources.contextTexts];
   sources = [...sources, ...vectorSearchResults.sources];
 
+  const queryAnalysis = HybridSearch.analyzeQuery(updatedMessage);
+  const isDocumentGrounded = Boolean(queryAnalysis?.isDocumentGrounded);
+
+  // If the user's prompt is strictly document-grounded and no context chunks are found,
+  // do not allow the LLM to hallucinate or use general knowledge. Return strict failure message.
+  if (isDocumentGrounded && contextTexts.length === 0) {
+    const textResponse =
+      "I could not find sufficient relevant information in the uploaded documents to answer this question.";
+    writeResponseChunk(response, {
+      id: uuid,
+      uuid: uuid,
+      type: "textResponse",
+      textResponse,
+      sources: [],
+      attachments,
+      close: true,
+      error: null,
+    });
+
+    await WorkspaceChats.new({
+      workspaceId: workspace.id,
+      prompt: message,
+      response: {
+        text: textResponse,
+        sources: [],
+        type: chatMode,
+        attachments,
+      },
+      threadId: thread?.id || null,
+      include: false,
+      user,
+    });
+    return;
+  }
+
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
   if (chatMode === "query" && contextTexts.length === 0) {
@@ -286,6 +321,7 @@ async function streamChatWithWorkspace(
       type: "textResponse",
       textResponse,
       sources: [],
+      attachments,
       close: true,
       error: null,
     });
@@ -309,12 +345,17 @@ async function streamChatWithWorkspace(
   // Compress & Assemble message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
   // Reuse the system prompt from routing pre-fetch when available.
-  const systemPrompt =
+  let systemPrompt =
     prefetchedContext?.systemPrompt ??
     (await chatPrompt(workspace, user, {
       prompt: updatedMessage,
       rawHistory,
     }));
+
+  if (contextTexts.length > 0 && isDocumentGrounded) {
+    systemPrompt = `${systemPrompt}\n\nStrict Document Grounding Directive:\nThe user inquiry is strictly document-grounded. You MUST answer using ONLY the factual content directly provided in the context from the uploaded documents. Under NO circumstances should you extrapolate, use outside knowledge, or fall back to general model knowledge. If the provided document context is insufficient to answer the question, state: "I could not find sufficient relevant information in the uploaded documents to answer this question." NEVER say "However, based on general knowledge..." or provide general knowledge alternatives.`;
+  }
+
   const messages = await LLMConnector.compressMessages(
     {
       systemPrompt,
@@ -339,6 +380,18 @@ async function streamChatWithWorkspace(
       });
 
     completeText = textResponse;
+    if (
+      isDocumentGrounded &&
+      (/(?:no\s+relevant\s+documents?(?:\s+(?:were|are|was))?\s+found|could\s+not\s+find\s+(?:any|sufficient)\s+relevant\s+documents?).*?(?:however|but\s+based|based\s+on\s+general|from\s+general|general\s+model\s+knowledge)/is.test(
+        completeText
+      ) ||
+        /(?:however,?\s+based\s+on\s+general\s+knowledge|based\s+on\s+general\s+knowledge|from\s+general\s+(?:model\s+)?knowledge)/i.test(
+          completeText
+        ))
+    ) {
+      completeText =
+        "I could not find sufficient relevant information in the uploaded documents to answer this question.";
+    }
     metrics = addChatCostToMetrics(performanceMetrics, {
       routingMetadata,
       workspace,
@@ -368,6 +421,20 @@ async function streamChatWithWorkspace(
       workspace,
       connector: LLMConnector,
     });
+  }
+
+  if (
+    completeText?.length > 0 &&
+    isDocumentGrounded &&
+    (/(?:no\s+relevant\s+documents?(?:\s+(?:were|are|was))?\s+found|could\s+not\s+find\s+(?:any|sufficient)\s+relevant\s+documents?).*?(?:however|but\s+based|based\s+on\s+general|from\s+general|general\s+model\s+knowledge)/is.test(
+      completeText
+    ) ||
+      /(?:however,?\s+based\s+on\s+general\s+knowledge|based\s+on\s+general\s+knowledge|from\s+general\s+(?:model\s+)?knowledge)/i.test(
+        completeText
+      ))
+  ) {
+    completeText =
+      "I could not find sufficient relevant information in the uploaded documents to answer this question.";
   }
 
   if (completeText?.length > 0) {

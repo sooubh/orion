@@ -31,16 +31,16 @@ export default function FileUploadWarningModal({
   if (isEmbedding) {
     return (
       <Modal isOpen={show} onClose={onClose} size="lg">
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-slate-50 light:text-slate-900 text-lg font-semibold mb-4">
+        <div className="flex flex-col items-center justify-center p-4">
+          <p className="text-slate-900 dark:text-white text-lg font-semibold mb-4">
             Embedding {embedProgress + 1} of {fileCount}{" "}
             {pluralize("file", fileCount)}
           </p>
           <CircleNotch
             size={32}
-            className="animate-spin text-slate-50 light:text-slate-900"
+            className="animate-spin text-slate-900 dark:text-white"
           />
-          <p className="text-zinc-400 light:text-slate-600 text-sm mt-2">
+          <p className="text-slate-600 dark:text-zinc-400 text-sm mt-2">
             Please wait while we embed your files...
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function FileUploadWarningModal({
     <Modal isOpen={show} onClose={onClose} size="lg">
       <ModalHeader title="Context Window Warning" onClose={onClose} />
       <ModalBody>
-        <p className="text-zinc-300 light:text-slate-700 text-sm">
+        <p className="text-slate-700 dark:text-zinc-300 text-sm">
           Your workspace is using {numberWithCommas(tokenCount)} of{" "}
           {numberWithCommas(maxTokens)} available tokens. We recommend keeping
           usage below {(Workspace.maxContextWindowLimit * 100).toFixed(0)}% to
@@ -61,12 +61,12 @@ export default function FileUploadWarningModal({
           <Link
             target="_blank"
             to={Paths.documentation.contextWindows()}
-            className="text-zinc-400 light:text-slate-500 text-sm underline"
+            className="text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200 text-sm underline ml-1"
           >
             Learn more about context windows &rarr;
           </Link>
         </p>
-        <p className="text-zinc-300 light:text-slate-700 text-sm">
+        <p className="text-slate-700 dark:text-zinc-300 text-sm mt-2">
           Choose how you would like to proceed with these uploads.
         </p>
       </ModalBody>

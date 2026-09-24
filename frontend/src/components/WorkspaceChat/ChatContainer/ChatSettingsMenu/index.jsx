@@ -42,26 +42,22 @@ export default function ChatSettingsMenu({
         ref={buttonRef}
         type="button"
         onClick={() => setShowMenu(!showMenu)}
-        className={`group border-none cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-full transition-all ${
+        className={`group border cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-full transition-all shadow-xs ${
           showMenu
-            ? "bg-zinc-700 light:bg-slate-200"
-            : "hover:bg-zinc-700 light:hover:bg-slate-200"
+            ? "bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-white border-slate-300 dark:border-zinc-600"
+            : "bg-white dark:bg-[#111215] hover:bg-slate-100 dark:hover:bg-[#1f2328] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-[#1f2328]"
         }`}
       >
         <SlidersHorizontal
           size={18}
-          className={
-            showMenu
-              ? "text-white light:text-slate-800"
-              : "text-zinc-300 light:text-slate-600 group-hover:text-white light:group-hover:text-slate-800"
-          }
+          className="text-slate-700 dark:text-zinc-300"
         />
       </button>
 
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute right-0 top-[42px] bg-zinc-800 light:bg-slate-50 border border-zinc-700 light:border-slate-300 rounded-lg p-3.5 w-[226px] flex flex-col gap-1.5 shadow-lg"
+          className="absolute right-0 top-[42px] bg-white dark:bg-[#111215] border border-slate-200 dark:border-[#1f2328] rounded-xl p-3.5 w-[226px] flex flex-col gap-1.5 shadow-xl"
         >
           <TextSizeRow />
           <MemoriesRow onClose={() => setShowMenu(false)} />

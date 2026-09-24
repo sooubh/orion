@@ -105,19 +105,19 @@ function ImageGenerationCard({ props }) {
     <div className="my-2">
       <div className="inline-block">
         {status !== "ready" && (
-          <div className="relative rounded-xl overflow-hidden bg-zinc-800 aspect-square w-[280px]">
+          <div className="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-[#22262d] aspect-square w-[280px]">
             {status === "loading" && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <CircleNotch
                   size={28}
                   weight="bold"
-                  className="animate-spin text-zinc-400 light:text-slate-500"
+                  className="animate-spin text-slate-500 dark:text-zinc-400"
                 />
               </div>
             )}
 
             {status === "failed" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-y-2 text-zinc-400 light:text-slate-500">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-y-2 text-slate-500 dark:text-zinc-400">
                 <ImageBroken size={28} weight="bold" />
                 <span className="text-xs">
                   {t("imageGeneration.card.failed-to-load")}
@@ -128,7 +128,7 @@ function ImageGenerationCard({ props }) {
         )}
 
         {status === "ready" && (
-          <div className="relative group rounded-xl overflow-hidden bg-zinc-800 max-w-max">
+          <div className="relative group rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-[#22262d] max-w-max shadow-xs">
             <img
               src={objectUrl}
               alt={prompt || t("imageGeneration.card.alt-text")}
@@ -154,7 +154,7 @@ function ImageGenerationCard({ props }) {
             <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={handleCopy}
-                className="border-none p-2 rounded-lg bg-black/60 hover:bg-black/80 light:bg-slate-200/60 light:hover:bg-slate-200 text-white light:text-slate-700"
+                className="border-none p-2 rounded-lg bg-white/80 hover:bg-white dark:bg-black/60 dark:hover:bg-black/80 text-slate-700 dark:text-white shadow-xs transition-colors cursor-pointer"
               >
                 {copied ? (
                   <Check size={16} weight="bold" />
@@ -171,23 +171,23 @@ function ImageGenerationCard({ props }) {
             >
               <button
                 onClick={() => setMenuOpen((prev) => !prev)}
-                className="border-none p-2 rounded-lg bg-black/60 hover:bg-black/80 light:bg-slate-200/60 light:hover:bg-slate-200 text-white light:text-slate-700"
+                className="border-none p-2 rounded-lg bg-white/80 hover:bg-white dark:bg-black/60 dark:hover:bg-black/80 text-slate-700 dark:text-white shadow-xs transition-colors cursor-pointer"
               >
                 <DotsThree size={16} weight="bold" />
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 mt-1 w-36 rounded-lg bg-zinc-900 light:bg-white border border-zinc-700 light:border-slate-200 shadow-lg z-10 overflow-hidden">
+                <div className="absolute right-0 mt-1 w-36 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-lg z-10 overflow-hidden">
                   <button
                     onClick={handleEdit}
-                    className="w-full flex items-center gap-x-2 px-3 py-2 text-sm text-white light:text-slate-700 hover:bg-zinc-800 light:hover:bg-slate-100 border-none"
+                    className="w-full flex items-center gap-x-2 px-3 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 border-none transition-colors cursor-pointer"
                   >
                     <PencilSimple size={14} weight="bold" />
                     {t("imageGeneration.card.edit")}
                   </button>
                   <button
                     onClick={handleDownload}
-                    className="w-full flex items-center gap-x-2 px-3 py-2 text-sm text-white light:text-slate-700 hover:bg-zinc-800 light:hover:bg-slate-100 border-none"
+                    className="w-full flex items-center gap-x-2 px-3 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 border-none transition-colors cursor-pointer"
                   >
                     <DownloadSimple size={14} weight="bold" />
                     {t("imageGeneration.card.download")}

@@ -1,5 +1,5 @@
 const SHARED_CLASS =
-  "w-full border border-solid border-zinc-700 light:border-slate-500 bg-zinc-800 light:bg-white text-white light:text-slate-900 placeholder:text-zinc-500 light:placeholder:text-slate-500 text-sm leading-5 rounded-lg focus:outline-white light:focus:outline-slate-400 outline-none px-[14px] py-[10px]";
+  "w-full border border-slate-300 dark:border-[#22262d] bg-white dark:bg-[#16181d] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 text-sm leading-5 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 px-[14px] py-[10px]";
 
 function TextareaInput({ value, placeholder, onChange }) {
   return (
